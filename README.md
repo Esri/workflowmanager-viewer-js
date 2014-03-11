@@ -14,8 +14,9 @@ Source code for ArcGIS Workflow Manager JavaScrpt viewer - Manage your workflows
 
 ## Instructions
 
-Deployment
-1. Fork and then clone the repo. 
+Deployment:
+
+1. Fork and then clone the repo.
 2. Install an HTTP server such IIS or Apache.
 3. Modify the deployed js/app/WorkflowManager/config/AppConfig.js file to configure the
 Workflow Manager service, AOI Map service, and ArcGIS Token service if these are secured
