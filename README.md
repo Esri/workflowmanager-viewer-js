@@ -5,7 +5,7 @@ Source code for ArcGIS Workflow Manager JavaScrpt viewer - Manage your workflows
 
 [View it live](http://workflowsample.esri.com/wmjsnew/)
 
-![App](https://raw.github.com/Esri/workflowmanager-viewer-js/master/workflowmanager-vierwer-js.png)
+![App](https://raw.github.com/Esri/workflowmanager-viewer-js/master/workflowmanager-viewer-js.png)
 
 ## Features
 * Ready-to-deploy GIS web client workflow manager application for ArcGIS Server.
