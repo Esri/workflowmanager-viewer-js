@@ -1,0 +1,87 @@
+/* ========= Styling rules to affect widgets ========= */
+.bootstrap .dijitPopup {
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+.bootstrap .dijitTooltipDialogPopup {
+/* exception popups: do not use a shadow on these because they aren't rectangular */
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* TODO: Drag and Drop */
+.bootstrap .dojoDndItem {
+  border-color: rgba(0,0,0,0);
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  -ms-transition-duration: 0.25s;
+  -o-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+  -webkit-transition-property: background-color, border-color;
+  -moz-transition-property: background-color, border-color;
+  -o-transition-property: background-color, border-color;
+  transition-property: background-color, border-color;
+}
+.bootstrap .dojoDndItemOver {
+  background-color: $hovered-background-color;
+  background-image: url("images/standardGradient.png");
+  background-repeat: repeat-x;
+  _background-image: none;
+  padding: 1px;
+  border: solid 1px $hovered-border-color;
+  color: $hovered-text-color;
+}
+.bootstrap .dojoDndItemAnchor,
+.bootstrap .dojoDndItemSelected {
+  background-color: $selected-background-color;
+  background-image: url("images/standardGradient.png");
+  background-repeat: repeat-x;
+  _background-image: none;
+  padding: 1px;
+  border: solid 1px $selected-border-color;
+  color: #fff;
+}
+.bootstrap .dojoDndItemBefore,
+.bootstrap .dojoDndItemAfter {
+  border-color: $dnd-dropseparator-color;
+}
+.bootstrap table.dojoDndAvatar {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  background-color: $dnd-avatar-background-color;
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.bootstrap .dojoDndAvatarHeader td {
+  height: 20px;
+  padding-left: 21px;
+}
+.bootstrap.dojoDndMove .dojoDndAvatarHeader,
+.bootstrap.dojoDndCopy .dojoDndAvatarHeader {
+  background-image: url("images/dnd.png");
+  background-repeat: no-repeat;
+  background-position: 2px -122px;
+}
+.bootstrap .dojoDndAvatarItem td {
+  padding: 5px;
+}
+.bootstrap.dojoDndMove .dojoDndAvatarHeader {
+  background-color: $dnd-avatar-header-background-color;
+  background-position: 2px -103px;
+}
+.bootstrap.dojoDndCopy .dojoDndAvatarHeader {
+  background-color: $dnd-avatar-header-background-color;
+  background-position: 2px -68px;
+}
+.bootstrap.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader {
+  background-color: $dnd-avatar-candrop-header-background-color;
+  background-position: 2px -33px;
+}
+.bootstrap.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader {
+  background-color: $dnd-avatar-candrop-header-background-color;
+  background-position: 2px 2px;
+}

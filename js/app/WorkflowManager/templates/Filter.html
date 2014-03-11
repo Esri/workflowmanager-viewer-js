@@ -1,0 +1,99 @@
+<div>
+    <!-- Toggle for job queries -->
+    <span style="display: none;">
+        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="queryType" checked="checked" value="publicQuery" disabled="false" data-dojo-attach-point="queryTypePublic" data-dojo-attach-event="onClick: toggleQueryType" />
+        <label for="publicQuery" style="width: 100px; font-weight: normal;">${i18n_QueryTypePublic}</label>
+        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="queryType" value="userQuery" disabled="true" data-dojo-attach-point="queryTypeUser" data-dojo-attach-event="onClick: toggleQueryType" />
+        <label for="userQuery" style="width: 100px; font-weight: normal;">${i18n_QueryTypeUser}</label>
+    </span>
+    
+    <span style="display: none;">
+        <input data-dojo-attach-point="cboJobQueries">
+    </span>
+    
+    <span class="header-text">${i18n_Queries}</span>:
+    <div class="query-dropDown-container" data-dojo-attach-point="queryTreeBtn"></div>
+    <span class="header-text">${i18n_OrFindJob}</span>:
+
+    <!--
+    <div data-dojo-attach-point="searchInput" class="input-append" style="margin:0">
+        <input data-dojo-attach-point="defaultSearchInput" data-dojo-attach-event="onkeyup: typeahead" class="span2" type="text" style="border-radius:15px 0 0 15px; width:200px" size="12">
+        <button data-dojo-attach-point="btnSearch" data-dojo-attach-event="onclick: search" class="btn" style="line-height: 20px; border-radius:0 15px 15px 0" type="button"><i class="icon-search"></i></button>
+    </div>
+    -->
+    <form data-dojo-attach-point="jobSearchForm" data-dojo-type="dijit.form.Form" style="display: inline-block;">
+        <input data-dojo-attach-point="txtJobSearch" />
+        <button type="submit" data-dojo-attach-point="btnJobSearch"></button>
+        <!--<button type="button" data-dojo-attach-point="btnClearSearch" class="text-button neg-button"></button>-->
+    </form>
+    
+    
+
+    <!-- Create job dialog -->
+    <button type="button" data-dojo-attach-point="btnCreateNewJob"></button>
+    <!--<button type="button" data-dojo-type="dijit.form.Button" onclick="createJobDialog.show();" data-dojo-attach-point="btnCreateNewJob" style="float: right;">Create New Job</button>-->
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="createJobDialog" data-dojo-id="createJobDialog" title="${i18n_CreateNewJob}" style="width: 800px">
+        <div class="dijitDialogPaneContentArea">
+            <div class="form">
+                <div class="row">
+                    <label>${i18n_JobType}:</label>
+                    <input data-dojo-attach-point="cboJobTypes">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobAssignment}:</label>
+                    <span>
+                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="user" data-dojo-attach-point="assignmentTypeUser" data-dojo-attach-event="onClick: toggleAssignment" />
+                        <label for="user" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUser}</label>
+                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="group" data-dojo-attach-point="assignmentTypeGroup" data-dojo-attach-event="onClick: toggleAssignment" />
+                        <label for="group" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentGroup}</label>
+                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" checked="true" value="unassigned" data-dojo-attach-point="assignmentTypeUnassigned" data-dojo-attach-event="onClick: toggleAssignment" />
+                        <label for="unassigned" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUnassigned}</label>
+                    </span>
+                </div>
+                <div class="row" data-dojo-attach-point="assignmentTypeWrapper">
+        	        <label></label>
+                    <span data-dojo-attach-point="assignmentTypeUserWrapper"><input data-dojo-attach-point="cboAssignmentUsers"></span>
+                    <span data-dojo-attach-point="assignmentTypeGroupWrapper"><input data-dojo-attach-point="cboAssignmentGroups"></span>
+                </div>
+                <div class="row">
+                    <label>${i18n_JobStartDate}:</label>
+                    <input data-dojo-attach-point="createJobStartDateControl">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobDueDate}:</label>
+                    <input data-dojo-attach-point="createJobDueDateControl">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobDataWorkspace}:</label>
+                    <input data-dojo-attach-point="cboJobDataWorkspaces">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobParentVersion}:</label>
+                    <input data-dojo-attach-point="cboJobParentVersion">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobPriority}:</label>
+			        <input data-dojo-attach-point="cboJobPriorities">
+                </div>
+                <div class="row">
+                    <label>${i18n_JobDescription}:</label>
+                    <textarea data-dojo-attach-point="propertiesFormDescription"></textarea>
+                </div>
+                <div class="row">
+                    <label>${i18n_JobOwner}:</label>
+                    <span data-dojo-attach-point="cboUsers"></span>
+                    <!--<input data-dojo-attach-point="cboUsers">-->
+                </div>
+                <div class="row">
+                    <label>${i18n_NumberOfJobs}:</label>
+                    <input data-dojo-type="dijit/form/NumberSpinner" value="1" data-dojo-props="smallDelta:1, constraints:{min:1,max:100,places:0}" style="width: 80px;" data-dojo-attach-point="propertiesFormNumbersOfJobs" />
+                </div>
+            </div>
+        </div>
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-attach-point="btnCreateJob" data-dojo-attach-event="onClick:createNewJob" data-dojo-props="class: 'dojo-btn-success'" disabled="true">${i18n_CreateJob}</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){createJobDialog.hide();}">${i18n_Cancel}</button>
+        </div>
+    </div>
+    
+</div>

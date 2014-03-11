@@ -1,0 +1,152 @@
+/* Accordion
+ * 
+ * Styling AccordionContainer basically means styling the accordion pane (dijitAccordionInnerContainer)
+ * and the title inside of it (dijitAccordionTitle).   There are 4 basic states to style:
+ * 
+ * 1. closed pane (and default styling): 
+ * 		.dijitAccordionInnerContainer - container for each accordion child
+ * 		.dijitAccordionTitle - title for each accordion child
+ *
+ * 2. active closed pane (ie, mouse down on a title bar)
+ * 		.dijitAccordionInnerContainerActive - for background-color, border
+ * 		.dijitAccordionInnerContainerActive dijitAccordionTitle - for text color
+ * 
+ * 3. open pane (expanded child)
+ *		.dijitAccordionChildWrapper - wraps around the child widget (typically ContentPane)
+ *			setting a margin so that there's blue trim all the way around the child
+ *
+ * 		These rules need to override the closed pane active:
+ *
+ * 		.dijitAccordionInnerContainerSelected - for background-color, border
+ * 		.dijitAccordionInnerContainerSelected .dijitAccordionTitle - for text color
+ * 
+ * 4. hovered pane, open or closed
+ * 		The selectors below affect hovering over both a closed pane (ie, hovering a title bar),
+ * 		and hovering over an open pane.   Also, treat mouse down on an open pane as a hover:
+ *
+ * 		.dijitAccordionInnerContainerHover, .dijitAccordionInnerContainerSelectedActive - for background-color, border
+ * 		.dijitAccordionInnerContainerHover .dijitAccordionTitle - for text color
+ */
+.bootstrap .dijitAccordionContainer {
+  border: none;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+.bootstrap .dijitAccordionInnerContainer {
+  background: #fff;
+  border: 1px solid #ccc;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-transition-property: background-color, border;
+  -moz-transition-property: background-color, border;
+  -o-transition-property: background-color, border;
+  transition-property: background-color, border;
+  -webkit-transition-duration: 0.3s;
+  -moz-transition-duration: 0.3s;
+  -ms-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-timing-function: linear;
+  -moz-transition-timing-function: linear;
+  transition-timing-function: linear;
+}
+.bootstrap .dijitAccordionInnerContainer+.dijitAccordionInnerContainer {
+  margin-top: -1px;
+}
+.bootstrap .dijitAccordionInnerContainer:first-child,
+.bootstrap .dijitAccordionInnerContainer:first-child .dijitAccordionTitle {
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+}
+.bootstrap .dijitAccordionInnerContainer:last-child,
+.bootstrap .dijitAccordionInnerContainer:last-child .dijitAccordionTitle {
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+}
+.bootstrap .dijitAccordionTitle {
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  padding: 8px 12px;
+  line-height: 20px;
+  min-height: 20px;
+  color: #000;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  font-weight: bold;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  border-top: $accordion-title-bar-border-top;
+}
+.bootstrap .dijitAccordionInnerContainer:first-child .dijitAccordionTitle {
+  border-top: 0 none;
+}
+.bootstrap .dijitAccordionTitle .arrowTextUp,
+.bootstrap .dijitAccordionTitle .arrowTextDown {
+  display: none;
+  float: right;
+  font-size: 120%;
+  font-weight: bold;
+  font-family: arial;
+  text-align: center;
+  width: 1em;
+}
+.bootstrap .dijitAccordionTitle .arrowTextUp {
+  display: block;
+}
+.bootstrap .dijitAccordionContainer .dijitAccordionChildWrapper {
+  background-color: transparent;
+  border: 0;
+  margin: 0 0 0;
+  position: relative;
+  z-index: 1;
+}
+.bootstrap .dijitAccordionContainer .dijitAccordionContainer-child {
+  padding: 4px;
+  background: #f2f3f7;
+}
+/* Hovering open or closed pane */
+.bootstrap .dijitAccordionInnerContainerHover .dijitAccordionTitle {
+  background: #32baff;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* Active state for closed pane */
+.bootstrap .dijitAccordionInnerContainerActive .dijitAccordionTitle {
+  background: #12b0ff;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* Selected pane */
+.bootstrap .dijitAccordionInnerContainer.dijitAccordionInnerContainerSelected .dijitAccordionTitle {
+  -moz-border-radius: 0;
+  border-radius: 0;
+  position: relative;
+  z-index: 10;
+}
+.bootstrap .dijitAccordionInnerContainerSelected .dijitAccordionTitle {
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  background: linear-gradient(#12b0ff 0%, #0081c2 100%);
+  border-bottom: 1px solid #ccc;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.bootstrap .dijitAccordionInnerContainerSelected .dijitAccordionTitle .arrowTextUp {
+  display: none;
+}
+.bootstrap .dijitAccordionInnerContainerSelected .dijitAccordionTitle .arrowTextDown {
+  display: block;
+}

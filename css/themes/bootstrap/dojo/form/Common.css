@@ -1,0 +1,185 @@
+/* 'dijitTextBox' refers to 'dijit(TextBox|DateTextBox|CurrencyTextBox|...)' */
+.bootstrap .dijitTextBox,
+.bootstrap .dijitInputInner {
+  color: #000;
+}
+.bootstrap .dijitTextBox .dijitInputField .dijitPlaceHolder {
+  padding: 4px;
+}
+.bootstrap .dijitTextArea {
+  padding: 4px 6px;
+}
+.bootstrap .dijitSelect .dijitInputField,
+.bootstrap .dijitTextBox .dijitInputField {
+  padding: 0 4px;
+  margin: 0 2px;
+}
+.bootstrap .dijitTextBox {
+  background: #fff;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+}
+/* hover */
+.bootstrap .dijitTextBoxHover,
+.bootstrap .dijitTextBoxHover .dijitButtonNode {
+  border: 1px solid #0081c2;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  -ms-transition-duration: 0.25s;
+  -o-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+/* focused */
+.bootstrap .dijitTextBoxFocused,
+.bootstrap .dijitTextBoxFocused .dijitButtonNode {
+  background: #fff;
+  border: 1px solid rgba(0,129,194,0.8);
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(0,129,194,0.6);
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(0,129,194,0.6);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(0,129,194,0.6);
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  -ms-transition-duration: 0.1s;
+  -o-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+}
+.bootstrap .dijitTextBoxErrorFocused,
+.bootstrap .dijitTextBoxErrorFocused .dijitButtonNode {
+  background: #fff;
+  border: 1px solid #a9302a;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+}
+/* disabled */
+.bootstrap .dijitTextBoxDisabled,
+.bootstrap .dijitTextBoxDisabled .dijitButtonNode {
+  background: #e6e6e6;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.bootstrap .dijitTextBoxDisabled,
+.bootstrap .dijitTextBoxDisabled .dijitInputInner {
+  color: #999;
+}
+/* error */
+.bootstrap .dijitTextBoxError,
+.bootstrap .dijitTextBoxError .dijitButtonNode {
+  background: #fff;
+  border: 1px solid #bd362f;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+}
+/* error: icon */
+.bootstrap .dijitValidationTextBoxError .dijitValidationContainer {
+  background-color: #bd362f;
+  background-image: url("../form/images/error.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 9px;
+}
+.bootstrap .dijitValidationTextBoxError .dijitValidationIcon {
+  width: 0;
+  background-color: transparent !important;
+/* so the INPUT doesn't obscure the border in rtl+a11y */
+}
+/*========================= Select and Combobox =========================*/
+.bootstrap .dijitSelectLabel,
+.bootstrap .dijitTextBox .dijitInputInner,
+.bootstrap .dijitValidationTextBox .dijitValidationContainer {
+  padding: 4px 2px;
+}
+/* dropdown arrows */
+.bootstrap .dijitSelect .dijitArrowButtonInner,
+.bootstrap .dijitComboBox .dijitArrowButtonInner {
+  margin: 0;
+  width: 0;
+}
+.bootstrap .dijitToolbar .dijitComboBox .dijitArrowButtonInner {
+  border: none;
+}
+.bootstrap .dijitComboBox .dijitButtonNode {
+  border: 1px solid #ccc;
+  padding: 4px 12px 5px 12px;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: pointer;
+  padding: 12px 8px;
+  -moz-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+}
+.bootstrap .dijitComboBoxOpenOnClickHover .dijitButtonNode,
+.bootstrap .dijitComboBox .dijitDownArrowButtonHover {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+/* Arrow Button change when drop down is open */
+.bootstrap .dijitComboBox .dijitHasDropDownOpen {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+/* disabled */
+.bootstrap .dijitComboBoxDisabled .dijitButtonNode {
+  color: #999;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: default;
+  opacity: 0.65;
+}
+/*========================= DateTextBox =========================*/
+/* dateTextBox dijitArrowButtonInner, display a calendar icon instead of an arrow*/
+.bootstrap .dijitDateTextBox .dijitArrowButtonInner {
+  background-image: url("images/glyphicons-halflings.png");
+  background-position: -192px -120px;
+  background-repeat: no-repeat;
+  height: 14px;
+  margin: -5px -3px;
+  width: 14px;
+  border: 0;
+}
+/*========================= Multiple Select =========================*/
+/* (Dojo does not have any styles for multiple select by default, the flexibility of styling it is really limited) */
+.bootstrap select {
+  padding: 4px 0;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset;
+}
+.bootstrap select option {
+  padding: 4px 8px;
+}

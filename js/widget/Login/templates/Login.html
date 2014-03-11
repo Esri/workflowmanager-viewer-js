@@ -1,0 +1,19 @@
+<div class="loginPage" data-dojo-attach-point="loginPage" style="opacity: 0">
+	<form data-dojo-attach-point="loginForm" data-dojo-type="dijit.form.Form">
+		<input type="text" name="username" required="true"
+			data-dojo-attach-point="usernameInput"
+			data-dojo-type="dijit/form/ValidationTextBox"
+			data-dojo-props="'class': 'login-input', 'placeHolder':'username'"/>
+        <div data-dojo-attach-point="passwordContainer">
+            <input type="password" name="password" required="true"
+                data-dojo-attach-point="passwordInput"
+                data-dojo-type="dijit/form/ValidationTextBox"
+                data-dojo-props="'class': 'login-input', 'placeHolder':'password'" />
+        </div>
+		<button data-dojo-type=dijit/form/Button 
+			data-dojo-attach-point="loginButton" 
+            type="submit"
+			data-dojo-props='"class": "dojo-btn-success login-input login-submit"'>${i18n_Login}</button>
+	</form>
+    <p data-dojo-attach-point="loginErrorContainer"></p>
+</div>

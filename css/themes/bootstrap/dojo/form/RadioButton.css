@@ -1,0 +1,95 @@
+/* RadioButton
+ * 
+ * Styling RadioButton mainly includes:
+ * 
+ * 1. Containers
+ * 		.dijitRadio|.dijitRadioIcon - for border, padding, width|height and background image
+ * 
+ * 2. RadioButton within ToggleButton
+ * 		.dijitToggleButton|.dijitToggleButtonChecked .* - for background image
+ * 
+ * 3. Checked state
+ * 		.dijitRadioChecked - for checked background-color|image
+ * 		.dijitToggleButtonChecked - for border, background-color|image, display and width|height
+ * 
+ * 4. Hover state
+ * 		.dijitRadioHover|.dijitRadioCheckedHover - for background image
+ * 
+ * 5. Disabled state
+ * 		.dijitRadioDisabled|.dijitRadioCheckedDisabled - for background image
+ */
+.bootstrap .dijitRadio,
+.bootstrap .dijitRadioIcon {
+/* inside a toggle button */
+/* background-image: url("../" + $image-form-checkbox-and-radios) */
+/* checkbox sprite image */
+  background-repeat: no-repeat;
+  background-color: #e6e6e6;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-border-radius: 99px;
+  border-radius: 99px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  position: relative;
+}
+/* normal */
+/* checked */
+/* the checked icon */
+.bootstrap .dijitRadioChecked:after,
+.bootstrap .dijitToggleButtonChecked .dijitRadioIcon:after,
+.bootstrap .dijitRadioCheckedDisabled:after {
+  background: linear-gradient(#008fd6 0, #006da3 100%);
+  content: "";
+  display: block;
+  height: 8px;
+  width: 8px;
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  -moz-border-radius: 99px;
+  border-radius: 99px;
+  -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  box-shadow: 0 0 1px rgba(0,0,0,0.3);
+}
+/* hover */
+.bootstrap .dijitRadioHover {
+/* hovering over an unselected enabled radio button */
+/* background-position: -135px */
+  background-color: #ececec;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+}
+.bootstrap .dijitRadioCheckedHover:after {
+  background: linear-gradient(#26b7ff 0, #00a2f2 100%);
+  -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  box-shadow: 0 0 1px rgba(0,0,0,0.3);
+}
+/* disabled */
+.bootstrap .dijitRadioCheckedDisabled {
+/* selected but disabled */
+/* background-position: -150px */
+  opacity: 0.65;
+}
+.bootstrap .dijitRadioCheckedDisabled:after,
+.bootstrap .dijitToggleButtonCheckedDisabled .dijitRadioIcon:after {
+  background: linear-gradient(#f0f0f0 0, #d7d7d7 100%);
+  -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0 0 1px rgba(0,0,0,0.3);
+  box-shadow: 0 0 1px rgba(0,0,0,0.3);
+}
+.bootstrap .dijitRadioDisabled {
+/* background-position: -165px */
+  background-color: #e6e6e6;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  opacity: 0.65;
+}

@@ -1,0 +1,134 @@
+/* NumberSpinner - namespace "dijitSpinner"
+ * 
+ * Styling NumberSpinner mainly includes:
+ * 
+ * 1. Arrows
+ * 		Outer containers: .dijitSpinnerButtonContainer|.dijitSpinnerButtonInner  - for border, padding and position
+ * 		Arrows: .dijitArrowButton|.dijitUpArrowButton.|dijitDownArrowButton
+ * 		Inner container: .dijitArrowButtonInner - for border, padding, width|height and background image
+ * 
+ * 2. Hover state
+ * 		.dijitUpArrowButtonHover|.dijitDownArrowButtonHover .*  - for background color|image
+ * 
+ * 3. Active state
+ * 		.dijitUpArrowButtonActive|.dijitDownArrowButtonActive .*  - for border, padding, margin and background color|image
+ * 
+ * 4. Focused state
+ * 		.dijitSpinnerFocused .* - for background color|image
+ * 
+ * 5. Disabled state
+ * 		.dijitSpinnerDisabled .* - for background color|image
+ */
+.bootstrap .dijitSpinnerButtonContainer {
+  overflow: hidden;
+  position: relative;
+  width: auto;
+  padding: 0;
+  border-left: 1px solid #ccc;
+}
+.bootstrap .dijitSpinner .dijitSpinnerButtonInner {
+  width: 24px;
+  padding: 4px;
+  margin: 0;
+}
+/* button */
+.bootstrap .dijitSpinner .dijitArrowButton {
+  border: 1px solid #ccc;
+  padding: 4px 12px 5px 12px;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: pointer;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  border: 0;
+  width: auto;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  padding: 0 8px;
+}
+.bootstrap .dijitSpinner .dijitUpArrowButton {
+  border-top-right-radius: 4px;
+}
+.bootstrap .dijitSpinner .dijitDownArrowButton {
+  border-bottom-right-radius: 4px;
+  border-top: 1px solid #ccc;
+}
+/* hover */
+.bootstrap .dijitSpinner .dijitUpArrowButtonHover,
+.bootstrap .dijitSpinner .dijitDownArrowButtonHover {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+  border: 0;
+}
+.bootstrap .dijitSpinner .dijitDownArrowButtonHover {
+  border-top: 1px solid #ccc;
+}
+/* active */
+.bootstrap .dijitSpinner .dijitDownArrowButtonActive,
+.bootstrap .dijitSpinner .dijitUpArrowButtonActive {
+  color: #000;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: none;
+  outline: none;
+  border: 0;
+}
+.bootstrap .dijitSpinner .dijitDownArrowButtonActive {
+  border-top: 1px solid #ccc;
+}
+/* disabled */
+.bootstrap .dijitSpinnerDisabled .dijitDownArrowButton,
+.bootstrap .dijitSpinnerDisabled .dijitUpArrowButton {
+  color: #999;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: default;
+  opacity: 0.65;
+  border: 0;
+}
+.bootstrap .dijitSpinnerDisabled .dijitDownArrowButton {
+  border-top: 1px solid #ccc;
+}
+/* up & down arrows */
+.bootstrap .dijitSpinner .dijitArrowButtonInner {
+  height: 0;
+  width: 0;
+  margin-top: 4px;
+/* up arrow */
+  border-left: 4px solid transparent;
+  border-bottom: 4px solid #000;
+  border-right: 4px solid transparent;
+  border-top: 0;
+  display: block;
+}
+.bootstrap .dijitSpinner .dijitDownArrowButton .dijitArrowButtonInner {
+  border-left: 4px solid transparent;
+  border-bottom: 0;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+}
+.bootstrap .dijitSpinner .dijitArrowButtonInner .dijitInputField {
+  padding: 0;
+}

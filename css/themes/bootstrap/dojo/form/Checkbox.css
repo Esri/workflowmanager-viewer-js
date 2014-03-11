@@ -1,0 +1,98 @@
+/* CheckBox
+ * 
+ * Styling CheckBox mainly includes:
+ * 
+ * 1. Containers
+ * 		.dijitCheckBox|.dijitCheckBoxIcon - for border, padding, width|height and background image
+ * 
+ * 2. CheckBox within ToggleButton
+ * 		.dijitToggleButton|.dijitToggleButtonChecked .* - for background image
+ * 
+ * 3. Checked state
+ * 		.dijitCheckBoxChecked - for checked background-color|image
+ * 		.dijitToggleButtonChecked - for border, background-color|image, display and width|height
+ * 
+ * 4. Hover state
+ * 		.dijitCheckBoxHover|.dijitCheckBoxCheckedHover - for background image
+ * 
+ * 5. Disabled state
+ * 		.dijitCheckBoxDisabled|.dijitCheckBoxCheckedDisabled - for background image
+ */
+.bootstrap .dijitToggleButton .dijitCheckBoxIcon {
+  background-image: url("images/glyphicons-halflings.png");
+}
+.bootstrap .dijitCheckBox {
+  background-image: url("../form/images/checkboxRadioButtonStates.png");
+/* checkbox sprite image */
+  background-repeat: no-repeat;
+  background-color: #e6e6e6;
+  border: 0 none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.bootstrap .dijitCheckBoxIcon		/* inside a toggle button */ {
+  background-repeat: no-repeat;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+}
+/* unchecked */
+.bootstrap .dijitCheckBox {
+  background-position: 20px;
+}
+.bootstrap .dijitToggleButton .dijitCheckBoxIcon {
+  background-position: 14px;
+}
+/* checked */
+.bootstrap .dijitCheckBoxChecked {
+  background-position: 2px center;
+  background-color: #0081c2;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+}
+.bootstrap .dijitToggleButtonChecked .dijitCheckBoxIcon {
+  background-position: -288px 0;
+}
+/* hover */
+.bootstrap .dijitCheckBoxHover {
+/* hovering over an unchecked enabled checkbox */
+  background-position: 20px;
+  background-color: #ececec;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+}
+.bootstrap .dijitCheckBoxCheckedHover {
+/* hovering over an checked enabled checkbox */
+  background-position: 2px center;
+  background-color: #12b0ff;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+}
+/* disabled */
+.bootstrap .dijitCheckBoxDisabled {
+/* disabled */
+  background-position: 20px 0;
+  background-color: #e6e6e6;
+  border: 0 none;
+  -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  -moz-box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  box-shadow: 0 0 2px rgba(0,0,0,0.35) inset;
+  opacity: 0.65;
+}
+.bootstrap .dijitCheckBoxCheckedDisabled {
+/* disabled but checked */
+  background-position: 0px;
+  opacity: 0.65;
+}

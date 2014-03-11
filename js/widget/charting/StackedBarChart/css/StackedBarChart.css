@@ -1,0 +1,88 @@
+.stackedBar-container {
+	position:relative;
+	margin: 5px 5px 0;
+}
+
+.stackedBar-label,
+.stackedBar-wrapper,
+.stackedBar-value {
+	display:inline-block;
+}
+
+.stackedBar-label {
+	color: #888888;
+	float: left;
+	text-align: left;
+	width: 100%;
+}
+
+.stackedBar-wrapper {
+	width: 75%;
+	background-color: #F7F7F7;
+	background-image: linear-gradient(to bottom, #F5F5F5, #F9F9F9);
+	background-repeat: repeat-x;
+	border-radius: 4px 4px 4px 4px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+	margin-bottom: 8px;
+	overflow: hidden;
+	padding: 3px;
+	margin: 1px -4px 4px;
+	vertical-align:middle;
+}
+
+.stackedBar-wrapper .stackedBar {
+	height:18px;
+	background-image: url('images/bar-gradient.png');
+	background-position: top left;
+	background-repeat: repeat-x;
+}
+
+.stackedBar-value {
+	color: #888888;
+	display: block;
+	padding: 4px 8px;
+	position: absolute;
+	right: 5%;
+	text-align: center;
+	bottom: 2px;
+	width: 15%;
+	border-radius:4px;
+}
+
+.stackedBar-container:hover .stackedBar-wrapper .stackedBar {
+	background-position: 0 -34px;
+	box-shadow:1px 1px 2px #888;
+}
+
+.stackedBar-container:hover .stackedBar-value {
+	background: #000;
+	opacity:0.8;
+	filter:alpha(opacity=80);
+	color:white;
+}
+
+.stackedBar-container:hover .stackedBar-value:before {
+	content: "";
+	border-top: 5px solid transparent;
+	border-left: 5px solid transparent;
+	border-right: 5px solid #000;
+	border-bottom: 5px solid transparent;
+	left: -10px;
+	position: absolute;
+	top: 10px;
+	width: 0;
+	height: 0;
+	display: block;
+}
+
+.stackedBarLegend-container {
+	margin-top: 20px;
+}
+
+.stackedBarLegend-symbol {
+	width: 12px; 
+	height: 12px; 
+	float: left;
+	margin: 3px;
+	clear: both;
+}

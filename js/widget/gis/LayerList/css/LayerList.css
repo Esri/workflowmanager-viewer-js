@@ -1,0 +1,155 @@
+.listContainer {
+}
+
+	.listContainer h3 {
+		color: #333333;
+		font-weight: bold;
+		margin: 0;
+		padding: 10px 10px 10px 20px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		position: relative;
+	}
+
+	.listContainer ul {
+		list-style: none;
+		padding: 10px;
+		margin: 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.65);
+	}
+
+	.listContainer li {
+		padding: 10px;
+	}
+
+		.listContainer li.first {
+			border-top: 0 none;
+		}
+
+		.listContainer li.last {
+			border-bottom: 0 none;
+		}
+		.listContainer li .dijitCheckBox {
+			vertical-align:top;
+		}
+		.listContainer li .layerName {
+			margin-left: 15px;
+			width: 110px;
+			display: inline-block;
+			word-wrap: break-word;
+			cursor: pointer;
+		}
+
+	
+
+.layer-icon-button {
+	color: rgba(0, 0, 0, 0.2);
+	float: right;
+	font-size: 1.2em;
+	opacity: 0;
+	margin-left: 4px;
+	cursor: pointer;
+}	
+
+.listContainer li:hover .layer-icon-button {
+	opacity: 1;
+}
+
+.layer-icon-button:hover,
+.layer-icon-button:active,
+.layer-icon-button.layer-info-button-selected,
+.layer-icon-button.layer-opacity-button-selected {
+	color: #0060AA;
+	opacity: 1;
+}
+
+.layer-icon-button.layer-remove-button:hover,
+.layer-icon-button.layer-remove-button:active {
+	color:#b94a48;
+}
+
+/* footer */
+
+.layerList-footer {
+	width: 100%;
+	background: #F2F3F7;
+	border-top: 1px solid #FFFFFF;
+}
+
+	.layerList-footer:after {
+		background: #DDDDDD;
+		content: "";
+		height: 1px;
+		position: absolute;
+		top: -2px;
+		width: 100%;
+	}
+
+.addNewButton {
+	cursor: pointer;
+	display: block;
+	padding: 4px 0;
+}
+
+	.addNewButton:hover,
+	.addNewButton:active {
+		text-decoration: underline;
+	}
+
+	.addNewButton .addNewButtonInner {
+		color: #37487E;
+		display: block;
+		line-height: 24px;
+		margin: 0 auto;
+		margin-left: 20px;
+	}
+
+		.addNewButton .addNewButtonInner i {
+			margin-right: 15px;
+		}
+/* icons */
+
+.icon-in-dropdown {
+	font-size: 1.2em;
+	margin-right: 1em;
+	width: 16px !important;
+	display: inline-block !important;
+}
+
+.listContainer li.divider {
+	border-bottom: 1px solid #FFFFFF;
+	border-top: 1px solid #DDDDDD;
+	height: 0;
+	margin: 10px 0;
+	padding: 0;
+}
+
+/* layer attributes */
+
+.layer-attr-container {
+	height: 400px;
+	margin: 0 -10px;
+	overflow: auto;
+	padding: 0 10px;
+}
+
+	.layer-attr-container h3 {
+		color: #37487E;
+	}
+
+.close-button {
+	background: url("images/dialogCloseIcon.png") no-repeat scroll 0 0 transparent;
+	height: 16px;
+	opacity: 0.65;
+	position: absolute;
+	right: 12px;
+	top: 10px;
+	width: 12px;
+	cursor: pointer;
+	display: block;
+	z-index: 1;
+}
+
+	.close-button:hover,
+	.close-button:active {
+		opacity: 1;
+	}

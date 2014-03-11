@@ -1,0 +1,99 @@
+.bootstrap .dgrid {
+  border: 1px solid #ccc;
+  border-top: 3px solid #0081c2;
+  background: #fff;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  -webkit-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+}
+.bootstrap .ui-widget-header {
+  font-weight: bold;
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+}
+.bootstrap .dgrid-footer {
+  border-top: 1px solid #ccc;
+}
+.bootstrap .ui-widget-header,
+.bootstrap .ui-widget-header .dgrid-cell,
+.bootstrap .dgrid-footer,
+.bootstrap .dgrid-footer .dgrid-cell {
+  line-height: 20px;
+  background-color: $button-background-color;
+  background-repeat: repeat-x;
+$button-background-image
+  _background-image: none;
+}
+.bootstrap .ui-widget-header .dgrid-cell {
+  border-color: #ccc;
+}
+.bootstrap .ui-widget-header .dgrid-cell:hover {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+.bootstrap .ui-widget-header .dgrid-cell:active {
+  color: #000;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: none;
+  outline: none;
+}
+.bootstrap .ui-state-default {
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  -ms-transition-duration: 0.1s;
+  -o-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+  -webkit-transition-property: background-color border-color;
+  -moz-transition-property: background-color border-color;
+  -o-transition-property: background-color border-color;
+  transition-property: background-color border-color;
+}
+.has-ie-6 .bootstrap .ui-state-default {
+  background-image: none;
+}
+.bootstrap .ui-state-default:hover {
+  background-color: #e6e6e6;
+}
+/* reset dijits within datagrid to their default color and text shadow when hovered over */
+/* .{$theme-name} .ui-state-default:hover .dijit {
+	color:$text-color;
+	text-shadow:$text-shadow;
+} */
+.bootstrap .ui-state-active {
+  background-color: #32baff;
+  -webkit-box-shadow: 0 0px 5px rgba(0,0,0,0.25) inset;
+  -moz-box-shadow: 0 0px 5px rgba(0,0,0,0.25) inset;
+  box-shadow: 0 0px 5px rgba(0,0,0,0.25) inset;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+}
+.bootstrap .ui-state-active:hover {
+  background-color: #32baff;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+}
+.bootstrap .dgrid-cell {
+  border-color: #d9d9d9;
+  vertical-align: middle;
+}
+/* list view */
+.bootstrap .dgrid-list .ui-state-default {
+  line-height: 20px;
+  padding: 4px;
+}

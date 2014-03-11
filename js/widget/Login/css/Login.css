@@ -1,0 +1,23 @@
+.loginPage {
+    opacity: 0;
+    -moz-transition: opacity 1s;
+    -o-transition: opacity 1s;
+    -webkit-transition: opacity 1s; /* Safari */
+	transition: opacity 1s;
+}
+#loginContainer form {
+	margin: 0 auto;
+	width: 300px;
+}
+#loginContainer .login-input {
+	width: 100%;
+	font-size: 1.4em;
+	margin: 5px 0;
+}
+#loginContainer .login-input.login-submit {
+    margin-top: 24px;
+}
+#loginContainer .login-input .dijitButtonNode{
+	width: 100%;
+	padding: 4px 0 5px;
+}

@@ -1,0 +1,88 @@
+<div>
+    <div class="form">
+        <form>
+            <div class="row">
+                <label>${i18n_JobId}:</label>
+                <span data-dojo-attach-point="propertiesFormJobID">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobName}:</label>
+                <span data-dojo-attach-point="propertiesFormJobName">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobType}:</label>
+                <!--<input data-dojo-attach-point="cboJobTypes">-->
+                <span data-dojo-attach-point="propertiesFormJobType">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobStatus}:</label>
+                <!--<input data-dojo-attach-point="cboJobStatuses">-->
+                <span data-dojo-attach-point="propertiesFormJobStatus">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobPercentComplete}:</label>
+                <span data-dojo-attach-point="propertiesFormPercentComplete">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobAOI}:</label>
+                <span data-dojo-attach-point="propertiesFormAOI">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobDataWorkspace}:</label>
+                <span data-dojo-attach-point="cboJobDataWorkspaces"></span>
+                <!--<input data-dojo-attach-point="cboJobDataWorkspaces">-->
+            </div>
+            <div class="row">
+                <label>${i18n_JobVersion}:</label>
+                <span data-dojo-attach-point="propertiesFormVersion">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobParentVersion}:</label>
+                <span data-dojo-attach-point="propertiesFormParentVersion">${i18n_NotApplicable}</span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobAssignment}:</label>
+                <span>
+                    <input type="radio" data-dojo-type="dijit/form/RadioButton" name="jobAssignmentType" value="user" data-dojo-attach-point="jobAssignmentTypeUser" data-dojo-attach-event="onClick: toggleAssignment" />
+                    <label for="user" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUser}</label>
+                    <input type="radio" data-dojo-type="dijit/form/RadioButton" name="jobAssignmentType" value="group" data-dojo-attach-point="jobAssignmentTypeGroup" data-dojo-attach-event="onClick: toggleAssignment" />
+                    <label for="group" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentGroup}</label>
+                    <input type="radio" data-dojo-type="dijit/form/RadioButton" name="jobAssignmentType" value="unassigned" checked="true" data-dojo-attach-point="jobAssignmentTypeUnassigned" data-dojo-attach-event="onClick: toggleAssignment" />
+                    <label for="unassigned" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUnassigned}</label>
+                </span>
+            </div>
+            <div class="row" data-dojo-attach-point="jobAssignmentTypeWrapper">
+                <label></label>
+                <span data-dojo-attach-point="jobAssignmentTypeUserWrapper"><input data-dojo-attach-point="cboAssignmentUsers"></span>
+                <span data-dojo-attach-point="jobAssignmentTypeGroupWrapper"><input data-dojo-attach-point="cboAssignmentGroups"></span>
+            </div>
+            <div class="row">
+                <label>${i18n_JobOwner}:</label>
+                <span data-dojo-attach-point="cboUsers"></span>
+                <!--<input data-dojo-attach-point="cboUsers">-->
+            </div>
+            <div class="row">
+                <label>${i18n_JobPriority}:</label>
+                <input data-dojo-attach-point="cboJobPriorities">
+            </div>
+            <div class="row">
+                <label>${i18n_JobStartDate}:</label>
+                <input data-dojo-attach-point="jobPropertiesStartDateControl">
+            </div>
+            <div class="row">
+                <label>${i18n_JobDueDate}:</label>
+                <input data-dojo-attach-point="jobPropertiesDueDateControl">
+            </div>
+            <div class="row">
+                <label class="textarea-label">${i18n_JobDescription}:</label>
+                <!--<span data-dojo-attach-point="propertiesFormDescription">${i18n_NotApplicable}</span>-->
+                <textarea data-dojo-attach-point="propertiesFormDescription"></textarea>
+            </div>
+            <div class="row">
+                <label></label>
+                <button type="button" data-dojo-type="dijit.form.Button" data-dojo-attach-point="btnUpdateProperties" data-dojo-attach-event="onClick: updateProperties" disabled="true">${i18n_Update}</button>
+                <span data-dojo-attach-point="errorContainer" class="errorContent"></span>
+            </div>
+        </form>
+    </div>
+</div>

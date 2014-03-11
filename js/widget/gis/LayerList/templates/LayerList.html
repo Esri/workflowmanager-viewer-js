@@ -1,0 +1,61 @@
+<div>
+	<div data-dojo-attach-point="layerListContainer" class="layerListContainer listContainer">
+	</div>
+	<div class="layerList-footer">
+		<a class="addNewButton"
+			data-dojo-attach-point="addOnlineLayerButton">
+			<span class="addNewButtonInner"><i class="icon-plus" style="text-align: center; width: 20px; display: inline-block; text-decoration: none"></i>Add online layer</span></a>
+		<a class="addNewButton"
+			data-dojo-attach-point="attachShapeFileButton">
+			<span class="addNewButtonInner"><i class="icon-plus" style="text-align: center; width: 20px; display: inline-block; text-decoration: none"></i>Add shapefile</span></a>
+	</div>
+
+
+	<div data-dojo-type="dijit/Dialog" data-dojo-attach-point="onlineLayerDialog" data-dojo-id="onlineLayerDialog" style="width: 500px" title="Add online layer">
+		<div class="dijitDialogPaneContentArea">
+			<div style="margin: 20px;">
+				<span style="width: 20%; display: inline-block;">Layer Name:</span>
+				<input type="text" data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="newOnlineLayerName" style="width: 78%;"/>
+			</div>
+			<div style="margin: 16px;">
+				<span style="width: 20%; display: inline-block;">URL:</span>
+				<input type="text" data-dojo-type="dijit/form/Textarea" data-dojo-attach-point="newOnlineLayerUrl" style="width: 78%;" value="http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer" />
+			</div>
+		</div>
+		<div class="dijitDialogPaneActionBar">
+			<button data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="confirmAddOnlineLayerButton"
+				class="dojo-btn-success"
+				type="button">
+				Add</button>
+			<button data-dojo-type="dijit/form/Button"
+				data-dojo-props="onClick:function(){onlineLayerDialog.hide();}"
+				type="button">
+				Cancel</button>
+		</div>
+	</div>
+
+	<div data-dojo-type="dijit/Dialog" data-dojo-attach-point="attachShapeFileDialog" data-dojo-id="attachShapeFileDialog" style="width: 300px" title="Add Shapefile">
+		<div class="dijitDialogPaneContentArea">
+			<form style="margin: 16px;" data-dojo-attach-point="uploadForm" enctype="multipart/form-data" method="post" >
+				<div>Please select your shapefile:</div>
+				<div style="margin: 10px;">
+					<input type="file" name="file" size="40" data-dojo-attach-point="uploadFileInput">
+				</div>
+			</form>
+		</div>
+		<div class="dijitDialogPaneActionBar">
+			<button data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="addShapeFileButton"
+				class="dojo-btn-success"
+				type="button">
+				Attach</button>
+			<button data-dojo-type="dijit/form/Button"
+
+				data-dojo-props="onClick:function(){attachShapeFileDialog.hide();}"
+				type="button">
+				Cancel</button>
+		</div>
+	</div>
+
+</div>

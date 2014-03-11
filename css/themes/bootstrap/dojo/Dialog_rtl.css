@@ -1,0 +1,8 @@
+/* Dialog */
+.bootstrap .dijitDialogRtl .dijitDialogCloseIcon {
+  right: auto;
+  left: 12px;
+}
+.bootstrap .dijitDialogRtl .dijitDialogPaneActionBar {
+  text-align: left;
+}

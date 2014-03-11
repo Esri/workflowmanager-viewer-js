@@ -1,0 +1,140 @@
+.esriMeasurement {
+  background: #fff;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  color: #000;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+}
+.esriMeasurement div:first-child {
+  display: none !important;
+}
+.distanceIcon {
+  background-image: url("../images/Measure_Distance16.png");
+  width: 16px;
+  height: 16px;
+}
+.areaIcon {
+  background-image: url("../images/Measure_Area16.png");
+  width: 16px;
+  height: 16px;
+}
+.locationIcon {
+  background-image: url("../images/Measure_Point16.png");
+  width: 16px;
+  height: 16px;
+}
+.esriButton {
+  float: left;
+}
+.esriButton + .esriButton {
+  margin-left: -1px;
+}
+.esriButton .dijitButtonNode {
+  border: 1px solid #ccc;
+  padding: 4px 12px 5px 12px;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: pointer;
+  float: left;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+.esriButton:first-child .dijitButtonNode {
+  -moz-border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
+}
+.esriButton:nth-child(3) .dijitButtonNode {
+  -moz-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+}
+.esriButtonHover .dijitButtonNode {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+.esriButtonActive .dijitButtonNode {
+  color: #000;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: none;
+  outline: none;
+}
+.esriButtonChecked .dijitButtonNode {
+  color: #000;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: none;
+  outline: none;
+}
+.esriToggleButton .dijitButtonNode {
+  border: 1px solid #ccc;
+  padding: 4px 12px 5px 12px;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: pointer;
+}
+.esriToggleButtonHover .dijitButtonNode,
+.esriToggleButtonOpened .dijitButtonNode {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+.esriToggleButtonDisabled .dijitButtonNode {
+  color: #999;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: default;
+  opacity: 0.65;
+}
+.esriUnitButton .dijitButtonText {
+  font-size: 16px !important;
+}
+.resultLabel {
+  margin-top: 8px;
+  margin-bottom: $map-measurement-result-label-margin-bottom;
+  border-bottom: 1px solid #ccc;
+}
+.result {
+  padding: 4px;
+}

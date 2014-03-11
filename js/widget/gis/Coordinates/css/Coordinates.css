@@ -1,0 +1,10 @@
+/* Coordinates */
+.map-coordinates-container {
+	background: #FFF;
+	opacity:0.6;
+	filter:alpha(opacity=60);
+	z-index: 200;
+}
+.map-coordinates-content {
+	margin: 0 5px;
+}

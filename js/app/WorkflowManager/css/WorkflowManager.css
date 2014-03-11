@@ -1,0 +1,424 @@
+body {
+    font-size: .9em;
+}
+
+.logo {
+	float:left;
+	margin: 5px;	
+}
+.headerTitle {
+    color: #FFF;
+    float: left;
+    font-size: 26px;
+    font-weight: bold;
+    margin: 5px 0 0 10px;
+    -ms-text-shadow: -1px 2px 2px rgba(0, 0, 0, 0.25);
+    text-shadow: -1px 2px 2px rgba(0, 0, 0, 0.25);
+}
+.headerSubTitle {
+    color: #CCCCCC;
+    float: left;
+    font-size: 20px;
+    margin: 12px 0 0 12px;
+}
+.headerLinks {
+	float: right;
+	margin: 10px;
+	color: #FFF;
+}
+.headerLinks a {
+    color: #FFF;
+}
+.header-text {
+    font-weight: bold;
+}
+.clear-fix {
+    clear: both;
+}
+
+.errorContent {
+    color: #f00;
+}
+
+.error-dialog {
+    z-index: 99999 !important;
+}
+
+.wide-btn .dijitButtonNode {
+    width: 140px;
+}
+
+body .dijitComboBox {
+    margin-right: 5px;
+}
+
+/* Text button */
+body .text-button.dijitButton .dijitButtonNode {
+    margin-top: -3px;
+    border: none;
+    background: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+body .text-button.neg-button.dijitButton .dijitButtonNode:hover {
+    color: #b51212;
+    background: #EEE;
+}
+body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
+    line-height: 13px;
+}
+
+.bootstrap .dijitRadio, 
+.bootstrap .dijitRadioIcon {
+    margin: 0 5px;
+}
+
+/* History grid sizing */
+/*.tab.row.gridContainer {
+    height: 83%;
+}*/
+
+/* Fix tabContainer in Dialog */
+.bootstrap .dijitDialog .dijitDialogPaneContent {
+    padding: 0;
+    height: 96%;
+}
+#jobTabsContainer {
+    width: 100% !important;
+}
+.bootstrap .dijitDialog .dijitDialogPaneContent .dijitTabContainer {
+    margin: 0px;
+    top: 0 !important;
+    left: 0 !important;
+}
+/* Left justify tab labels */
+#jobDialog #tabs_tablist div {
+    text-align: left;
+}
+
+/* Fix expand/collapse text in query tree */
+.query-dropDown-container {
+    display: inline-block;
+}
+.query-dropDown-container .dijitDropDownButton .dijitButtonNode {
+    width: 400px;
+    text-align: left;
+}
+.query-dropDown-container .dijitDropDownButton .dijitButtonNode .dijitArrowButtonInner {
+    float: right;
+    margin-top: .7em;
+}
+.query-dropDown-container .tree-dropDownButton {
+    line-height: 15px;
+}
+.bootstrap .tree-tooltipDialog .dijitTooltipContainer {
+    background: #fff;
+    border: 1px solid #ccc;
+    -ms-opacity: 1;
+    opacity: 1;
+    padding: 4px 8px;
+    color: #000;
+    text-shadow: none;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    -ms-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.bootstrap .query-dropDown-container .dijitButtonText {
+    width: 360px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    -moz-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    float: left;
+    display: inline-block;
+}
+
+.bootstrap .tree-tooltipDialog.dijitTooltipBelow .dijitTooltipConnector {
+    border-bottom: 4px solid #ccc;
+}
+.dijitTree .dijitExpandoText {
+    display: initial;
+}
+.dijitTree .dijitTreeNode:hover, .dijitTree .dijitTreeContent {
+    cursor: pointer;
+}
+.tree-tooltipDialog .dijitTree {
+    overflow-x: hidden;
+}
+.tree-tooltipDialog .dijitTreeLabel {
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+}
+
+/* Use row class outside properties chart */
+.floating.row, .tab.row {
+    margin: 10px;
+}
+.floating.row .row-label {
+    display: inline-block;
+    width: 100px;
+}
+
+/* Use row class in tabs */
+.tab.row label {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+}
+.tab.row .dijitButton {
+    margin: 0;
+}
+
+.tab.row label.textarea-label {
+    vertical-align: top;
+}
+
+/* Fix filtering select/dropdown arrow spacing */
+.bootstrap .dijitComboBox .dijitButtonNode.dijitArrowButton {
+    padding: 11px 8px;
+}
+
+/* Fix search button display */
+.search-button .dijitReset.dijitStretch.dijitButtonContents {
+    margin-top: -3px;
+    margin-bottom: 2px;
+}
+.search-button .dijitReset.dijitInline.dijitButtonText {
+    line-height: 0;
+}
+
+/* AttachmentItem Widget */
+.attachment-type, .attachment-link, .attachment-remove {
+    float: left;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.attachment-type {
+    width: 100px;
+    margin-right: 20px;
+}
+.attachment-link {
+    width: 300px;
+    margin-right: 20px;
+}
+.bootstrap .dijitButton.icon-button .dijitButtonNode {
+    border: none;
+    padding: 0;
+    margin-top: -10px;
+    color: #AAA;
+    -moz-border-radius: initial;
+    border-radius: initial;
+    background: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    line-height: initial;
+    text-shadow: none;
+    cursor: pointer;
+}
+.bootstrap .dijitButton.icon-button {
+    margin: 0;
+}
+
+/* Grid fixes */
+.bootstrap .dgrid-header-row.ui-widget-header .dgrid-cell:hover {
+    border-top-style: none;
+}
+
+/* History grid styles */
+.dgrid-column-type, .dgrid-column-date {
+    width: 12em;
+}
+.dgrid-column-user {
+    width: 10em;
+}
+
+/* Holds grid styles */
+#tabHolds .dgrid, #tabHistory .dgrid {
+    height: auto;
+}
+#tabHolds .dgrid .dgrid-scroller, #tabHistory .dgrid .dgrid-scroller {
+    position: relative;
+    max-height: 500px;
+    overflow: auto;
+}
+
+/* Map Popup */
+.esriPopup .titlePane .title {
+    width: 80%;
+}
+.esriPopup .titlePane .title a {
+    text-decoration: underline;
+}
+.esriPopup .contentPane p {
+    margin: .5em 0;
+}
+
+/* Map tools */
+#mapTL {
+    width: 75%;
+}
+
+/* MAP */
+#aoiMap {
+    padding: 0;
+}
+
+#aoiMapTL {
+	position: absolute;
+	top: 0.5em;
+	left: 5em;
+	z-index: 20;
+}
+#aoiMapTR {
+	position: absolute;
+	top: 0.5em;
+	right: 0.5em;
+	z-index: 20;
+}
+#aoiMapBL {
+	position: absolute;
+	bottom: 0.5em;
+	left: 0.5em;
+	z-index: 20;
+}
+#aoiMapBR {
+	position: absolute;
+	bottom: 0.5em;
+	right: 0.5em;
+	z-index: 20;
+}
+#aoiMapCenter {
+	position: absolute;
+	top: 5em;
+	left: 5em;
+	z-index: 20;
+}
+
+/* IE style fixes */
+.bootstrap .dijitDialogPaneContent .dijitDialogPaneActionBar {
+    padding: 0 8px 8px 8px;
+}
+.bootstrap .dijitButton .dijitButtonNode, 
+.bootstrap .dijitDropDownButton .dijitButtonNode, 
+.bootstrap .dijitComboButton .dijitButtonNode, 
+.bootstrap .dijitToggleButton .dijitButtonNode,
+.bootstrap .dijitComboBox .dijitButtonNode,
+.esriSimpleSlider div {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#ffffff', endColorstr='#e6e6e6');
+}
+.bootstrap .dijitButton.dojo-btn-primary .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-primary .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-primary .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-primary .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-primary .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#08c', endColorstr='#04c');
+}
+.bootstrap .dijitButton.dojo-btn-success .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-success .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-success .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-success .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-success .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#62c462', endColorstr='#51a351');
+}
+.bootstrap .dijitButton.dojo-btn-danger .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-danger .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-danger .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-danger .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-danger .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#ee5f5b', endColorstr='#bd362f');
+}
+.bootstrap .dijitButton.dojo-btn-warning .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-warning .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-warning .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-warning .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-warning .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#fbb450', endColorstr='#f89406');
+}
+.bootstrap .dijitButton.dojo-btn-info .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-info .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-info .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-info .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-info .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#5bc0de', endColorstr='#2f96b4');
+}
+.bootstrap .dijitButton.dojo-btn-inverse .dijitButtonNode, 
+.bootstrap .dijitDropDownButton.dojo-btn-inverse .dijitButtonNode, 
+.bootstrap .dijitComboButton.dojo-btn-inverse .dijitButtonNode, 
+.bootstrap .dijitToggleButton.dojo-btn-inverse .dijitButtonNode,
+.bootstrap .dijitComboBox.dojo-btn-inverse .dijitButtonNode {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#444', endColorstr='#222');
+}
+.bootstrap .dijitMenuItemHover td,
+.bootstrap .dijitMenuItemHover,
+.bootstrap .dijitMenuItemSelected td,
+.bootstrap .dijitMenuItemSelected,
+.bootstrap .dijitMenuItemSelected td,
+.bootstrap .dijitMenuItemSelected {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#008fd6', endColorstr='#006da3');
+}
+.dj_ie .bootstrap .dijitRadioChecked:after, 
+.dj_ie .bootstrap .dijitToggleButtonChecked .dijitRadioIcon:after, 
+.dj_ie .bootstrap .dijitRadioCheckedDisabled:after {
+    background: #006da3;
+}
+.dj_ie .bootstrap .dijitRadioCheckedHover:after, 
+.dj_ie .bootstrap .dijitToggleButtonCheckedHover .dijitRadioIcon:after, 
+.dj_ie .bootstrap .dijitRadioCheckedDisabledHover:after {
+    background: #008fd6;
+}
+
+/* Fix for floating chart filtering selects */
+/* Integrate with width media queries in future */
+#chart-dropdown-container {
+        width: 70%;
+    }
+@media (max-width: 1500px) {
+    #chart-dropdown-container {
+        width: 60%;
+    }
+
+    #mapTL {
+        width: 60%;
+    }
+}
+/* Fix for action pane in dialogs */
+.bootstrap .dijitDialogPaneActionBar {
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+.dijitDialogPaneActionBar .dijitButton {
+    margin: 10px;
+}
+
+/* Medium*/
+@media (max-height: 768px) {
+    /* Dialog fix */
+    .bootstrap .dijitDialog .dijitDialogPaneContent {
+        height: 94%;
+    }
+    /* History/Hold grid */
+    #tabHolds .dgrid .dgrid-scroller, #tabHistory .dgrid .dgrid-scroller {
+        max-height: 300px;
+    }
+}
+/* Small */
+@media (max-height: 550px) {
+    /* Dialog fix */
+    .bootstrap .dijitDialog .dijitDialogPaneContent {
+        height: 92%;
+    }
+    /* History/Hold grid */
+    #tabHolds .dgrid .dgrid-scroller, #tabHistory .dgrid .dgrid-scroller {
+        max-height: 200px;
+    }
+}

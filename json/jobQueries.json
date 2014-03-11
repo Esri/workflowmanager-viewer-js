@@ -1,0 +1,9 @@
+[
+	{"label":"All Jobs","id":"1"},
+	{"label":"Unassigned","id":"2"},
+	{"label":"Assigned to my groups", "id":"3"},
+	{"label":"With steps assigned to my groups", "id":"4"},
+	{"label":"Assigned to me", "id":"5"},
+	{"label":"With steps assigned to me", "id":"6"},
+	{"label":"Detailed query", "id":"7"}
+]

@@ -1,0 +1,29 @@
+<div style="margin: 10px;">
+    <div style="margin: 5px;">
+        <div id="chart-dropdown-container" style="float: left; width: 330px;">
+            <div style="float: left; margin-bottom: 5px;">
+                <span style="display: block;">${i18n_CategorizedBy}</span>
+                <input data-dojo-attach-point="cboChartCategorizedBy">
+            </div>
+            <div style="float: left; margin-left: 5px;">
+                <span style="display: block;">${i18n_GroupedBy}</span>
+                <input data-dojo-attach-point="cboChartGroupedBy">
+            </div>
+        </div>
+        <div style="float: right; margin: 22px 5px 0 0;">
+            <input type="radio" data-dojo-type="dijit/form/RadioButton" name="chartType" value="chartTypeBar" checked="true" data-dojo-attach-event="onClick: toggleCharts" />
+            <label for="chartTypeBar">${i18n_BarChart}</label>
+            <input type="radio" data-dojo-type="dijit/form/RadioButton" name="chartType" value="chartTypePie" data-dojo-attach-event="onClick: toggleCharts" />
+            <label for="chartTypePie">${i18n_PieChart}</label>
+        </div>
+        <div class="clear-fix"></div>
+    </div>
+    <div data-dojo-attach-point="simpleStatsChartContainer">
+        <div data-dojo-attach-point="statsBarChartContainer"></div>
+        <div data-dojo-attach-point="statsPieChartContainer"></div>
+    </div>
+    <div data-dojo-attach-point="groupedStatsChartContainer">
+        <div data-dojo-attach-point="groupedStatsBarChartContainer"></div>
+        <div data-dojo-attach-point="groupedStatsPieChartContainer"></div>
+    </div>
+</div>

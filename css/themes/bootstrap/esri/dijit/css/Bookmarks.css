@@ -1,0 +1,108 @@
+.esriBookmarks {
+  background: #fff;
+  border: 1px solid #ccc;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  box-shadow: 0 0 2px #fff inset, 0 0 2px rgba(0,0,0,0.2);
+  padding: 4px 0;
+}
+.esriBookmarkTable {
+  width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+.esriBookmarkItem {
+  color: #0081c2;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  padding: 4px 0;
+  display: inline-block;
+  width: 100%;
+  background: transparent;
+  border: 0 none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.esriBookmarkItem > div {
+  position: relative;
+}
+.esriBookmarkItem.esriBookmarkHighlight {
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  background: linear-gradient(#12b0ff 0%, #0081c2 100%);
+  border: 0 none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.esriBookmarkLabel {
+  position: relative;
+  float: left;
+  overflow: hidden;
+  line-height: 20px;
+  white-space: nowrap;
+  margin-left: 4px;
+  text-align: left;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.esriBookmarkItem.esriAddBookmark {
+  border: 1px solid #ccc;
+  padding: 4px 12px 5px 12px;
+  color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: linear-gradient(#fff 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  cursor: pointer;
+  width: 8em;
+  text-align: center;
+  margin: 0 auto;
+  display: block;
+}
+.esriBookmarkItem.esriAddBookmark:hover {
+  color: #000;
+  border: 1px solid #ccc;
+  background: linear-gradient(#f3f3f3 0%, #e6e6e6 100%);
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: background 0.1s linear 0s;
+}
+.esriBookmarkItem.esriAddBookmark:active {
+  color: #000;
+  border: 1px solid #ccc;
+  background: #e6e6e6;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) inset, 0 1px 2px rgba(0,0,0,0.05);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+  transition: none;
+  outline: none;
+}
+.esriBookmarkEditImage {
+  float: right;
+  width: 30px;
+  cursor: pointer;
+  background: transparent url("../images/edit.png") no-repeat scroll center center;
+}
+.esriBookmarkRemoveImage {
+  float: right;
+  width: 30px;
+  cursor: pointer;
+  background: transparent url("../images/close.gif") no-repeat scroll center center;
+}
+.esriBookmarkEditBox {
+  line-height: 20px;
+  position: absolute;
+  top: -1px !important;
+  left: 4px !important;
+}

@@ -1,0 +1,53 @@
+<div>
+    <div data-dojo-attach-point="currentStepDiv" class="tab row">
+    	<div class="tab row">
+	    	<label>${i18n_CurrentSteps}:</label>
+	    	<span data-dojo-attach-point="workflowCurrentStepName"></span>
+	    	<span data-dojo-attach-point="currentStepSelectWrapper"><input data-dojo-attach-point="cboCurrentStepSelect"></span>
+	    </div>
+	
+	    <div class="tab row">
+	        <span data-dojo-attach-point="btnExecuteStep"></span>
+	        <span data-dojo-attach-point="btnMarkStepComplete"></span>
+	    </div>
+    </div>
+
+    <div class="tab row">
+        <div><img data-dojo-attach-point="workflowImageContainer" src="" /></div>
+    </div>
+
+    <!-- Workflow question step dialog -->
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="questionStepDialog" data-dojo-id="questionStepDialog" style="max-width: 600px">       
+        <div class="dijitDialogPaneContentArea">
+            <div class="form">
+                <div class="row">
+                    <label style="width: 100%" data-dojo-attach-point="questionStepMessage"></label>
+                    <span data-dojo-attach-point="questionStepDropdownWrapper"><input data-dojo-attach-point="cboQuestionSteps"></span>                 
+                    <span data-dojo-attach-point="questionStepButtonWrapper"></span>
+                </div>
+                <div class="row" data-dojo-attach-point="questionNotesDiv">
+                    <label style="width: 100%">${i18n_QuestionNotes}</label>
+                    <textarea data-dojo-attach-point="questionStepNotesTextarea"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="dijitDialogPaneActionBar" data-dojo-attach-point="questionStepActionBar">
+            <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-attach-event="onClick:questionStepHandler" data-dojo-props="class:'dojo-btn-success'">${i18n_Ok}</button>
+        </div>
+    </div>
+
+    <!-- Workflow step conflict dialog -->
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="stepConflictDialog" data-dojo-id="stepConflictDialog" title="Select next step">       
+        <div class="dijitDialogPaneContentArea">
+            <div class="form">
+                <div class="row">
+                    <input data-dojo-attach-point="cboStepConflictsSelect">
+                </div>
+            </div>
+        </div>
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-attach-event="onClick:resolveConflict" data-dojo-props="class:'dojo-btn-success'">${i18n_Ok}</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){stepConflictDialog.hide();}">${i18n_Cancel}</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+﻿<div style="height: 95%;">
+    <form data-dojo-attach-point="holdsForm" data-dojo-type="dijit.form.Form">
+        <div class="tab row">
+            <label>${i18n_HoldType}</label>
+            <input data-dojo-attach-point="holdType">
+        </div>
+        <div class="tab row">
+            <label>${i18n_Comment}:</label>
+            <textarea data-dojo-attach-point="holdTextarea"></textarea>
+        </div>
+        <div class="tab row">
+            <label></label>
+            <span data-dojo-attach-point="btnSaveHold"></span>
+        </div>
+    </form>
+    
+    <div class="tab row">
+        <label></label>
+        <span data-dojo-attach-point="errorContainer" class="errorContent"></span>
+    </div>
+    <div class="tab row gridContainer">
+        <div data-dojo-attach-point="gridContainer"></div>
+    </div>
+</div>

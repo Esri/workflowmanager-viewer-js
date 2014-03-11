@@ -1,0 +1,33 @@
+<div class="form-container">
+
+    <div class="steps" style="float: left; width: 200px;">
+        Steps:
+    </div>
+
+	<div class="form">
+
+		<div class="step-title container" data-dojo-attach-point="titleBar">
+			<h3><span><span data-dojo-attach-point="stepNumber">--</span></span><span data-dojo-attach-point="stepTitle">---</span></h3>
+		</div>
+		
+        <div class="form-body">
+			<div data-dojo-attach-point="formBody"></div>
+		</div>
+
+		<div class="form-action-bar">
+			<div class="form-action-bar-inner container" data-dojo-attach-point="formActionBarInner">
+				<button
+					data-dojo-type="dijit/form/Button"
+					data-dojo-attach-point="previousButton"
+					type="button" class="dojo-btn-primary" style="float: left; display: none"><i class="icon-arrow-left"></i>Previous</button>
+				<button
+					data-dojo-type="dijit/form/Button"
+					data-dojo-attach-point="nextButton"
+					type="button" class="dojo-btn-primary" style="float: right">Save & Next<i class="icon-arrow-right"></i></button>
+			</div>
+		</div>
+	</div>
+
+	<!-- arrow -->
+	<div class="step-arrow" data-dojo-attach-point="stepArrow"></div>
+</div>
