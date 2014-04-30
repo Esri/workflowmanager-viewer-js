@@ -352,11 +352,11 @@ function (
         parseURLToken: function (urlToParse) {
             var self = lang.hitch(this);
             self.wmTokenTask.parseTokens(
-                self.currentUser,
-                urlToParse,
                 self.currentJob.id,
+                urlToParse,
+                self.currentUser,
                 function(result) {
-                    self.openURL(result.output);
+                    self.openURL(result);
                 },
                 function(error) {
                     // The parseToken request failed, open the URL as-is.
