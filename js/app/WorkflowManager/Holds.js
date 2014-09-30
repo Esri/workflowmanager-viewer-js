@@ -1,51 +1,51 @@
 ﻿define([
     "dojo/topic",
     "dojo/dom",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
 
-	"dojo/text!./templates/Holds.html",
-	"dojo/i18n!./nls/Strings",
+    "dojo/text!./templates/Holds.html",
+    "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
 
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
     "dojo/string",
-	"dojo/dom-style",
+    "dojo/dom-style",
     "dojo/date/locale",
-	"dijit/registry",
+    "dijit/registry",
 
     "dojo/store/Memory",
 
     "dgrid/OnDemandGrid",
-	"dgrid/extensions/DijitRegistry",
-	"dgrid/Selection",
-	"dgrid/tree",
-	"dgrid/editor",
-	"dgrid/extensions/Pagination",
-	"dgrid/extensions/ColumnHider",
+    "dgrid/extensions/DijitRegistry",
+    "dgrid/Selection",
+    "dgrid/tree",
+    "dgrid/editor",
+    "dgrid/extensions/Pagination",
+    "dgrid/extensions/ColumnHider",
     "dgrid/extensions/ColumnResizer",
 
-	"dijit/form/FilteringSelect",
-	"dijit/form/TextBox",
+    "dijit/form/FilteringSelect",
+    "dijit/form/TextBox",
     "dijit/form/Textarea",
-	"dijit/form/Button",
-	"dijit/form/DropDownButton",
+    "dijit/form/Button",
+    "dijit/form/DropDownButton",
     "dijit/form/Form"
 ],
 
 function (
-	topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-	template, i18n, appTopics,
-	lang, connect, parser, query, on, string, domStyle, locale, registry,
+    topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+    template, i18n, appTopics,
+    lang, connect, parser, query, on, string, domStyle, locale, registry,
     Memory,
     OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
-	FilteringSelect, TextBox, Textarea, Button, DropDownButton, Form) {
+    FilteringSelect, TextBox, Textarea, Button, DropDownButton, Form) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
@@ -98,6 +98,7 @@ function (
                 id: "holdSaveButton",
                 name: "holdSaveButton",
                 style: "width:160px;",
+                "class": "dojo-btn-success",
                 disabled: true,
                 onClick: lang.hitch(this, function () {
                     this.saveButtonClicked();

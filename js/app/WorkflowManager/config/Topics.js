@@ -1,15 +1,26 @@
 define(function () {
     return {
+
+        chart: {
+            handleShape: "/chart/handleShape",
+            redoShape: "/chart/redoShape"
+        },
+
         map: {
             loaded: "/map/loaded",
             zoom: {
                 extent: "/map/zoom/extent"	
             },
             clearGraphics: "/map/clearGraphics",
+            layer : {
+                click: "/map/layer/click",
+                jobQuery: "/map/layer/jobQuery",                
+            },
             draw: {
                 start: "/map/draw/start",
                 end: "/map/draw/end",
                 clear: "/map/draw/clear",
+                saveGraphics: "/map/draw/saveGraphics",
                 deactivateAll: "/map/draw/deactivateAll"
             }
         },
@@ -35,6 +46,8 @@ define(function () {
         },
 
         grid: {
+            resetFilter: "grid/resetFilter",
+            filter: "grid/filter",
             jobDialog: "/grid/jobDialog",
             rowSelected: "/grid/rowSelected",
             assignJobs: "/grid/assignJobs",
@@ -43,7 +56,11 @@ define(function () {
         },
 
         attachment: {
-            removeAttachment: "/attachment/removeAttachment"
+            uploadAttachment: "/attachment/uploadAttachment",
+            getContentURL: "/attachment/getContentURL",
+            populateAttachment: "/attachment/populateAttachment",
+            removeAttachment: "/attachment/removeAttachment",
+            updateAttacments: "/attachment/updateAttachments"
         },
 
         properties: {
@@ -62,6 +79,14 @@ define(function () {
 
         notes: {
             noteUpdate: "/notes/noteUpdate"
+        },
+
+        extendedProperties: {
+            enableButton: "/extendedProperties/enableButton",
+            updateExtendedProperties: "/extendedProperties/updateExtendedProperties",
+            getFieldValues: "/extendedProperties/getFieldValues",
+            invalidUpdate: "/extendedProperties/invalidUpdate",
+            errorUpdating: "/extendedProperties/errorUpdating"
         }
 	};
 });

@@ -1,7 +1,10 @@
 define({
-	root: {
-	} /*,
-	
-	de: true,
-	'de-at': true */
+    root: {
+    } /*,
+    
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true */
 });

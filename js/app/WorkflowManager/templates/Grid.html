@@ -1,66 +1,67 @@
-<div style="height: 100%">
-    <div data-dojo-attach-point="gridContainer" style="height: 100%;"></div>
-    
-    <!-- Commented out for release -->
-    <!--<div>
-    	<span data-dojo-attach-point="selectedJobsCount">0</span> <span data-dojo-attach-point="selectedJobs">selected jobs</span>: 
-    
-    	<button type="button" data-dojo-type="dijit.form.Button" onclick="assignDialog.show();" data-dojo-attach-point="btnAssign" disabled="disabled">Assign</button>
-        <div data-dojo-type="dijit.Dialog" data-dojo-id="assignDialog" title="Assign Jobs" style="width: 500px">
-            <div class="dijitDialogPaneContentArea">
-                <br />
-                <div class="floating row">
-                    <label class="row-label">${i18n_JobAssignment}:</label>
-                    <span>
-                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="user" data-dojo-attach-point="assignmentTypeUser" data-dojo-attach-event="onClick: toggleAssignment" />
-                        <label for="user" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUser}</label>
-                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="group" data-dojo-attach-point="assignmentTypeGroup" data-dojo-attach-event="onClick: toggleAssignment" />
-                        <label for="group" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentGroup}</label>
-                        <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" checked="true" value="unassigned" data-dojo-attach-point="assignmentTypeUnassigned" data-dojo-attach-event="onClick: toggleAssignment" />
-                        <label for="unassigned" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUnassigned}</label>
-                    </span>
+<div style="width: 100%">
+    <div class="query-title">
+        <!-- Commented out for release -->
+        <!--<div>
+            <span data-dojo-attach-point="selectedJobsCount">0</span> <span data-dojo-attach-point="selectedJobs">selected jobs</span>:
+
+            <button type="button" data-dojo-type="dijit.form.Button" onclick="assignDialog.show();" data-dojo-attach-point="btnAssign" disabled="disabled">Assign</button>
+            <div data-dojo-type="dijit.Dialog" data-dojo-id="assignDialog" title="Assign Jobs" style="width: 500px">
+                <div class="dijitDialogPaneContentArea">
+                    <br />
+                    <div class="floating row">
+                        <label class="row-label">${i18n_JobAssignment}:</label>
+                        <span>
+                            <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="user" data-dojo-attach-point="assignmentTypeUser" data-dojo-attach-event="onClick: toggleAssignment" />
+                            <label for="user" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUser}</label>
+                            <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" value="group" data-dojo-attach-point="assignmentTypeGroup" data-dojo-attach-event="onClick: toggleAssignment" />
+                            <label for="group" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentGroup}</label>
+                            <input type="radio" data-dojo-type="dijit/form/RadioButton" name="assignmentType" checked="true" value="unassigned" data-dojo-attach-point="assignmentTypeUnassigned" data-dojo-attach-event="onClick: toggleAssignment" />
+                            <label for="unassigned" style="width: 100px; font-weight: normal;">${i18n_JobAssignmentUnassigned}</label>
+                        </span>
+                    </div>
+                    <div class="floating row" data-dojo-attach-point="assignmentTypeWrapper">
+                        <label class="row-label"></label>
+                        <span data-dojo-attach-point="assignmentTypeUserWrapper"><input data-dojo-attach-point="cboAssignmentUsers"></span>
+                        <span data-dojo-attach-point="assignmentTypeGroupWrapper"><input data-dojo-attach-point="cboAssignmentGroups"></span>
+                    </div>
+                    <br />
+                    <br />
                 </div>
-                <div class="floating row" data-dojo-attach-point="assignmentTypeWrapper">
-        	        <label class="row-label"></label>
-                    <span data-dojo-attach-point="assignmentTypeUserWrapper"><input data-dojo-attach-point="cboAssignmentUsers"></span>
-                    <span data-dojo-attach-point="assignmentTypeGroupWrapper"><input data-dojo-attach-point="cboAssignmentGroups"></span>
+                <div class="dijitDialogPaneActionBar">
+                    <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnAssignJob">Assign</button>
+                    <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){assignDialog.hide();}">Cancel</button>
                 </div>
-                <br />
-                <br />
             </div>
-            <div class="dijitDialogPaneActionBar">
-                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnAssignJob">Assign</button>
-                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){assignDialog.hide();}">Cancel</button>
-            </div>
-        </div>
-
-        <button type="button" data-dojo-type="dijit.form.Button" onclick="closeDialog.show();" data-dojo-attach-point="btnClose" disabled="disabled">Close</button>
-        <div data-dojo-type="dijit.Dialog" data-dojo-id="closeDialog" title="Close Jobs" style="width: 500px">
+            -->
+        <span class="grid-label" data-dojo-attach-point="selectedQueryName"></span><span class ="grid-label">:  </span><span class="grid-label grid-italic" data-dojo-attach-point="numberJobs"></span>
+        <p class="grid-buttons" data-dojo-attach-point="gridButtons" style="display: none">
+            <span data-dojo-attach-point="btnCloseContainer"><button type="button" data-dojo-type="dijit.form.Button" onclick="closeDialog.show();" data-dojo-props="class:'dojo-btn-info'" data-dojo-attach-point="btnClose">${i18n_Close}</button></span>
+            <span data-dojo-attach-point="btnDeleteContainer"><button type="button" data-dojo-type="dijit.form.Button" onclick="deleteDialog.show();" data-dojo-props="class:'dojo-btn-danger'" data-dojo-attach-point="btnDelete">${i18n_Delete}</button></span>
+</p>
+        <div data-dojo-type="dijit.Dialog" data-dojo-id="deleteDialog" title="${i18n_DeleteTitle}" class="grid-dialog">
             <div class="dijitDialogPaneContentArea">
                 <br />
-                Are you sure you want to <span style="font-weight: bold;">close the selected job(s)</span>?
+                <span class="grid-content">${i18n_PromptDelete}</span>
                 <br />
                 <br />
             </div>
             <div class="dijitDialogPaneActionBar">
-                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnCloseJob">Yes</button>
-                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){closeDialog.hide();}">No</button>
+                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnDeleteJob">${i18n_Yes}</button>
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){deleteDialog.hide();}, class:'dojo-btn-danger'">${i18n_No}</button>
             </div>
         </div>
-
-        <button type="button" data-dojo-type="dijit.form.Button" onclick="deleteDialog.show();" data-dojo-attach-point="btnDelete" disabled="disabled">Delete</button>
-        <div data-dojo-type="dijit.Dialog" data-dojo-id="deleteDialog" title="Delete Jobs" style="width: 500px">
+        <div data-dojo-type="dijit.Dialog" data-dojo-id="closeDialog" title="${i18n_CloseTitle}" class="grid-dialog">
             <div class="dijitDialogPaneContentArea">
                 <br />
-                Are you sure you want to <span style="font-weight: bold;">delete the selected job(s)</span>?
+                <span class="grid-content">${i18n_PromptClose}</span>
                 <br />
                 <br />
             </div>
             <div class="dijitDialogPaneActionBar">
-                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnDeleteJob">Yes</button>
-                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){deleteDialog.hide();}">No</button>
+                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnCloseJob">${i18n_Yes}</button>
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){closeDialog.hide();}, class:'dojo-btn-danger'">${i18n_No}</button>
             </div>
         </div>
-
-    </div>-->
+    </div>
+    <div data-dojo-attach-point="gridContainer" style="width: 100%"></div>
 </div>

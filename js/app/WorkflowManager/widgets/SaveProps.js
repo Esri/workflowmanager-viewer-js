@@ -1,38 +1,42 @@
 ﻿define([
     "dojo/topic",
     "dojo/dom",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
 
-	"dojo/text!./SaveProps/SaveProps.html",
+    "dojo/text!./SaveProps/SaveProps.html",
     "dojo/i18n!./SaveProps/nls/Strings",
     "app/WorkflowManager/config/Topics",
 
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
     "dojo/string",
-	"dojo/dom-style",
-	"dijit/registry",
+    "dojo/dom-style",
+    "dijit/registry",
 
-	"dijit/form/Button",
+    "dijit/form/Button",
     "dijit/Dialog"
 ],
 
 function (
-	topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-	template, i18n, appTopics,
-	lang, connect, parser, query, on, string, domStyle, registry,
-	Button, Dialog) {
+    topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+    template, i18n, appTopics,
+    lang, connect, parser, query, on, string, domStyle, registry,
+    Button, Dialog) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
         templateString: template,
         widgetsInTemplate: true,
+        
+        //i18n
+        i18n_SaveProperties: i18n.saveProperties,
+        i18n_SavePrompt: i18n.savePrompt,
 
         constructor: function () {
         },
@@ -46,7 +50,7 @@ function (
 
             this.savePropsDialog.startup();
 
-            this.savePropsDialog.set("title", "Save Properties?");
+            this.savePropsDialog.set("title", i18n.saveProperties);
             this.savePropsDialog.set("style", "width: 600px;");
             //this.savePropsDialog.onHide(this.controller.clearProps());
 
@@ -68,6 +72,7 @@ function (
             this.dismissDialogButton = new Button({
                 label: i18n.declineSave,
                 name: "dismissDialogButton",
+                "class" : "dojo-btn-danger",
                 onClick: lang.hitch(this, function () {
                     this.closeDialog();
                 })

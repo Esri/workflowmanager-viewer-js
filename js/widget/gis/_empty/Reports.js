@@ -3,24 +3,24 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-	
-	"dojo/topic",
-	"dojo/dom",
-	"dojo/dom-style",
-	"dojo/dom-construct",
-	"dojo/dom-class",
-	"dojo/_base/lang",
+    
+    "dojo/topic",
+    "dojo/dom",
+    "dojo/dom-style",
+    "dojo/dom-construct",
+    "dojo/dom-class",
+    "dojo/_base/lang",
     "dojo/string",
-	
+    
     "dojo/text!./Reports/templates/Reports.html",
-	"dojo/i18n!./Reports/nls/Strings"
+    "dojo/i18n!./Reports/nls/Strings"
     ], 
-	
-	function(
-		declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
-		topic, dom, domStyle, domConstruct, domClass, lang, string, 
-		template, i18n
-	) {
+    
+    function(
+        declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
+        topic, dom, domStyle, domConstruct, domClass, lang, string, 
+        template, i18n
+    ) {
 
     //anonymous function to load CSS files required for this module
     (function() {
@@ -35,20 +35,20 @@ define([
             head.appendChild(link);
         }
     }());
-		
+        
     // main geolocation widget
     return declare("dijit.gis.Reports", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: template,
         widgetsInTemplate: true,
-		
+        
         postCreate: function() {
             this.inherited(arguments);
 
         },
-		
-		startup: function() {
-			console.log("Reports started");	
-		}
+        
+        startup: function() {
+            console.log("Reports started");    
+        }
     });
-	
+    
 });

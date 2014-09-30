@@ -1,10 +1,47 @@
-<div class="form">
-	<div class="row">
-        <span data-dojo-attach-point="attachmentsInfo">${i18n_NoAttachments}</span>
+<div>
+    <div data-dojo-attach-point="attachmentTypeContainer">
+        <div class="attachment-row">
+            <input type="radio" data-dojo-attach-point="embedAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="embed" checked="true" data-dojo-attach-event="onClick: toggleEmbedAttachmentType" />
+            <label for="embed">${i18n_Embed}</label>
+            <input type="radio" data-dojo-attach-point="linkAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="link" data-dojo-attach-event="onClick: toggleLinkAttachmentType" />
+            <label for="link">${i18n_Link}</label>
+            <input type="radio" data-dojo-attach-point="urlAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="url" data-dojo-attach-event="onClick: toggleURLAttachmentType" />
+            <label for="url">${i18n_URL}</label>
+        </div>
+        <div class="tab row" data-dojo-attach-point="embedAttachmentContainer" style="display: none">
+            <form id="sendForm">
+                <input type="text" id="user" name="user" value="" style="display: none" />
+                <input type="text" id="storageType" name="storageType" value="2" style="display: none" />
+                <input type="text" id="f" name="f" value="json" style="display: none" />
+                <input type="file" data-dojo-attach-point="fileUploader" />
+            </form>
+        </div>
+        <div class="tab row" data-dojo-attach-point="linkURLAttachmentContainer" style="display: none">
+            <input type="text" data-dojo-attach-point="attachTextBox" />
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="addButton" data-dojo-props="class: 'dojo-btn-success'">${i18n_Add}</button>
+        </div>
     </div>
-
-    <div class="row">
-        <div data-dojo-attach-point="fileListContainer"></div>
+    <div class="form">
+        <div class="row">
+                <span data-dojo-attach-point="attachmentsInfo">${i18n_NoAttachments}</span>
+                <div class="row" data-dojo-attach-point="attachmentFileList" style="width: 540px">
+                    <div class="row">
+                        <p class="attachment-title" data-dojo-attach-point="attachmentTitle">${i18n_AttachmentFile}</p>
+                        <p data-dojo-attach-point="attachmentType" class="attachment-type">${i18n_AttachmentType}</p>
+                    </div>
+                    <div data-dojo-attach-point="fileListContainer">
+                    </div>
+                </div>
+        </div>
     </div>
-
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="errorDialog" data-dojo-id="errorDialog" title="" class="attachment-dialog">
+        <div class="dijitDialogPaneContentArea">
+            <div class="attachment-dialog-text">
+                <span data-dojo-attach-point="dialogPrompt" style="display: inline-block; text-align: left"></span>
+            </div>
+            <div class="dijitDialogPaneActionBar attachment-action-pane">
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="dialogOk" data-dojo-props="class: 'dojo-btn-success'">${i18n_Ok}</button>
+            </div>
+        </div>
+    </div>
 </div>

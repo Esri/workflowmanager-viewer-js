@@ -3,10 +3,18 @@
         openJob: "Open Job",
         loadingJobInfo: "Loading Job Info",
         loading: "Loading",
-        selectAJob: "Select A Job"
+        selectAJob: "Select A Job",
+        
+        // AOI identify window
+        createdBy: "Created By",
+        assignedTo: "Assigned To",
+        priority: "Priority",
+        status: "Status"
     }),
-
-    "de": true,
-    "de-at": true,
-    "es-ES": true
+    
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true
 });

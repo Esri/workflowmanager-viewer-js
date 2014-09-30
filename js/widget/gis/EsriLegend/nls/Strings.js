@@ -1,9 +1,11 @@
 define({
-	root: ({
-		Legend_Label: "Legend"
-	}),
-	
-	"de": true,
-	"de-at": true,
-    "es-ES": true
+    root: ({
+        Legend_Label: "Legend"
+    }),
+    
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true
 });

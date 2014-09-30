@@ -1,6 +1,21 @@
-﻿<div class="row">
-    <p data-dojo-attach-point="attachmentType" class="attachment-type">${i18n_NoAttachmentType}</p>
-    <p class="attachment-link"><a data-dojo-attach-point="attachmentLink" href="#" target="_blank"><span data-dojo-attach-point="attachmentFilename">${i18n_NoFilename}</span></a></p>
-    <p class="attachment-remove"><button data-dojo-attach-point="btnRemoveAttachment" type="button"><i class="icon-remove icon-large"></i></button></p>
-    <div class="clear-fix"></div>
+﻿<div>
+    <div class="row">
+        <p class="attachment-url" data-dojo-attach-point="attachmentURL"><a data-dojo-attach-point="attachmentURLLink" href="#" target="_blank"><span data-dojo-attach-point="attachmentURLName">${i18n_NoFilename}</span></a></p>
+        <p data-dojo-attach-point="attachmentType" class="attachment-type">${i18n_NoAttachmentType}</p>
+        <p style="display: none" class="attachment-remove" data-dojo-attach-point="attachmentRemove"><button data-dojo-attach-point="btnRemoveAttachment" type="button"><i class="icon-remove icon-large"></i></button></p>
+        <div class="clear-fix"></div>
+    </div>
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="OpenFileDialog" data-dojo-id="OpenFileDialog" title="" class="attachment-dialog">
+        <div class="dijitDialogPaneContentArea">
+            <div class="attachment-dialog-text">
+                <span class="attachment-prompt">${i18n_DialogPrompt}</span>
+            </div>
+            <div class="attachment-dialog-text-link attachment-dialog-text">
+                <span class="linked-file-path" data-dojo-attach-point="LinkFilePath"></span>
+            </div>
+            <div class="attachment-action-pane dijitDialogPaneActionBar">
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="dialogOk" data-dojo-props="class: 'dojo-btn-success'">${i18n_Ok}</button>
+            </div>
+        </div>
+    </div>
 </div>

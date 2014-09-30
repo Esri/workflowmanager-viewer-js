@@ -1,5 +1,5 @@
 <div style="margin: 10px;">
-    <div style="margin: 5px;">
+    <div style="margin: 5px; min-height: 60px">
         <div id="chart-dropdown-container" style="float: left; width: 330px;">
             <div style="float: left; margin-bottom: 5px;">
                 <span style="display: block;">${i18n_CategorizedBy}</span>
@@ -11,6 +11,9 @@
             </div>
         </div>
         <div style="float: right; margin: 22px 5px 0 0;">
+            <span data-dojo-attach-point="resetButton" style="display: none;">
+                <button data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick: resetRow" data-dojo-props="class: 'dojo-btn-info'">${i18n_Reset}</button>
+            </span>
             <input type="radio" data-dojo-type="dijit/form/RadioButton" name="chartType" value="chartTypeBar" checked="true" data-dojo-attach-event="onClick: toggleCharts" />
             <label for="chartTypeBar">${i18n_BarChart}</label>
             <input type="radio" data-dojo-type="dijit/form/RadioButton" name="chartType" value="chartTypePie" data-dojo-attach-event="onClick: toggleCharts" />

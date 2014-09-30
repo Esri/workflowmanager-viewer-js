@@ -3,10 +3,12 @@
         confirmClear: "Yes, delete AOI",
         declineClear: "No, don't delete AOI",
         clearDialogContent: "Are you sure you want to delete the AOI for this job?",
-        clearDialogTitle: "Delete Aoi"
+        clearDialogTitle: "Delete AOI"
     }),
 
-    "de": true,
-    "de-at": true,
-    "es-ES": true
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true
 });

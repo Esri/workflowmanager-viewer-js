@@ -45,7 +45,7 @@ body {
 }
 
 .wide-btn .dijitButtonNode {
-    width: 140px;
+    min-width: 180px;
 }
 
 body .dijitComboBox {
@@ -79,6 +79,17 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 /*.tab.row.gridContainer {
     height: 83%;
 }*/
+
+
+/*Extended Properties*/
+.propertyTable {
+    outline-width: thin;
+    outline-color: lightgrey;
+    outline-style: ridge;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
 
 /* Fix tabContainer in Dialog */
 .bootstrap .dijitDialog .dijitDialogPaneContent {
@@ -197,19 +208,123 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 }
 
 /* AttachmentItem Widget */
-.attachment-type, .attachment-link, .attachment-remove {
+.attachment-type, .attachment-title, .attachment-url,.attachment-remove, .attachment-link  {
     float: left;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 .attachment-type {
     width: 100px;
     margin-right: 20px;
-}
+} 
 .attachment-link {
-    width: 300px;
-    margin-right: 20px;
+    width: 50px;
+    margin-right: 0px;
 }
+.attachment-url, .attachment-title{
+    width:300px;
+    margin-right: 20px;
+    overflow:hidden;
+}
+.disable {
+    opacity: .5;
+}
+.attachment-item {
+    margin-right: 10px;
+}
+.divider {
+    margin-bottom: 0px;
+    margin-top: 10px;
+}
+.attachment-label {
+    float: left;
+    width: 100%
+}
+.attachment-dialog {
+    width: 300px;
+}
+.attachment-dialog-text {
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: center;
+}
+.attachment-dialog-text-link {
+    margin: 10px;
+}
+.attachment-action-pane {
+    height: 40px
+}
+.attachment-prompt {
+    display: inline-block;
+    text-align: left;
+}
+.linked-file-path{
+    display: inline-block;
+    text-align: left; 
+    width: 246px; 
+    word-wrap: break-word;
+}
+.attachment-radio-label {
+    width: auto;
+    font-weight: normal;
+}
+.attachment-row {
+    margin: 10px;
+}
+.attachment-list {
+    margin-left: 40px;
+}
+
+.extendedProperty-item-label {
+    width: 150px;
+}
+.extendedProperty-item {
+    float: left;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.extendedProperty-item-field {
+    width: 232px;
+    height: 28px;
+}
+.extendedProperty-item-required {
+    color: black; 
+    font-size: 23px;
+}
+.extendedProperty-item-error {
+    color: white; 
+    background-color: red;
+}
+
+.warning-label {
+    color: red;
+    margin-left: 10px;
+}
+
+.query-title {
+    margin-left: 20px;
+    height: 36px;
+}
+
+.grid-dialog {
+    width: 370px;
+}
+.grid-content {
+    margin-left: 20px;
+}
+.grid-buttons {
+    float: right;
+    margin: 0px;
+}
+.grid-label {
+    float: left;
+    margin: 7px 0px 0px 0px;
+}
+.grid-italic{
+    font-style: italic;
+    margin-left: 5px;
+}
+
 .bootstrap .dijitButton.icon-button .dijitButtonNode {
     border: none;
     padding: 0;

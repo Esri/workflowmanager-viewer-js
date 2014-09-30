@@ -1,3 +1,12 @@
 <div>
-	Extended Properties
+    <p data-dojo-attach-point="textContainer"><span>${i18n_NoExtendedProperties}</span></p>
+        <div data-dojo-attach-point="extendedPropertiesTableListAttach"></div>
+    <div class="tab row">
+        <p data-dojo-attach-point="buttonContainer" style="display: none;">
+            <button type="button" data-dojo-attach-point="btnUpdateRecordsAttach"></button>
+            <span class="extendedProperty-item-required">  * </span>
+            <span> ${i18n_Required}</span>
+        </p>
+        <span data-dojo-attach-point="errorContainer" class="errorContent"></span>
+    </div>
 </div>

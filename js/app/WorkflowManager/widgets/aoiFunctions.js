@@ -1,33 +1,33 @@
 ﻿define([
     "dojo/topic",
     "dojo/dom",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
 
-	"dojo/text!./AoiFunctions/AoiFunctions.html",
+    "dojo/text!./AoiFunctions/AoiFunctions.html",
     "dojo/i18n!./AoiFunctions/nls/Strings",
     "app/WorkflowManager/config/Topics",
 
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
     "dojo/string",
-	"dojo/dom-style",
-	"dijit/registry",
+    "dojo/dom-style",
+    "dijit/registry",
 
-	"dijit/form/Button",
+    "dijit/form/Button",
     "dijit/Dialog"
 ],
 
 function (
-	topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-	template, i18n, appTopics,
-	lang, connect, parser, query, on, string, domStyle, registry,
-	Button, Dialog) {
+    topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+    template, i18n, appTopics,
+    lang, connect, parser, query, on, string, domStyle, registry,
+    Button, Dialog) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
@@ -69,6 +69,7 @@ function (
             this.dismissDialogButton = new Button({
                 label: i18n.declineClear,
                 name: "cancleClearAoiButton",
+                "class": "dojo-btn-danger",
                 onClick: lang.hitch(this, function () {
                     this.aoiFunctionsDialog.hide();
                 })

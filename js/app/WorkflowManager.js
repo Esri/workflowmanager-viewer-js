@@ -68,7 +68,8 @@ define([
     "./WorkflowManager/widgets/aoiFunctions",
     
     // WM Utils
-    "./WorkflowManager/utils/Util",
+    "./WorkflowManager/utils/MapUtil",
+    "./WorkflowManager/utils/WMUtil",
     
     // GIS widgets
     "widget/gis/EsriMap", 
@@ -99,7 +100,7 @@ define([
     Geocoder,
     WMAOILayerTask, WMConfigurationTask, WMJobTask, WMReportTask, WMTokenTask, WMWorkflowTask, Enum, JobQueryParameters,
     appTopics, Alert, Header, Filter, Grid, Statistics, Properties, ExtendedProperties, Notes, Workflow, Attachments, AttachmentItem, History, Aoi, Holds, mapTemplate, AoiFunctionsTemplate,
-    WMUtil,
+    MapUtil, WMUtil,
     EsriMap, EsriLegend, Coordinates, BasemapGallery, DrawTool, Login,
     Expander,
     Memory,
@@ -133,6 +134,12 @@ define([
         wmReportTask : null,
         wmTokenTask : null,
         wmWorkflowTask : null,
+        
+        // AOI query layer objects
+        aoiMapServiceUrl: null,
+        aoiMapServiceLayerID : 0,
+        aoiMapServiceQueryLayerUrl : null,
+        aoiDynamicLayerDefinitions : null,
 
         // Token service url
         tokenServerUrl : null,
@@ -146,10 +153,11 @@ define([
         commentActivityTypeId : null,
 
         // Current user
+        authenticationMode : "none",
         isWindowsUser : false,
         user : null, // username
         userDetails : null, // user detailed information
-        userQueries : null,
+        userQueries: null,
 
         userPrivileges : {
             canAssignAnyJob : false,
@@ -178,32 +186,104 @@ define([
         currentJobHolds : null,
         jobHasActiveHold : null,
 
+        // passed job/query
+        jobIDInURL : null,
+        queryIDInURL : null, 
+
         // Current query results
-        queryResults : null,
+        queryResults: null,
+        currentQueryId: null,
+        selectedQuery: null,
+        savedQuery: null,
+
+        //i18n
+        i18n_SearchResults: i18n.filter.results,
+        i18n_NumberJobs: i18n.grid.numberJobs,
 
         // Assignment group
-        currentAssignmentGroup : null,
+        currentAssignmentGroup: null,
 
-        startup : function(args) {
+        // Updating locks
+        updatingAttachments: null,
+        updatingExtendedProperties: null,
+       
+        handleURL: function() {
+            //grab url and parse it,
+            //pass teh appropriate id to teh correct variable
+            var url = window.location.toString().split("#")[0];
+            var index = url.indexOf("?");
+            if (index > -1) {
+                var endURL = url.substr(index + 1);
+                if (endURL == "true") {
+                    config.app.Reloaded = endURL;
+                } else {
+
+                    var jobToShow = endURL.split("?")[0];
+                    config.app.Reloaded = endURL.split("?")[1];
+                    var paramName = jobToShow.split("=")[0].toString().toUpperCase();
+                    var idNumber = jobToShow.split("=")[1];
+                    if (paramName == "JOBID") {
+                        this.jobIDInURL = idNumber;
+                    } else if (paramName == "QUERYID") {
+                        this.queryIDInURL = idNumber;
+                    }
+                }
+            }
+        },
+
+        startup: function (args) {
+            
+            //handle the url and any flags passed with it
+            this.handleURL();
+           
             //loading screen strings
             dom.byId("loadingAppTitle").innerHTML = i18n.header.title;
             dom.byId("loadingAppSubTitle").innerHTML = i18n.header.subHeader;
             dom.byId("loadingMessage").innerHTML = i18n.loading.loading;
 
             this.wmServerUrl = config.app.ServiceRoot;
+            
+            this.aoiMapServiceUrl = config.app.jobAOILayer.url;
+            this.aoiMapServiceLayerID = config.app.jobAOILayer.AOILayerID != null ? config.app.jobAOILayer.AOILayerID : 0; 
+            this.aoiMapServiceQueryLayerUrl = this.aoiMapServiceUrl + "/" + this.aoiMapServiceLayerID;
+            this.aoiDynamicLayerDefinitions = MapUtil.formatLayerDefinitions([
+                    MapUtil.getLayerDefinition(this.aoiMapServiceLayerID, "1=0")
+                ]);            
+            
             this.tokenServerUrl = config.app.TokenService;
             this.initTasks();
 
             // Theme
             this.initTheme(config.theme);
 
-            if (args && args.user) {
-                // log in user automatically
-                this.user = args.user;
-                this.isWindowsUser = true;
-                this.validateUser(this.user);
-            } else {
-                this.initLogin();
+            // Authenticate user
+            this.authenticationMode = config.app.AuthenticationMode != null ? config.app.AuthenticationMode.toLowerCase() : "none";
+            switch (this.authenticationMode) {
+                case "windows" :
+                    if (args && args.user) {
+                        // log in user automatically
+                        this.user = args.user;
+                        this.isWindowsUser = true;
+                        this.validateUser(this.user);
+                    }
+                    else {
+                        this.errorHandler(i18n.error.errorRetrievingWindowsUser);
+                    }
+                    break;
+                case "token" :
+                    this.initLogin();
+                    break;
+                case "none" :
+                    if (config.app.AutoLogin == false || config.app.Reloaded) {
+                        this.initLogin();
+                    } else if (config.app.AutoLogin ) {
+                        this.initLogin(config.app.DefaultUser);
+                    }
+                    break;  
+                default:
+                    var errMsg = i18n.error.errorInvalidAuthenticationMode.replace("{0}", this.authenticationMode);
+                    this.errorHandler(errMsg);
+                    break;
             }
         },
 
@@ -275,7 +355,7 @@ define([
             esri.config.defaults.io.proxyUrl = config.proxy.url;
             esri.config.defaults.io.alwaysUseProxy = config.proxy.alwaysUseProxy;
 
-            this.wmAOILayerTask = new WMAOILayerTask(config.app.jobAOILayer.url);
+            this.wmAOILayerTask = new WMAOILayerTask(this.aoiMapServiceQueryLayerUrl);
             this.wmConfigurationTask = new WMConfigurationTask(this.wmServerUrl);
             this.wmReportTask = new WMReportTask(this.wmServerUrl);
             this.wmJobTask = new WMJobTask(this.wmServerUrl);
@@ -406,60 +486,92 @@ define([
                     var oldVal = self.tabs.get("selectedChildWidget");
                     var newVal = arguments[0];
                     //console.log("selected child changed from ", oldVal.title, " to ", newVal.title);
-
+                    
                     self.doSelectChild = selectChild;
                     self.selectChildObject = this;
                     self.selectChildArgs = arguments;
 
-                    // moving from properties to any other tab
+                    // moving from properties to any other tab, prompt user to save updates as needed
                     if ((oldVal.id == self.tabProperties.id) && (newVal.id != self.tabProperties.id)) {
                         self.tabProperties.content.closingProps();
-                    } else {
-                        switch (newVal.id) {
-                            case self.tabProperties.id:
-                                //refresh job data
-                                self.getJobById({
-                                    jobId : self.selectedRowId,
-                                    updateWorkflow : false,
-                                    zoomToPolygon : false
-                                });
-                                //temp clear update properties notification
-                                self.tabProperties.content.updateCallback("");
-                                selectChild.apply(this, arguments);
-                                break;
-                            case self.tabWorkflow.id:
-                                //refresh job data
-                                self.getJobById({
-                                    jobId : self.selectedRowId,
-                                    updateWorkflow : false,
-                                    zoomToPolygon : false
-                                });
-                                selectChild.apply(this, arguments);
-                                break;
-                            case self.tabHistory.id:
-                                //update tab
-                                self.updateHistory();
-                                selectChild.apply(this, arguments);
-                                break;
-                            case self.tabNotes.id:
-                                //update tab
-                                self.updateNotes();
-                                selectChild.apply(this, arguments);
-                                break;
-                            case self.tabHolds.id:
-                                //update tab
-                                self.updateHolds();
-                                selectChild.apply(this, arguments);
-                                break;
-                            default:
-                                break;
-                        };
+                    }
+                    if ((oldVal.id == self.tabExtendedProperties.id) && (newVal.id != self.tabExtendedProperties.id)) {
+                        self.tabExtendedProperties.content.closingExtendedProps();
+                    }
+                    
+                    // refresh tab contents
+                    switch (newVal.id) {
+                        case self.tabProperties.id:
+                            //refresh job data
+                            self.getJobById({
+                                jobId : self.selectedRowId,
+                                updateWorkflow : false,
+                                zoomToPolygon : false
+                            });
+                            //temp clear update properties notification
+                            self.tabProperties.content.updateCallback("");
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabWorkflow.id:
+                            //refresh job data
+                            self.getJobById({
+                                jobId : self.selectedRowId,
+                                updateWorkflow : false,
+                                zoomToPolygon : false
+                            });
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabHistory.id:
+                            //update tab
+                            self.updateHistory();
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabNotes.id:
+                            //update tab
+                            self.updateNotes();
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabHolds.id:
+                            //update tab
+                            self.updateHolds();
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabExtendedProperties.id:
+                            //update tab
+                            self.updateExtendedProperties(self.currentJob.id);
+                            selectChild.apply(this, arguments);
+                            break;
+                        case self.tabAttachments.id:
+                            
+                            self.updateAttachments(self.currentJob.id);
+                            selectChild.apply(this, arguments);
+                            break;
+                        default:
+                            break;
                     }
                 };
 
             });
+
             console.log("Done with service configuration");
         },
+
+        checkAttachmentPrivileges: function () {
+            //check for user privileges and job properites
+            var jobHold = this.jobHasActiveHold;
+            var canAddHeld = this.userPrivileges.canAddAttachesForHeldJobs;
+            var canManageAttach = this.userPrivileges.canManageAttachments;
+            var jobClosed = (this.currentJob.stage == Enum.JobStage.CLOSED);
+            if (jobHold) {
+                this.jobWarning.innerHTML = i18n.header.onHold;
+            } else if (jobClosed) {
+                this.jobWarning.innerHTML = i18n.header.closed;
+            } else {
+                this.jobWarning.innerHTML = "";
+            }
+            return {jobHold: jobHold, canAddHeld: canAddHeld, canManageAttach: canManageAttach, jobClosed: jobClosed};
+        },
+
 
         switchTabs : function() {
             var self = lang.hitch(this);
@@ -504,6 +616,20 @@ define([
                     self.addQueriesFromContainer(item, queries);
                 });
             }
+        },
+
+        setQueryNameFromId: function(queryId) {
+            var self = lang.hitch(this);
+            arrayUtil.forEach(self.filter.content.publicQueries, function(query) {
+                if (query.id == queryId) {
+                    self.savedQuery = query.name;
+                }
+            });
+            arrayUtil.forEach(self.filter.content.userQueries, function (query) {
+                if (query.id == queryId) {
+                    self.savedQuery = query.name;
+                }
+            });
         },
 
         initUserPrivileges : function(privileges) {
@@ -571,12 +697,14 @@ define([
             }
         },
 
-        getJobsByQueryID : function(queryID) {
+        getJobsByQueryID : function(queryID, reset) {
             var self = lang.hitch(this);
             //number of times it will try to retrieve results
             var queryTryTotal = 2;
             var queryTryCount = 0;
 
+            this.currentQueryId = queryID;
+            this.selectedQuery = this.savedQuery;
             //console.log("Query ID:", queryID);
             //if results aren't returned within 2 seconds it will show progress bar
             var progressTimer = setTimeout(function () { self.showProgress() }, 10000);
@@ -592,7 +720,25 @@ define([
                     clearInterval(queryTimeout);
 
                     console.log("queryJobsByID succeeded: ", data);
-                    self.populateQueryResults(data);
+
+                    //first check jobIDInURL, if true then short circuit and only grab one job
+                    //then check queryIDInURL, if true set it to false to avoid loop and call getjobsbyqueryid again
+                    //otherwise continue as usual and get all jobs
+                    if (self.jobIDInURL) {
+                        self.selectedQuery = self.i18n_SearchResults;
+                        self.getJobsByJobIDs([self.jobIDInURL]);
+                        self.jobIDInURL = null;
+                    } else if (self.queryIDInURL) {
+                        self.setQueryNameFromId(self.queryIDInURL);
+                        self.getJobsByQueryID(self.queryIDInURL);
+                        self.queryIDInURL = null;
+                    } else {
+                        self.populateQueryResults(data);
+                    }
+                    if (reset) {
+                        self.resetQueryLabel();
+                    }
+
                 }), function (error) {
                     //hide progress bar when results are returned
                     self.hideProgress();
@@ -661,18 +807,19 @@ define([
             var self = lang.hitch(this);
             var searchResultIds = [];
             var customColumns = [];
-            var jobIdField = self.aoiJobIdField;
+            var jobIdField = this.getJobIdColumnField(columns);
 
             // prepare the rows
             var rows = [];
             //just ids for feature layer query
             var rowIds = [];
+            
             arrayUtil.forEach(this.queryResults.rows, function(row) {
                 var newRow = {};
                 for (var column in columns) {
                     newRow[columns[column].id] = row.shift();
                     //only add values from fields with key that matches "job_id"
-                    if (columns[column].id.toLowerCase().indexOf(self.aoiJobIdField.toLowerCase()) != -1) {
+                    if (columns[column].id == jobIdField) {
                         //add id value to rowIds array for feature layer query
                         rowIds.push(newRow[column]);
                         //////////////format job ids to number instead of string
@@ -696,13 +843,89 @@ define([
                 x++;
             }
 
+            //allow these to accessed elsewhere
+            this.columns = columns;
+            this.rows = rows;
+            this.rowIds = rowIds;
             // apply store based on rows
+            this.grid.content.numberJobs.innerHTML = this.i18n_NumberJobs.replace("{0}", rows.length);
             this.grid.content.setGridData(columns, rows, this.queryResults.fields[0].name);
             // populate filtering selects in statistics
             this.statisticsContainer.content.populateDropdowns(customColumns);
 
             //update the feature definition expression
-            this.myMap.getUpdatedFeatures(rowIds)
+            this.myMap.getUpdatedFeatures(rowIds);
+        },
+        
+        getJobIdColumnField: function (columns) {
+            
+            for (var column in columns) {
+                if (WMUtil.isField(column, "JTX_JOBS.JOB_ID"))
+                {
+                    return column;
+                }
+            }
+            return null;
+        },
+        
+        resetQueryLabel: function(){
+            var self = lang.hitch(this);
+            this.grid.content.numberJobs.innerHTML = this.i18n_NumberJobs.replace("{0}", this.rows.length);
+            this.grid.content.selectedQueryName.innerHTML = this.savedQuery;
+            this.selectedQuery = this.savedQuery;
+        },
+
+        //reset the filter after filterRow has been called
+        resetRow: function () {
+            if (this.columns && this.rows && this.queryResults) {
+                this.columns[this.queryResults.fields[1].name].hidden = false;
+                topic.publish(appTopics.chart.handleShape, this, {});
+                this.grid.content.setGridData(this.columns, this.rows, this.queryResults.fields[0].name);
+                this.columns[this.queryResults.fields[1].name].hidden = true;
+                this.myMap.getUpdatedFeatures(this.rowIds);
+                this.grid.content.numberJobs.innerHTML = this.i18n_NumberJobs.replace("{0}", this.rows.length);
+                this.grid.content.selectedQueryName.innerHTML = this.selectedQuery;
+            }
+        },
+        
+        //filter the rows in a grid via the inputed field types, and there corresponding fields
+        //also accounts for N/A
+        filterRow: function(filterField1Type, filterField2Type, filterField1, filterField2) {
+            filterRows = []
+            this.columns[this.queryResults.fields[1].name].hidden = false;
+            var rows = this.rows;
+            var columns = this.columns;
+            var jobIdField = this.getJobIdColumnField(columns);
+
+            if (filterField1 == "N/A") {
+                filterField1 = "";
+            }
+            if (filterField2 == "N/A") {
+                filterField2 = "";
+            }
+
+            var rowIds = [];
+
+            for(var key in rows) {
+                var obj = rows[key];
+                if(filterField2Type) {
+                    if(obj[filterField1Type] == filterField1 && obj[filterField2Type] == filterField2) {
+                        filterRows.push(obj);
+                        rowIds.push(obj[columns[this.queryResults.fields[0].name].id]);
+                    }
+
+                } else {
+                    if(obj[filterField1Type] == filterField1) {
+                        filterRows.push(obj);
+                        rowIds.push(obj[columns[this.queryResults.fields[0].name].id]);
+                    }
+                }
+            }
+
+            this.grid.content.numberJobs.innerHTML = this.i18n_NumberJobs.replace("{0}", filterRows.length);
+            this.myMap.getUpdatedFeatures(rowIds);
+            this.grid.content.setGridData(columns, filterRows, this.queryResults.fields[0].name);
+            this.columns[this.queryResults.fields[1].name].hidden = true;
         },
 
         filterGrid : function(sender, args) {
@@ -715,13 +938,9 @@ define([
             this.wmJobTask.searchJobs(args.value, this.user, function(data) {
                 self.hideProgress();
                 clearTimeout(progressTimer);
-
+                self.selectedQuery = self.i18n_SearchResults;
                 // populate the queryResults
-                self.queryResults = data;
-                self.populateGrid();
-                console.log("doing pop chart from filterGrid");
-                self.populateChart();
-
+                self.populateQueryResults(data);
             }, function(error) {
                 self.hideProgress();
                 clearTimeout(progressTimer);
@@ -844,26 +1063,30 @@ define([
 
                 loadingJob = false;
                 self.currentJob = data;
+                self.updateGridButtons();
                 self.updateHolds();
 
                 // populate dialog title
                 self.jobDialog.set("title", data.name);
 
+                // aoi privileges
+                self.aoiPrivileges();
+
                 // set map aoi
+                topic.publish(appTopics.map.clearGraphics, null);
                 self.setMapAoi(data.aoi, args.zoomToPolygon);
+
+                //set draw tool buttons
+                self.drawTool.drawButtonDeactivation();
+                self.drawTool.drawButtonActivation(data.aoi.rings.length);
+
+                //update job properties
+                self.updateProperties();
 
                 //check privileges
                 //this should probably be moved to a .then for this function
-                self.checkPrivileges();
+                //self.checkPrivileges();
 
-                //set draw tool buttons
-                self.drawTool.drawButtonActivation(data.aoi.rings.length);
-
-                //update props and workflow
-                self.updateProperties();
-                // TODO Why is workflow being updated here when default view is job properties?
-                self.updateWorkflow();
-                
             }, function(error) {
                 //hide progress bar if showing
                 self.hideProgress();
@@ -898,6 +1121,16 @@ define([
             }
         },
 
+        updateGridButtons: function() {
+            var self = lang.hitch(this);
+            var canDelete = self.userPrivileges.canDeleteJobs;
+            if (self.currentJob.stage != Enum.JobStage.CLOSED || Object.keys(self.grid.content.dataGrid.selection).length > 1) {
+                self.grid.content.resetButtons();
+            } else {
+                self.grid.content.setButtons(canDelete, false);
+            }
+        },
+
         checkPrivileges : function() {
             /////////// call privilege funcs
             // call holds privileges
@@ -906,8 +1139,26 @@ define([
             this.notesPrivileges();
             // history privileges
             this.historyPrivileges();
-            // aoi privileges
-            this.aoiPrivileges();
+            // extended properties privileges
+            this.extendedPropertiesPrivileges();
+            // attachment privileges
+            this.attachmentPrivileges();
+        },
+
+        gridPrivileges: function(){
+            // Hides the close and delete buttons based on privileges
+            var canDelete = this.userPrivileges.canDeleteJobs;
+            var canClose = this.userPrivileges.canCloseJob;
+            this.grid.content.setPrivileges(canDelete, canClose);
+        },
+
+        extendedPropertiesPrivileges: function () {
+            // extended properties are editable if:
+            //  - job is not closed
+            //  - job is not on hold
+            //  - user has privilege to manage extended properties
+            var editable = this.userPrivileges.canManageExtendedProperties && this.currentJob.stage != Enum.JobStage.CLOSED && !this.jobHasActiveHold;
+            this.tabExtendedProperties.content.setEditable(editable);
         },
 
         holdsPrivilege : function() {
@@ -953,14 +1204,31 @@ define([
         },
 
         aoiPrivileges: function () {
+            var self = lang.hitch(this);
+
+            // AOI is editable if:
+            //  - job is not closed
+            //  - user has privilege to manage holds
+            //  - job has no active holds
+            //  - job is owned by current user, or job is assigned to the current user
             var hasAOIPermission = false;
-            if (((this.currentJob.stage != Enum.JobStage.CLOSED) && (this.userPrivileges.canManageAOI) && (this.currentJob.ownedBy == this.user))
-                || ((this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER) && (this.currentJob.assignedTo == this.user))) {
+            if (self.currentJob.id && self.currentJob.stage != Enum.JobStage.CLOSED && self.userPrivileges.canManageAOI && 
+                (self.currentJob.ownedBy == self.user || (self.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER && self.currentJob.assignedTo == self.user))) {
                 hasAOIPermission = true;
             };
 
-            this.drawTool.hasAOIPermission = hasAOIPermission, this.drawTool.AOIOverlapOverride = this.userPrivileges.AOIOverlapOverride;
+            self.drawTool.hasAOIPermission = hasAOIPermission, self.drawTool.AOIOverlapOverride = self.userPrivileges.AOIOverlapOverride;
         },
+
+        attachmentPrivileges: function()  {
+            //handle all privileges concerning attachments
+            //check the canManageAttachments
+            //check the canAddAttachmentsToHeldJob
+            //check if job is closed or held
+            var properties = this.checkAttachmentPrivileges();
+            this.tabAttachments.content.handlePrivileges(properties);
+        },
+
 
         updateProperties : function() {
             var self = lang.hitch(this);
@@ -971,6 +1239,58 @@ define([
                 groups : self.groups,
                 dataWorkspaces : self.serviceInfo.dataWorkspaces
             });
+        },
+        
+        updateAttachments: function (jobID) {
+            var self = lang.hitch(this);
+            //stop double population
+            if (!self.updatingAttachments) {
+                self.updatingAttachments = true;
+                //clear and reset the panes
+                self.tabAttachments.content.resetAttachmentPanes();
+                if (self.tabAttachments.content.fileListContainer.children.length > 0) {
+                    console.log("clear attachments ran");
+                    dojo.empty(self.tabAttachments.content.fileListContainer);
+                }
+                self.tabAttachments.content.updateNumberAttachments(true);
+                //get atachment data and populate the tab
+                var jobAttachments = [];
+                self.wmJobTask.getAttachments(jobID, function (data) {
+                    jobAttachments = data
+                    if (jobAttachments.length > 0) {
+                        console.log("Attachments for " + jobID + ": " + jobAttachments);
+                        self.tabAttachments.content.populateAttachments(jobAttachments);
+                    };
+                    self.updatingAttachments = false;
+                }, function (error) {
+                    var errMsg = i18n.error.errorRetrievingAttachments;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                    self.updatingAttachments = false;
+                });
+            }
+        },
+
+        updateExtendedProperties: function(jobId){
+            var self = lang.hitch(this);
+            //stop double population
+            if (!self.updatingExtendedProperties) {
+                self.updatingExtendedProperties = true;
+                //clear the tab
+                console.log("clear extended properties ran");
+                self.tabExtendedProperties.content.clearProperties();
+                //populate the tab
+                self.wmJobTask.getExtendedProperties(jobId, function (containers) {
+                    console.log("Extended Properties for " + jobId);
+                    self.tabExtendedProperties.content.populateExtendedProperties(containers);
+                    self.updatingExtendedProperties = false;
+                }, function (error) {
+                    var errMsg = i18n.error.errorRetrievingExtendedProperties;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                    self.updatingExtendedProperties = false;
+                });
+            }
         },
 
         updateWorkflow : function() {
@@ -1045,7 +1365,7 @@ define([
                 arrayUtil.forEach(data, function(row) {
                     // Set type to its description set in Activity Types
                     //row.holdDate = locale.format(row.holdDate, { formatLength: "short" });
-                    row.typeName = self.serviceInfo.holdTypes[row.type - 1].name;
+                    row.typeName = self.serviceInfo.holdTypes[self.findWithAttr(self.serviceInfo.holdTypes, "id", row.type)].name;
                     // add active property
                     if ((row.releaseDate == null) || (row.releaseDate == "")) {
                         row.isActive = true;
@@ -1055,6 +1375,7 @@ define([
                     }
                     formattedArray.push(row);
                 });
+                self.checkPrivileges();
                 self.tabHolds.content.setGridData(formattedArray);
                 self.tabProperties.content.setJobHolds(formattedArray);
 
@@ -1065,12 +1386,13 @@ define([
             });
         },
 
-        initLogin : function() {
+        initLogin : function(user) {
             this.loginPage = new Login({
                 controller : this,
-                config : config
+                authenticationMode : this.authenticationMode,
+                defaultUser : config.app.DefaultUser
             }, "loginContainer");
-            this.loginPage.startup();
+            this.loginPage.startup(user);
         },
 
         errorHandler : function(message, error) {
@@ -1137,7 +1459,7 @@ define([
                 gutters : false,
                 liveSplitters : true,
                 region : "bottom",
-                style : "width: 100%; height: 40%; margin: 0;"
+                style : "width: 100%; height: 40%; margin: 0; border-top: 1px solid #ccc;"
             }).placeAt(this.inner);
             this.bottom.startup();
 
@@ -1149,6 +1471,9 @@ define([
                 content : new Grid()
             }).placeAt(this.bottom);
             this.grid.startup();
+
+            //set grid privileges
+            this.gridPrivileges();
 
             this.statisticsContainer = new ContentPane({
                 id : "statisticsContainer",
@@ -1170,6 +1495,9 @@ define([
                     if (self.tabs.selectedChildWidget.id == self.tabProperties.id) {
                         self.tabProperties.content.closingProps();
                     }
+                    if (self.tabs.selectedChildWidget.id == self.tabExtendedProperties.id) {
+                        self.tabExtendedProperties.content.closingExtendedProps();
+                    }
                 }
             });
             this.jobDialog.startup();
@@ -1182,6 +1510,10 @@ define([
             }).placeAt(this.jobDialog.containerNode);
             this.jobTabsContainer.startup();
 
+            // Warning label
+            this.jobWarning = domConstruct.create("span", { class: "warning-label", innerHTML: "" });
+            domConstruct.place(this.jobWarning, this.jobDialog.titleBar, 2);
+
             // Tabs
             this.tabs = new TabContainer({
                 region : "left",
@@ -1191,6 +1523,10 @@ define([
                 style : "width: 100%; height: 100%;"
             }).placeAt(this.jobTabsContainer);
             this.tabs.startup();
+
+            //fixes spacing issue
+            dojo.byId("tabs_tablist").style.width = "160px";
+            this.tabs.containerNode.style.left = "160px";
 
             this.tabProperties = new ContentPane({
                 title : i18n.properties.title,
@@ -1219,8 +1555,26 @@ define([
             this.tabs.addChild(this.tabHistory);
             this.tabHistory.startup();
 
+            //extended properties
+            this.tabExtendedProperties = new ContentPane({
+                title: i18n.extendedProperties.title,
+                content: new ExtendedProperties(),
+                id: "tabExtendedProperties",
+                style: "padding-top: 0; padding-bottom: 0;"
+            });
+            this.tabs.addChild(this.tabExtendedProperties);
+            this.tabExtendedProperties.startup();
+
+            this.tabAttachments = new ContentPane({
+                id : "tabAttachments",
+                content : new Attachments(),
+                title : i18n.attachments.title
+            });
+            this.tabs.addChild(this.tabAttachments);
+            this.tabAttachments.startup();
+
             this.tabNotes = new ContentPane({
-                title : i18n.notes.title,
+                title: i18n.notes.title,
                 content : new Notes(),
                 id : "tabNotes"
             });
@@ -1253,6 +1607,7 @@ define([
                 dialogWidth = window.innerWidth - 100;
                 dialogHeight = window.innerHeight - 100;
                 self.jobDialog.set("style", "width: " + dialogWidth + "px; height: " + dialogHeight + "px;");
+                self.grid.content.resizeGrid();
             };
         },
 
@@ -1260,6 +1615,7 @@ define([
             var self = lang.hitch(this);
             this.myMap = new EsriMap({
                 mapConfig : config.map,
+                aoiLayerID : config.app.jobAOILayer.AOILayerID,
                 mapTopics : appTopics.map,
                 mapId : self.mapPanel.id,
                 controller : self
@@ -1276,6 +1632,7 @@ define([
                 this.basemapGallery = new BasemapGallery({
                     map : this.myMap.map,
                     basemapConfig : config.map.basemapGallery,
+                    customBasemapConfig: config.map.customBasemaps, 
                     galleryId : "myMapBasemapGallery"
                 }, "basemapGalleryContainer");
                 this.basemapGallery.startup();
@@ -1306,17 +1663,15 @@ define([
                 }, "drawContainer");
                 this.drawTool.startup();
             }
-
         },
 
-        addLayerToMap: function () {
+        addAOIDynamicMapLayerToMap: function () {
             // Job AOI layer
-            this.myMap.map.addLayer(this.myMap.getLayerObject(config.app.jobAOILayer));
+            this.myMap.addAOIDynamicLayer(config.app.jobAOILayer, this.aoiMapServiceQueryLayerUrl);
         },
 
         initWidgets : function() {
             console.log("initWidgets called (map started)");
-
             this.initTopics();
             this.initConfig();
         },
@@ -1326,7 +1681,29 @@ define([
             var self = lang.hitch(this);
             this.selectedRowId = null;
             var selectedFilter = 1;
+            
+            //topic for updating Extended Properties
+            topic.subscribe(appTopics.extendedProperties.updateExtendedProperties, function (sender, args) {
+                self.wmJobTask.updateRecord(self.currentJob.id, args.record, self.user, function (success) {
+                }, function (error) {
+                    var errMsg = i18n.error.errorUpdatingExtendedProperties;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
+            }),
 
+            topic.subscribe(appTopics.extendedProperties.getFieldValues, function (sender, args) {
+                 self.wmJobTask.listFieldValues(self.currentJob.id, args.tableName, args.field, self.user, function (response) {
+                     sender.setResponse(response);
+                 }, function (error) {
+                     var errMsg = i18n.error.errorGettingFieldValues;
+                     console.log(errMsg, error);
+                     self.errorHandler(errMsg, error);
+                 });
+
+             })
+
+            //new topics for selecting bar/charts
             topic.subscribe(appTopics.manager.serviceConfigurationLoaded, function(sender, args) {
                 console.log("Service configuration loaded", args);
                 self.serviceInfo = args.serviceInfo;
@@ -1337,9 +1714,9 @@ define([
                 self.commentActivityTypeId = args.commentActivityTypeId;
                 self.onServiceConfigurationLoaded();
 
-                self.addLayerToMap();
+                self.addAOIDynamicMapLayerToMap();
             });
-
+            
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
                 if (args.value == "") {
                     //Resets filter, defaults to All Jobs
@@ -1350,6 +1727,8 @@ define([
             });
 
             topic.subscribe(appTopics.filter.jobQueriesChanged, function(sender, args) {
+                self.grid.content.selectedQueryName.innerHTML = args.selectedQuery;
+                self.savedQuery = args.selectedQuery;
                 self.getJobsByQueryID(args.selectedId);
                 selectedFilter = args.selectedId;
             });
@@ -1384,6 +1763,7 @@ define([
                     self.hideProgress();
 
                     var jobIds = data;
+                    self.selectedQuery = i18n.grid.newJob;
                     console.log("Jobs created successfully: ", jobIds);
                     self.getJobsByJobIDs(jobIds);
                 }, function(error) {
@@ -1395,7 +1775,7 @@ define([
                 });
             });
 
-            topic.subscribe("/map/draw/graphics/save", function(sender, args) {
+            topic.subscribe(appTopics.map.draw.saveGraphics, function(sender, args) {
                 console.log("draw graphics save clicked:", args);
                 var progressTimer = setTimeout(function() {
                     self.showProgress()
@@ -1447,29 +1827,60 @@ define([
             });
 
             // add hold
-            topic.subscribe(appTopics.holds.addHold, function(sender, args) {
-                self.wmJobTask.createHold(self.currentJob.id, args.holdType, args.comment, self.user, function() {
-                    console.log("Hold added successfully");
-                    self.tabHolds.content.holdAddedSuccess();
-                    self.updateHolds();
-                }, function(error) {
-                    var errMsg = i18n.error.errorAddingHold;
-                    console.log(errMsg, error);
+            topic.subscribe(appTopics.holds.addHold, function (sender, args) {
+                if (args.holdType != "") {
+                    self.wmJobTask.createHold(self.currentJob.id, args.holdType, args.comment, self.user, function () {
+                        console.log("Hold added successfully");
+                        self.tabHolds.content.holdAddedSuccess();
+                        self.updateHolds();
+                    }, function (error) {
+                        var errMsg = i18n.error.errorAddingHold;
+                        console.log(errMsg, error);
+                        self.errorHandler(errMsg, error);
+                    });
+                } else {
+                    var error = "";
+                    var errMsg = i18n.error.errorMissingHoldType;
+                    console.log(errMsg);
                     self.errorHandler(errMsg, error);
-                });
+                }
             });
 
             // assign job from grid
             topic.subscribe(appTopics.grid.assignJobs, function(sender, args) {
                 self.assignJobs(args);
             });
+
+            //reset current grid
+            topic.subscribe(appTopics.grid.resetFilter, function (sender, args) {
+                self.resetRow();
+            });
+            //filter current grid
+            topic.subscribe(appTopics.grid.filter, function (sender, args) {
+                self.filterRow(args.filterField1Type, args.filterField2Type, args.filterField1, args.filterField2);
+            });
+            
             // close job from grid
             topic.subscribe(appTopics.grid.closeJobs, function(sender, args) {
-                self.closeJobs(args);
+                self.wmJobTask.closeJobs(args.jobs, self.user, function (data) {
+                    console.log("Jobs closed successfully: ", args.jobs);
+                    self.getJobsByQueryID(self.currentQueryId, true);
+                }, function (error) {
+                    var errMsg = i18n.error.errorClosingJob;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
             });
             // delete job from grid
             topic.subscribe(appTopics.grid.deleteJobs, function(sender, args) {
-                self.deleteJobs(args);
+                self.wmJobTask.deleteJobs(args.jobs, true, self.user, function (data) {
+                    console.log("Jobs deleted successfully: ", args.jobs);
+                    self.getJobsByQueryID(self.currentQueryId, true);
+                }, function (error) {
+                    var errMsg = i18n.error.errorDeletingJob;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
             });
 
             // update properties version from data workspace
@@ -1527,14 +1938,63 @@ define([
                 });
             });
 
+            //adding Attachments
+            topic.subscribe(appTopics.attachment.uploadAttachment, function (sender, args) {
+                var jobId = self.currentJob.id;
+                if (args.url) {
+                    self.wmJobTask.addLinkedURLAttachment(jobId, args.url, self.user, function (attachmentId) {
+                        self.updateAttachments(jobId);
+                    });
+                } else if (args.link) {
+                    self.wmJobTask.addLinkedFileAttachment(jobId, args.link, self.user, function (attachmentId) {
+                        self.updateAttachments(jobId);
+                    });
+                } else {
+                    self.wmJobTask.addEmbeddedAttachment(self.user, jobId, args.form, function (attachmentId) {
+                        self.updateAttachments(jobId);
+                    }, function (error) {
+                        console.log("Error Adding Attachment " + jobId + ' ' + error);
+                        //With IE9, esri request will throw an error even though the request was successful.
+                        //Refresh the attachments tab.
+                        self.updateAttachments(jobId);
+                    });
+                }
+                
+            });
+
+            //get content url and set the hyperlink
+            topic.subscribe(appTopics.attachment.getContentURL, function (sender, args) {
+                var jobId = self.currentJob.id;
+                var attachmentId = args.attachmentId;
+                var contentURL = self.wmJobTask.getAttachmentContentURL(jobId, attachmentId) + "?f=file&_ts=" + new Date().getTime();
+                //sender.attachmentLink.href = contentURL;
+                sender.setContentURL(contentURL);
+            });
+
+            //remove attachments
+            topic.subscribe(appTopics.attachment.removeAttachment, function (sender, args) {
+                    console.log("recieved remove click: " + args.attachmentId);
+                    self.tabAttachments.content.removeAttachment(args);
+                    self.wmJobTask.deleteAttachment(self.currentJob.id, args.attachmentId, self.user, function (success) {
+                        console.log("Attachment deleted successfully");
+                    }, function (error) {
+                        console.log("Error deleting attachment with id: " + args.attachmentId + " " + error);
+                    });
+            });
+
             // Log action for job
             // requires:
-            // activity type (15 for comment)
+            // activity type (if no activity type is specified, comment activity type is used)
             // value for the log
             topic.subscribe(appTopics.manager.logAction, function(sender, args) {
                 self.showProgress();
-                self.wmJobTask.logAction(self.currentJob.id, args.activityType, args.value, self.user, function(success) {
-                    console.log("Comment added successfully");
+                
+                var activityType = self.commentActivityTypeId;
+                if (args.activityType != null)
+                    activityType = args.activityType;
+
+                self.wmJobTask.logAction(self.currentJob.id, activityType, args.value, self.user, function(success) {
+                    console.log("Activity added successfully");
                     self.tabHistory.content.commentAddedSuccess();
                     self.updateHistory();
                     self.hideProgress();
@@ -1589,7 +2049,7 @@ define([
                 self.hideProgress();
             });
 
-            topic.subscribe("Map/ClickLayer", function(jobId) {
+            topic.subscribe(appTopics.map.layer.click, function(jobId) {
                 //query for job data
                 var progressTimer = setTimeout(function() {
                     self.showProgress()
@@ -1597,8 +2057,8 @@ define([
                 self.wmJobTask.getJob(jobId, function(data) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
-
-                    topic.publish("Map/ClickLayer/JobQuery", data, self.serviceInfo.jobStatuses);
+                    self.setMapAoi(self.currentJob.aoi, false);
+                    topic.publish(appTopics.map.layer.jobQuery, data, self.serviceInfo.jobStatuses, self.serviceInfo.jobPriorities);
                 }, function(error) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
@@ -1625,7 +2085,7 @@ define([
             var self = lang.hitch(this);
             self.user = username;
 
-            if (config.app.UseTokenAuthentication) {
+            if (self.authenticationMode == "token") {
                 var webURL = document.URL;
                 var tokenRequest = esri.request({
                     url : this.tokenServerUrl,

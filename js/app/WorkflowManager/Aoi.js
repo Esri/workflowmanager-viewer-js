@@ -1,54 +1,54 @@
 ﻿define([
     "dojo/topic",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
-	
-	"dojo/text!./templates/Aoi.html",
-	"dojo/i18n!./nls/Strings",
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    
+    "dojo/text!./templates/Aoi.html",
+    "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
-	"./config/AppConfig",
+    "./config/AppConfig",
     "dojo/text!./templates/AoiMap.html",
-	
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
+    
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
     "dojo/string",
-	"dojo/dom-style",
-	"dijit/registry",
+    "dojo/dom-style",
+    "dijit/registry",
 
     "dojo/store/Memory",
 
     // GIS widgets
-	"widget/gis/EsriMap",
+    "widget/gis/EsriMap",
     "widget/gis/BasemapGallery",
     "widget/gis/DrawTool",
 
     "dijit/layout/BorderContainer",
-	"dijit/layout/ContentPane",
-	"dijit/form/FilteringSelect",
-	"dijit/form/TextBox",
+    "dijit/layout/ContentPane",
+    "dijit/form/FilteringSelect",
+    "dijit/form/TextBox",
     "dijit/form/Textarea",
-	"dijit/form/Button",
-	"dijit/form/DropDownButton"
-	],
+    "dijit/form/Button",
+    "dijit/form/DropDownButton"
+    ],
 
 function (
-	topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-	template, i18n, appTopics, config, mapTemplate,
-	lang, connect, parser, query, on, string, domStyle, registry,
+    topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+    template, i18n, appTopics, config, mapTemplate,
+    lang, connect, parser, query, on, string, domStyle, registry,
     Memory,
     EsriMap, BasemapGallery, DrawTool,
-	BorderContainer, ContentPane, FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
+    BorderContainer, ContentPane, FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
-		
+        
         templateString: template,
         widgetsInTemplate: true,
-		
+        
         i18n_JobName: i18n.properties.jobName,
         i18n_NotApplicable: i18n.properties.notApplicable,
 
@@ -106,9 +106,9 @@ function (
 
             if (config.map.drawTool.isEnabled) {
                 this.aoiDrawTool = new DrawTool({ map: this.aoiMap.map, drawConfig: config.map.drawTool }, "aoiDrawContainer");
-            	this.aoiDrawTool.startup();	
+                this.aoiDrawTool.startup();    
             }
         }
 
-	});
+    });
 });

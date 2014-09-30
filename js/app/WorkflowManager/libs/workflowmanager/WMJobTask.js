@@ -1,9 +1,10 @@
 define("workflowmanager/WMJobTask", [
     "dojo/_base/declare",
+    "dojo/dom",
     "workflowmanager/_BaseTask",
     "workflowmanager/_Util",
     "workflowmanager/Enum"
-], function(declare, BaseTask, Util, Enum) {
+], function(declare, dom, BaseTask, Util, Enum) {
     return declare([BaseTask], {
         
         constructor: function (url) {
@@ -219,31 +220,15 @@ define("workflowmanager/WMJobTask", [
                 successCallBack(response.attachmentId);
             }, errorCallBack);
         },
-        addEmbeddedAttachment: function (jobId, user, inputElementId, successCallback, errorCallback) {
-            /*
-            prepareing ajax file upload
-            url: the url of script file handling the uploaded files
-            fileElementId: the file type of input element id and it will be the index of  $_FILES Array()
-            dataType: it support json, xml
-            secureuri:use secure protocol
-            success: call back function when the ajax complete
-            error: callback function when the ajax failed            
-            */
+        //create a form data and send it
+        addEmbeddedAttachment: function(user, jobId, form, successCallBack, errorCallBack) {
             var tokenStr = (this.token) ? this.token : "";
             user = this.formatDomainUsername(user);
-            $.ajaxFileUpload
-                        (
-                            {
-                                url: "proxy.ashx?" + this.url + "/jobs/" + jobId + "/attachments/add?user=" + user + "&storageType=2&f=json" + tokenStr,
-                                user: user,
-                                secureuri: false,
-                                fileElementId: inputElementId,
-                                dataType: 'json',
-                                success: successCallback,
-                                error: errorCallback                            
-                            }
-                        )
-            return false;
+            var urlToSend = "/jobs/" + jobId + "/attachments/add?user=" + user + "&storageType=2&f=json" + tokenStr;
+            dom.byId('user').value = user;
+            this.sendRequestFile(form, urlToSend, function (response) {
+                successCallBack(response.attachmentId);
+            }, errorCallBack);
         },
         deleteAttachment: function (jobId, attachmentId, user, successCallBack, errorCallBack) {
             var params = {};

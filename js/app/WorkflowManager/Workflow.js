@@ -1,60 +1,60 @@
 define([
     "dojo/topic",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
-	
-	"dojo/text!./templates/Workflow.html",
-	"dojo/i18n!./nls/Strings",
-	"app/WorkflowManager/config/Topics",
-	
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    
+    "dojo/text!./templates/Workflow.html",
+    "dojo/i18n!./nls/Strings",
+    "app/WorkflowManager/config/Topics",
+    
     "dojo/_base/array",
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
-	"dojo/store/Memory",
-	"dojo/dom-style",
-	"dijit/registry",
-	
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
+    "dojo/store/Memory",
+    "dojo/dom-style",
+    "dijit/registry",
+    
     "dijit/Dialog",
-	"dijit/form/FilteringSelect",
-	"dijit/form/TextBox",
-	"dijit/form/Textarea",
-	"dijit/form/Button",
-	"dijit/form/DropDownButton",
-	
-	"workflowmanager/Enum",	
-	"./utils/Util",
-	"./Alert"
-	],
+    "dijit/form/FilteringSelect",
+    "dijit/form/TextBox",
+    "dijit/form/Textarea",
+    "dijit/form/Button",
+    "dijit/form/DropDownButton",
+    
+    "workflowmanager/Enum",    
+    "./utils/URLUtil",
+    "./Alert"
+    ],
 
 function (
-	topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
-	template, i18n, appTopics,
-	arrayUtil, lang, connect, parser, query, on, Memory, domStyle, registry,
-	Dialog, FilteringSelect, TextBox, Textarea, Button, DropDownButton,
-	Enum, Util, Alert) {
+    topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
+    template, i18n, appTopics,
+    arrayUtil, lang, connect, parser, query, on, Memory, domStyle, registry,
+    Dialog, FilteringSelect, TextBox, Textarea, Button, DropDownButton,
+    Enum, URLUtil, Alert) {
 
-	return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
-		
-		templateString: template,
-		widgetsInTemplate: true,
-		
-		//i18n
+    return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
+        
+        templateString: template,
+        widgetsInTemplate: true,
+        
+        //i18n
         i18n_Ok: i18n.common.ok,
         i18n_Cancel: i18n.common.cancel,
-		i18n_CurrentSteps: i18n.workflow.currentSteps,
+        i18n_CurrentSteps: i18n.workflow.currentSteps,
         i18n_QuestionNotes: i18n.workflow.questionNotes,
         i18n_SelectNextStep: i18n.workflow.selectNextStep,
-		
-		wmWorkflowTask: null,
+        
+        wmWorkflowTask: null,
         wmJobTask: null,
         wmTokenTask: null,
-		commentActivityType: null,
-		
+        commentActivityType: null,
+        
         currentUser: null,
         currentJob: null,
         currentStep: null,
@@ -67,42 +67,42 @@ function (
             DROPDOWN: 1            
         },
         
-		constructor: function () {
-		},
+        constructor: function () {
+        },
 
-		postCreate: function () {
-			this.inherited(arguments);
-		},
+        postCreate: function () {
+            this.inherited(arguments);
+        },
 
-		startup: function () {
-		    console.log("Workflow started");
-		    
-		    // Execute step button
-		    this.workflowExecuteStepButton = new Button({
-		        label: i18n.workflow.executeStep,
-		        id: "workflowExecuteStepButton",
-		        name: "workflowExecuteStepButton",
-		        disabled: true,
-                "class": "wide-btn",
+        startup: function () {
+            console.log("Workflow started");
+            
+            // Execute step button
+            this.workflowExecuteStepButton = new Button({
+                label: i18n.workflow.executeStep,
+                id: "workflowExecuteStepButton",
+                name: "workflowExecuteStepButton",
+                disabled: true,
+                "class": "wide-btn dojo-btn-info",
                 onClick: lang.hitch(this, function () {
                     this.executeStepButtonClicked();
                 })
-		    }, this.btnExecuteStep);
-		    this.workflowExecuteStepButton.startup();
+            }, this.btnExecuteStep);
+            this.workflowExecuteStepButton.startup();
 
             // Mark step complete button
-		    this.workflowMarkStepCompleteButton = new Button({
-		        label: i18n.workflow.markStepComplete,
-		        id: "workflowMarkStepCompleteButton",
-		        name: "workflowMarkStepCompleteButton",
-		        disabled: true,
-		        "class": "wide-btn",
-		        onClick: lang.hitch(this, function () {
+            this.workflowMarkStepCompleteButton = new Button({
+                label: i18n.workflow.markStepComplete,
+                id: "workflowMarkStepCompleteButton",
+                name: "workflowMarkStepCompleteButton",
+                disabled: true,
+                "class": "wide-btn dojo-btn-success",
+                onClick: lang.hitch(this, function () {
                     this.markStepCompleteButtonClicked();
                 })
-		    }, this.btnMarkStepComplete);
-		    this.workflowMarkStepCompleteButton.startup();
-		    	    
+            }, this.btnMarkStepComplete);
+            this.workflowMarkStepCompleteButton.startup();
+                    
             //Question step drop down selection
             this.questionStepsSelect = new FilteringSelect({
                 placeHolder: i18n.common.loading,
@@ -136,9 +136,9 @@ function (
                 name: "stepConflictsSelect"
             }, this.cboStepConflictsSelect);
             this.stepConflictsSelect.startup();            
-		},
-		
-		initializeProperties: function (args) {	    
+        },
+        
+        initializeProperties: function (args) {        
             this.wmWorkflowTask = args.workflowTask;
             this.wmjobTask = args.jobTask;
             this.wmTokenTask = args.tokenTask;
@@ -146,8 +146,8 @@ function (
             this.currentUser = args.currentUser;
             this.currentJob = args.currentJob;
         },
-		
-		loadWorkflow: function() {
+        
+        loadWorkflow: function() {
             // Reset fields and disable items
             this.currentStepDiv.style.display = "none";
             this.workflowCurrentStepName.innerHTML = "";
@@ -157,16 +157,16 @@ function (
             this.workflowMarkStepCompleteButton.set("disabled", true);
             this.workflowImageContainer.src = "";
 
-		    if (this.currentJob == null) {
-		        console.log("Unable to load workflow for null job");
-		        return;
-		    }
-		    
+            if (this.currentJob == null) {
+                console.log("Unable to load workflow for null job");
+                return;
+            }
+            
             // Retrieve workflow steps and image
             this.loadWorkflowControl();
-		    this.loadWorkflowImage();
-		},
-		
+            this.loadWorkflowImage();
+        },
+        
         loadWorkflowControl: function () {
             if ((this.currentJob.stage != Enum.JobStage.CLOSED)
                 && (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER)
@@ -186,14 +186,14 @@ function (
                     });
             }
         },
-		
+        
         loadWorkflowImage: function () {
             var urlString = this.wmWorkflowTask.getWorkflowImageURL(this.currentJob.id);
             this.workflowImageContainer.src = urlString;
         },
-		
-		getCurrentStepsHandler: function(steps) {
-		    this.currentSteps = steps;
+        
+        getCurrentStepsHandler: function(steps) {
+            this.currentSteps = steps;
                                 
             if (steps.length == 1) {
                 // one current step
@@ -209,7 +209,7 @@ function (
                 // no current step
                 this.currentStepDiv.style.display = "none";
             }
-		},
+        },
         
         checkCurrentStep: function () {
             var self = lang.hitch(this);
@@ -238,7 +238,7 @@ function (
                 if (stepData.stepType.executionType == Enum.StepExecutionType.PROCEDURAL) {// when execution type is procedual
                     this.workflowMarkStepCompleteButton.set("disabled", false);
                     if (stepData.autoRun) {
-                    	this.workflowExecuteStepButton.set("disabled", false);
+                        this.workflowExecuteStepButton.set("disabled", false);
                     }
                 } else {// when execution type is NOT procedual
                     if (stepData.canSkip) {
@@ -305,23 +305,28 @@ function (
             }
         },
         
-	    executeStepButtonClicked : function () {
+        executeStepButtonClicked : function () {
             topic.publish(appTopics.manager.showProgress, this);
             var self = lang.hitch(this);
             
             console.log("Executing step: " + this.currentStep.name);
             var platform = this.currentStep.stepType.supportedPlatform;
             if (platform == Enum.StepPlatformType.DESKTOP) {
-                console.log(i18n.workflow.executionWarning + ": " + i18n.workflow.executionWarningNotWebStep);
+                console.log(i18n.workflow.executionWarning + ": " + i18n.error.errorStepNotWebEnabled);
                 this.showError(i18n.workflow.executionWarning, i18n.error.errorStepNotWebEnabled, null);              
             } else {
                 var exeType = this.currentStep.stepType.executionType;
+                
+                // Execute certain step types on the server (essentially anything but questions).
+                // This is necessary in order to record that a step has been executed.
                 switch (exeType) {
                     case Enum.StepExecutionType.PROCEDURAL:  //procedual step will never have run button enabled
-                    	if (!this.currentStep.autoRun)          
-                        	break;
+                        if (!this.currentStep.autoRun)          
+                            break;
                     case Enum.StepExecutionType.EXECUTABLE:
                     case Enum.StepExecutionType.FUNCTION:
+                    case Enum.StepExecutionType.FILE:
+                    case Enum.StepExecutionType.URL:  
                         var stepIds = new Array();
                         stepIds[0] = this.currentStep.id;
                         this.wmWorkflowTask.executeSteps(this.currentJob.id, stepIds, this.currentUser, true,
@@ -332,6 +337,10 @@ function (
                                 self.showError(i18n.error.title, i18n.error.errorExecuteStep, error);
                             });
                         break;
+                }
+                     
+                // Handle client-side execution of certain step types
+                switch (exeType) {
                     case Enum.StepExecutionType.QUESTION:
                         this.popupQuestion();
                         break;
@@ -367,12 +376,12 @@ function (
         },
         
         openURL: function (url) {
-            var urlPath = Util.getAbsolutePathURL(url);
+            var urlPath = URLUtil.getAbsolutePathURL(url);
             window.open(urlPath, "_blank");
         },
-	    
-	    markStepCompleteButtonClicked: function () {
-	        var self = lang.hitch(this);
+        
+        markStepCompleteButtonClicked: function () {
+            var self = lang.hitch(this);
             console.log("Mark step complete button clicked");            
             var stepIds = new Array();
             stepIds[0] = this.currentStep.id;
@@ -630,7 +639,9 @@ function (
         
         showError: function(title, message, error) {
             topic.publish(appTopics.manager.hideProgress, this); 
+            if (title == null)
+                title = i18n.error.title;
             Alert.show(title, message, error);
         }
-	});
+    });
 });

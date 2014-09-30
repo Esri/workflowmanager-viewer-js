@@ -1,8 +1,11 @@
 define({
-	root: {
-		Reports_Label: "Reports"
-	} /*,
-	
-	de: true,
-	'de-at': true */
+    root: {
+        Reports_Label: "Reports"
+    },
+    
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true
 });

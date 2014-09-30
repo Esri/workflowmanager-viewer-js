@@ -17,11 +17,10 @@ define("workflowmanager/WMAOILayerTask", [
                 var JOB_ID = "JOB_ID";
                 var jobIDField = null;
                 var fieldName = null;
-                var errMsg = "Error loading job Id field from AOI map service";
 
                 var fields = data.fields;
                 if (fields ==  null)
-                    errorCallBack(new Error(errMsg));
+                    errorCallBack(new Error());
                 
                 for (var i=0,len=fields.length; i<len; i++) {
                     fieldName = fields[i].name.toString();

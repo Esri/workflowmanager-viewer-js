@@ -34,6 +34,26 @@ define("workflowmanager/_BaseTask", [
             }, { useProxy: (this.proxyURL && (this.proxURL != "")) });
             request.then(successCallBack, errorCallBack);
         },
+
+        sendRequestFile: function (formToSend, appendURL, successCallBack, errorCallBack) {
+            var requestUrl = (this.proxyURL) ? this.proxyURL + "?" + this.url : this.url;
+            requestUrl += appendURL;
+            var inputParams = {};
+            if (this.token) {
+                inputParams.token = this.token;
+            }
+            if (this.disableClientCaching) {
+                inputParams._ts = new Date().getTime();
+            }
+            var request = esriRequest({
+                url: requestUrl,
+                content: inputParams,
+                form: formToSend,
+                handleAs: "json",
+                callbackParamName: "callback"
+            }, { useProxy: (this.proxyURL && (this.proxURL != "")) });
+            request.then(successCallBack, errorCallBack);
+        },
         
         formatDomainUsername: function(username) {
             if (username && username.length > 0)

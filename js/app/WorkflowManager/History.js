@@ -1,56 +1,56 @@
 define([
     "dojo/topic",
     "dojo/dom",
-	"dojo/_base/declare",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
-	
-	"dojo/text!./templates/History.html",
-	"dojo/i18n!./nls/Strings",
+    "dojo/_base/declare",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
+    
+    "dojo/text!./templates/History.html",
+    "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
-	
-	"dojo/_base/lang",
-	"dojo/_base/connect",
-	"dojo/parser",
-	"dojo/query",
-	"dojo/on",
+    
+    "dojo/_base/lang",
+    "dojo/_base/connect",
+    "dojo/parser",
+    "dojo/query",
+    "dojo/on",
     "dojo/string",
-	"dojo/dom-style",
+    "dojo/dom-style",
     "dojo/date/locale",
-	"dijit/registry",
+    "dijit/registry",
 
     "dojo/store/Memory",
 
     "dgrid/OnDemandGrid",
-	"dgrid/extensions/DijitRegistry",
-	"dgrid/Selection",
-	"dgrid/tree",
-	"dgrid/editor",
-	"dgrid/extensions/Pagination",
-	"dgrid/extensions/ColumnHider",
+    "dgrid/extensions/DijitRegistry",
+    "dgrid/Selection",
+    "dgrid/tree",
+    "dgrid/editor",
+    "dgrid/extensions/Pagination",
+    "dgrid/extensions/ColumnHider",
     "dgrid/extensions/ColumnResizer",
-	
-	"dijit/form/FilteringSelect",
-	"dijit/form/TextBox",
+    
+    "dijit/form/FilteringSelect",
+    "dijit/form/TextBox",
     "dijit/form/Textarea",
-	"dijit/form/Button",
-	"dijit/form/DropDownButton"
-	],
+    "dijit/form/Button",
+    "dijit/form/DropDownButton"
+    ],
 
 function (
-	topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-	template, i18n, appTopics,
-	lang, connect, parser, query, on, string, domStyle, locale, registry,
+    topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+    template, i18n, appTopics,
+    lang, connect, parser, query, on, string, domStyle, locale, registry,
     Memory,
     OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
-	FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
+    FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
-		
+        
         templateString: template,
         widgetsInTemplate: true,
-		
+        
         i18n_JobName: i18n.properties.jobName,
         i18n_NotApplicable: i18n.properties.notApplicable,
         i18n_EnterMessage: i18n.history.enterComment,
@@ -85,6 +85,7 @@ function (
                 id: "historySaveButton",
                 name: "historySaveButton",
                 style: "width:160px;",
+                "class": "dojo-btn-success",
                 disabled: true,
                 onClick: lang.hitch(this, function () {
                     this.saveButtonClicked();
@@ -148,9 +149,7 @@ function (
 
         saveButtonClicked: function () {
             console.log("History save button clicked with value: " + this.createHistoryTextarea.value);
-            
-            // TODO Remove hardcoded activity type
-            topic.publish(appTopics.manager.logAction, this, { activityType: 15, value: this.createHistoryTextarea.value, errorContainer: this.errorContainer });
+            topic.publish(appTopics.manager.logAction, this, { value: this.createHistoryTextarea.value, errorContainer: this.errorContainer });
         },
 
         setEditable: function (isEditable) {
@@ -164,5 +163,5 @@ function (
                 this.historySaveButton.set("disabled", true);
             }
         }
-	});
+    });
 });

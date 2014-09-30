@@ -6,11 +6,13 @@
         rectangle: "Rectangle",
         lasso: "Lasso",
         save: "Save",
-        "delete": "Delete Aoi",
+        deleteAOI: "Delete AOI",
         cancel: "Cancel Draw"
     }),
-
-    "de": true,
-    "de-at": true,
-    "es-ES": true
+    
+    es: true,
+    it: true,
+    ru: true,
+    tr: true,
+    "zh-CN": true
 });
