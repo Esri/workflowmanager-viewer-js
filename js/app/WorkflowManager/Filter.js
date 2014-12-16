@@ -222,7 +222,7 @@ function (
             this.jobStartDateControl = new DateTextBox({
                 id: "createJobStartDateControl",
                 name: "createJobStartDateControl",
-                style: "width:200px;",
+                style: "width:250px;",
                 onChange: lang.hitch(this, function() {
                     var newStartDate = this.jobStartDateControl.get("value");
                     if (newStartDate > this.jobDueDateControl.get("value")) {
@@ -237,7 +237,7 @@ function (
             this.jobDueDateControl = new DateTextBox({
                 id: "createJobDueDateControl",
                 name: "createJobDueDateControl",
-                style: "width:200px;"
+                style: "width:250px;"
             }, this.createJobDueDateControl);
             this.jobDueDateControl.startup();
             
@@ -245,7 +245,7 @@ function (
             this.jobDataWorkspacesSelect = new FilteringSelect({
                 id: "createJobDataWorkspacesSelect",
                 name: "createJobDataWorkspacesSelect",
-                style: "width:200px;",
+                style: "width:250px;",
                 required: false,
                 disabled: true,
                 onChange: function () {
@@ -260,7 +260,7 @@ function (
                 name: "createJobParentVersionSelect",
                 queryOptions: {ignoreCase: true},
                 disabled: true,
-                style: "width:200px;"
+                style: "width:250px;"
             }, this.cboJobParentVersion);
             this.jobParentVersionSelect.startup();
 
@@ -268,7 +268,7 @@ function (
             this.assignmentUsersSelect = new FilteringSelect({
                 id: "createAssignmentUsersSelect",
                 name: "createAssignmentUsersSelect",
-                style: "width:200px;",
+                style: "width:250px;",
                 searchAttr: "fullName"
             }, this.cboAssignmentUsers);
             this.assignmentUsersSelect.startup();
@@ -277,7 +277,7 @@ function (
             this.assignmentGroupsSelect = new FilteringSelect({
                 id: "createAssignmentGroupsSelect",
                 name: "createAssignmentGroupsSelect",
-                style: "width:200px;"
+                style: "width:250px;"
             }, this.cboAssignmentGroups);
             this.assignmentGroupsSelect.startup();
 
@@ -285,7 +285,7 @@ function (
             this.jobPrioritiesSelect = new FilteringSelect({
                 id: "createJobPrioritiesSelect",
                 name: "createJobPrioritiesSelect",
-                style: "width:200px;"
+                style: "width:250px;"
             }, this.cboJobPriorities);
             this.jobPrioritiesSelect.startup();
 

@@ -1,9 +1,11 @@
 define(function() {
     return {
         
-        // valid themes: "claro", "nihilo", "soria", "tundra", "bootstrap", "flat", "arcgis"
+        // valid themes: "claro", "nihilo", "soria", "tundra", "bootstrap"
         theme: "bootstrap",
         
+        // Note: If using https, replace http with https and update the port number from
+        //       6080 to 6443 as needed.
         app: {
             ServiceRoot: "http://workflowsample.esri.com:6080/arcgis/rest/services/Workflow/WMServer",
             // Determines authentication mode to use for the application

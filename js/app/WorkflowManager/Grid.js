@@ -57,12 +57,18 @@ define([
         i18n_JobAssignmentUnassigned: i18n.properties.jobAssignmentUnassigned,
         i18n_Yes: i18n.grid.yes,
         i18n_No: i18n.grid.no,
+        // Delete
         i18n_PromptDelete: i18n.grid.promptDelete,
-        i18n_PromptClose: i18n.grid.promptClose,
         i18n_Delete: i18n.grid.deleteBtn,
+        i18n_DeleteTitle: i18n.grid.deleteTitle,
+        // Close
+        i18n_PromptClose: i18n.grid.promptClose,
         i18n_Close: i18n.grid.closeBtn,
         i18n_CloseTitle: i18n.grid.closeTitle,
-        i18n_DeleteTitle: i18n.grid.deleteTitle,
+        // Reopen
+        i18n_PromptReopen: i18n.grid.promptReopen,
+        i18n_Reopen: i18n.grid.reopenBtn,
+        i18n_ReopenTitle: i18n.grid.reopenTitle,
         
         dataGrid: null,
 
@@ -78,6 +84,11 @@ define([
             on(this.btnCloseJob, "click", function () {
                 var jobs = Object.keys(self.dataGrid.selection);
                 topic.publish(appTopics.grid.closeJobs, this, {jobs: jobs});
+            });
+
+            on(this.btnReopenJob, "click", function () {
+                var jobs = Object.keys(self.dataGrid.selection);
+                topic.publish(appTopics.grid.reopenClosedJobs, this, {jobs: jobs});
             });
 
             on(this.btnDeleteJob, "click", function () {
@@ -110,14 +121,14 @@ define([
                     case 0:
                         self.disableButtons();
                         break;
+                    case 1:
+                        self.enableButtons();
+                        break;
                     default:
                         //disable map buttons
                         topic.publish(appTopics.map.draw.deactivateAll, null);
                         //clear graphics on deselect
                         topic.publish(appTopics.map.clearGraphics, null);
-                    case 1:
-                        self.enableButtons();
-                        break;
                 }
 
                 //only execute if row selected was not already selected
@@ -157,18 +168,23 @@ define([
             this.dataGrid.startup();
         },
 
-        setPrivileges: function(canDelete, canClose){
+        setPrivileges: function(canDelete, canClose, canReopen){
             this.canClose = canClose;
+            this.canReopen = canReopen;
             this.canDelete = canDelete;
         },
 
-
         // based upon privileges
-        setButtons: function (canDelete, canClose) {
+        setButtons: function (canDelete, canClose, canReopen) {
             if (canClose) {
                 this.btnCloseContainer.style.display = "";
             } else {
                 this.btnCloseContainer.style.display = "none";
+            }
+            if (canReopen) {
+                this.btnReopenContainer.style.display = "";
+            } else {
+                this.btnReopenContainer.style.display = "none";
             }
             if (canDelete) {
                 this.btnDeleteContainer.style.display = "";
@@ -182,6 +198,11 @@ define([
                 this.btnCloseContainer.style.display = "";
             } else {
                 this.btnCloseContainer.style.display = "none";
+            }
+            if (this.canReopen) {
+                this.btnReopenContainer.style.display = "";
+            } else {
+                this.btnReopenContainer.style.display = "none";
             }
             if (this.canDelete) {
                 this.btnDeleteContainer.style.display = "";

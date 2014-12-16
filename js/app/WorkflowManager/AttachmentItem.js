@@ -99,6 +99,7 @@ function (
                 case 1:
                     self.attachmentTypeVar = self.i18n_TypeFile;
                     self.attachmentURLName.innerHTML = self.attachmentTitleVar;
+                    self.attachmentURLLink.target = "_blank";
                     self.attachmentURLLink.onclick = function () {
                         self.openLink();
                         return false;
@@ -123,6 +124,7 @@ function (
                 default:
                     self.attachmentTypeVar = self.i18n_TypeUrl;
                     self.attachmentURLName.innerHTML = self.attachmentFilenameVar;
+                    self.attachmentURLLink.target = "_blank";
                     self.attachmentURLLink.href = self.checkURLLink(self.attachmentFilenameVar);
                     
                     new Tooltip({

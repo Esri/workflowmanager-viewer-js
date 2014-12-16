@@ -77,7 +77,7 @@ function (
                 id: "holdTypeFilteringSelect",
                 name: "holdTypeFilteringSelect",
                 required: false,
-                style: "width:200px;",
+                style: "width:250px;",
                 disabled: true
             }, this.holdType);
             this.holdTypeFilteringSelect.startup();

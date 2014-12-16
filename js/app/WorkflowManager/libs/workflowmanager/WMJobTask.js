@@ -100,11 +100,22 @@ define("workflowmanager/WMJobTask", [
             params.jobs = (new Util()).convertIdsToString(jobIds);
             this.sendRequest(params, "/jobs/unassign", successCallBack, errorCallBack);
         },
+        closeJob: function (jobId, user, successCallBack, errorCallBack) {
+            var params = {};
+            params.user = this.formatDomainUsername(user);
+            this.sendRequest(params, "/jobs/" + jobId + "/close", successCallBack, errorCallBack);
+        },
         closeJobs: function (jobIds, user, successCallBack, errorCallBack) {
             var params = {};
             params.user = this.formatDomainUsername(user);
             params.jobs = (new Util()).convertIdsToString(jobIds);
             this.sendRequest(params, "/jobs/close", successCallBack, errorCallBack);
+        },
+        reopenClosedJobs: function (jobIds, user, successCallBack, errorCallBack) {
+            var params = {};
+            params.user = this.formatDomainUsername(user);
+            params.jobs = (new Util()).convertIdsToString(jobIds);
+            this.sendRequest(params, "/jobs/reopen", successCallBack, errorCallBack);
         },
         deleteJobs: function (jobIds, deleteHistory, user, successCallBack, errorCallBack) {
             var params = {};
@@ -146,11 +157,6 @@ define("workflowmanager/WMJobTask", [
             this.sendRequest(params, "/jobs/" + jobId + "/createVersion", function (response) {
                 successCallBack(response.versionName);
             }, errorCallBack);
-        },
-        closeJob: function (jobId, user, successCallBack, errorCallBack) {
-            var params = {};
-            params.user = this.formatDomainUsername(user);
-            this.sendRequest(params, "/jobs/" + jobId + "/close", successCallBack, errorCallBack);
         },
         updateAOI: function(jobId, aoi, user, successCallBack, errorCallBack) {
             var params = {};
@@ -236,11 +242,16 @@ define("workflowmanager/WMJobTask", [
             this.sendRequest(params, "/jobs/" + jobId + "/attachments/" + attachmentId + "/delete", successCallBack, errorCallBack);
         },
         getAttachmentContentURL: function (jobId, attachmentId) {
-            var contentURL = this.url + "/jobs/" + jobId + "/attachments/" + attachmentId + "/content"
+            var contentURL = this.url + "/jobs/" + jobId + "/attachments/" + attachmentId + "/content?f=file";
+            if (this.token) {
+                contentURL += "&token=" + this.token;
+            }
+            if (this.disableClientCaching) {
+                contentURL += "&_ts=" + new Date().getTime();
+            }
             if (this.proxyURL) {
                 contentURL = this.proxyURL + "?" + contentURL;
             }
-    
             return contentURL;
         },
         getHolds: function (jobId, successCallBack, errorCallBack) {

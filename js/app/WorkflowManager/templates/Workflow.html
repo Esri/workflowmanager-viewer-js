@@ -1,14 +1,21 @@
 <div>
+    <div data-dojo-attach-point="currentStepStatus" class="tab row">
+        <div class="tab row">
+            <label style="width: 100%" data-dojo-attach-point="currentStepStatusMessage"></label>
+        </div>
+    </div>
+
     <div data-dojo-attach-point="currentStepDiv" class="tab row">
         <div class="tab row">
             <label>${i18n_CurrentSteps}:</label>
             <span data-dojo-attach-point="workflowCurrentStepName"></span>
             <span data-dojo-attach-point="currentStepSelectWrapper"><input data-dojo-attach-point="cboCurrentStepSelect"></span>
         </div>
-    
+
         <div class="tab row">
             <span data-dojo-attach-point="btnExecuteStep"></span>
             <span data-dojo-attach-point="btnMarkStepComplete"></span>
+            <span data-dojo-attach-point="btnRecreateWorkflow"></span>
         </div>
     </div>
 
@@ -16,8 +23,19 @@
         <div><img data-dojo-attach-point="workflowImageContainer" src="" /></div>
     </div>
 
+    <!-- Recreate workflow confirmation dialog -->
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="recreateWorkflowDialog" data-dojo-id="recreateWorkflowDialog" title="${i18n_RecreateWorkflow}">
+        <div class="tab row">
+            <p>${i18n_PromptRecreateWorkflow}</p>
+        </div>
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-attach-event="onClick:recreateWorkflow" data-dojo-props="class:'dojo-btn-success'">${i18n_Ok}</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){recreateWorkflowDialog.hide();}">${i18n_Cancel}</button>
+        </div>
+    </div>
+
     <!-- Workflow question step dialog -->
-    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="questionStepDialog" data-dojo-id="questionStepDialog" style="max-width: 600px">       
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="questionStepDialog" data-dojo-id="questionStepDialog" style="max-width: 600px">
         <div class="dijitDialogPaneContentArea">
             <div class="form">
                 <div class="row">
@@ -37,7 +55,7 @@
     </div>
 
     <!-- Workflow step conflict dialog -->
-    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="stepConflictDialog" data-dojo-id="stepConflictDialog" title="Select next step">       
+    <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="stepConflictDialog" data-dojo-id="stepConflictDialog" title="${i18n_SelectNextStep}">
         <div class="dijitDialogPaneContentArea">
             <div class="form">
                 <div class="row">

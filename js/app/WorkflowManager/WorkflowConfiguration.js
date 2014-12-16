@@ -148,6 +148,7 @@ define([
         },
         
         errorHandler: function (message, error) {
+            topic.publish(appTopics.manager.hideProgress, this); 
             Alert.show(i18n.error.title, message, error);
         }
     });

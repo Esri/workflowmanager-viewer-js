@@ -176,6 +176,8 @@ define([
             canManageHolds : false,
             canManageLinkedProperties : false,
             canManageVersion : false,
+            canRecreateWorkflow : false,
+            canReopenClosedJobs : false,
             canUpdateProperties : false,
             canUpdatePropsForHeldJobs : false,
             AOIOverlapOverride : false,
@@ -290,10 +292,7 @@ define([
         initTheme : function(theme) {
             var css;
             switch (theme) {
-                //case "metro":
                 case "bootstrap":
-                case "flat":
-                case "arcgis":
                     css = [
                             "css/themes/" + theme + "/dojo/" + theme + ".css", 
                             "css/themes/" + theme + "/esri/css/esri.css", 
@@ -412,6 +411,7 @@ define([
 
             //load general information
             console.log("Loading WM service info");
+            self.showProgress();
             var wmConfig = new WorkflowConfiguration();
             wmConfig.loadServiceConfiguration({
                 user : this.user,
@@ -686,6 +686,12 @@ define([
                         break;
                     case "ManageVersion":
                         this.userPrivileges.canManageVersion = true;
+                        break;
+                    case "CanRecreateWorkflow":
+                        this.userPrivileges.canRecreateWorkflow = true;
+                        break;
+                    case "CanReopenClosedJobs":
+                        this.userPrivileges.canReopenClosedJobs = true;
                         break;
                     case "UpdateProperties":
                         this.userPrivileges.canUpdateProperties = true;
@@ -1124,11 +1130,16 @@ define([
         updateGridButtons: function() {
             var self = lang.hitch(this);
             var canDelete = self.userPrivileges.canDeleteJobs;
-            if (self.currentJob.stage != Enum.JobStage.CLOSED || Object.keys(self.grid.content.dataGrid.selection).length > 1) {
-                self.grid.content.resetButtons();
+            var canClose = self.userPrivileges.canCloseJob && self.currentJob.stage != Enum.JobStage.CLOSED;
+            var canReopen = self.userPrivileges.canReopenClosedJobs && self.currentJob.stage == Enum.JobStage.CLOSED;
+            
+            if (Object.keys(self.grid.content.dataGrid.selection).length == 1) {
+                // single job selected
+                self.grid.content.setButtons(canDelete, canClose, canReopen);
             } else {
-                self.grid.content.setButtons(canDelete, false);
-            }
+                // multiple jobs selected
+                self.grid.content.resetButtons();
+            } 
         },
 
         checkPrivileges : function() {
@@ -1146,10 +1157,11 @@ define([
         },
 
         gridPrivileges: function(){
-            // Hides the close and delete buttons based on privileges
+            // Hides the close, reopen and delete buttons based on privileges
             var canDelete = this.userPrivileges.canDeleteJobs;
             var canClose = this.userPrivileges.canCloseJob;
-            this.grid.content.setPrivileges(canDelete, canClose);
+            var canReopen = this.userPrivileges.canReopenClosedJobs;
+            this.grid.content.setPrivileges(canDelete, canClose, canReopen);
         },
 
         extendedPropertiesPrivileges: function () {
@@ -1217,7 +1229,8 @@ define([
                 hasAOIPermission = true;
             };
 
-            self.drawTool.hasAOIPermission = hasAOIPermission, self.drawTool.AOIOverlapOverride = self.userPrivileges.AOIOverlapOverride;
+            self.drawTool.hasAOIPermission = hasAOIPermission;
+            self.drawTool.AOIOverlapOverride = self.userPrivileges.AOIOverlapOverride;
         },
 
         attachmentPrivileges: function()  {
@@ -1302,9 +1315,10 @@ define([
                 tokenTask : self.wmTokenTask,
                 commentActivityType : self.commentActivityTypeId,
                 currentUser : self.user,
-                currentJob : self.currentJob
+                currentJob : self.currentJob,
+                canRecreateWorkflow : self.userPrivileges.canRecreateWorkflow
             });
-            self.tabWorkflow.content.loadWorkflow();
+            self.tabWorkflow.content.initializeWorkflow();
         },
 
         updateNotes : function() {
@@ -1871,6 +1885,17 @@ define([
                     self.errorHandler(errMsg, error);
                 });
             });
+            // reopen closed job from grid
+            topic.subscribe(appTopics.grid.reopenClosedJobs, function(sender, args) {
+                self.wmJobTask.reopenClosedJobs(args.jobs, self.user, function (data) {
+                    console.log("Jobs reopened successfully: ", args.jobs);
+                    self.getJobsByQueryID(self.currentQueryId, true);
+                }, function (error) {
+                    var errMsg = i18n.error.errorReopeningClosedJobs;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
+            });
             // delete job from grid
             topic.subscribe(appTopics.grid.deleteJobs, function(sender, args) {
                 self.wmJobTask.deleteJobs(args.jobs, true, self.user, function (data) {
@@ -1966,7 +1991,7 @@ define([
             topic.subscribe(appTopics.attachment.getContentURL, function (sender, args) {
                 var jobId = self.currentJob.id;
                 var attachmentId = args.attachmentId;
-                var contentURL = self.wmJobTask.getAttachmentContentURL(jobId, attachmentId) + "?f=file&_ts=" + new Date().getTime();
+                var contentURL = self.wmJobTask.getAttachmentContentURL(jobId, attachmentId);
                 //sender.attachmentLink.href = contentURL;
                 sender.setContentURL(contentURL);
             });
@@ -2048,6 +2073,15 @@ define([
             topic.subscribe(appTopics.manager.hideProgress, function(sender) {
                 self.hideProgress();
             });
+            
+            topic.subscribe(appTopics.map.layer.clearSelection, function(jobId) {
+                // clear grid selection
+                self.grid.content.dataGrid.clearSelection();
+                // cancel drawTool
+                self.drawTool.cancelDraw();
+                // disable drawTool
+                self.drawTool.drawButtonDeactivation();            
+            });
 
             topic.subscribe(appTopics.map.layer.click, function(jobId) {
                 //query for job data
@@ -2087,19 +2121,23 @@ define([
 
             if (self.authenticationMode == "token") {
                 var webURL = document.URL;
+                
+                var tokenUrl = this.tokenServerUrl;
+                if (!WMUtil.endsWith(tokenUrl, "/")) {
+                    tokenUrl += "/";
+                }
                 var tokenRequest = esri.request({
-                    url : this.tokenServerUrl,
+                    url : tokenUrl + "generateToken",
                     content : {
-                        request : "getToken",
+                        f : "json",
                         username : username,
                         password : password,
                         clientid : "ref." + webURL,
-                        expiration : 1440,
-                        f : "json"
+                        expiration : 1440
                     },
-                    handleAs : "json",
-                    callbackParamName : "callback"
-                });
+                    callbackParamName : "callback",
+                    preventCache: true,
+                }, { usePost: true });  // Change to use POST since 10.3 doesn't allow username and password in the query string
 
                 tokenRequest.then(function(data) {
                     // valid user login into server
@@ -2107,12 +2145,10 @@ define([
 
                     // validate user against workflow manager
                     self.validateUser(self.user);
-
-                    // TODO necessary to create cookies?
-                    //WMUtil.createCookie("serviceToken", data.token);
-                    //WMUtil.createCookie("currentUser", self.user);
+                    
                 }, function(error) {
                     // handle an error condition
+                    console.log("Unable to generate a security token.", error);
                     self.loginPage.invalidUser();
                 });
             } else {

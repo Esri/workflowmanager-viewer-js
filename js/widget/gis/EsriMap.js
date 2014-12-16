@@ -341,13 +341,20 @@ define([
             //Execute task and call showResults on completion
             self.queryTask.execute(self.query, function (fset) {
                 if (fset.features.length === 0) { 
-                    return;
+                    self.clearSelection();
                 } else if (fset.features.length === 1) {
                     self.showFeature(fset.features[0], evt);
                 } else {
                     self.showFeatureSet(fset, evt);
                 }
             });
+        },
+        
+        clearSelection: function() {
+            var self = lang.hitch(this);
+            //remove all graphics on the maps graphics layer
+            self.graphicsLayer.clear();
+            topic.publish(this.mapTopics.layer.clearSelection);
         },
         
         showFeature: function (feature, evt) {

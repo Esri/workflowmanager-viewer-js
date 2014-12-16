@@ -121,7 +121,7 @@ function (
                 id: "assignmentUsersSelect",
                 name: "assignmentUsersSelect",
                 disabled: true,
-                style: "width:200px;",
+                style: "width:250px;",
                 searchAttr: "fullName",
                 onChange: function () {
                     self.activateUpdateBtn();
@@ -135,7 +135,7 @@ function (
                 id: "assignmentGroupsSelect",
                 name: "assignmentGroupsSelect",
                 disabled: true,
-                style: "width:200px;",
+                style: "width:250px;",
                 onChange: function () {
                     self.activateUpdateBtn();
                 }
@@ -148,7 +148,7 @@ function (
                 id: "jobPrioritiesSelect",
                 name: "jobPrioritiesSelect",
                 disabled: true,
-                style: "width:200px;",
+                style: "width:250px;",
                 onChange: function () {
                     self.activateUpdateBtn();
                 }
@@ -159,7 +159,7 @@ function (
             this.jobStartDateControl = new DateTextBox({
                 id: "jobPropertiesStartDateControl",
                 name: "jobPropertiesStartDateControl",
-                style: "width:200px;",
+                style: "width:250px;",
                 disabled: true,
                 onChange: lang.hitch(this, function() {
                     var newStartDate = this.jobStartDateControl.get("value");
@@ -176,7 +176,7 @@ function (
             this.jobDueDateControl = new DateTextBox({
                 id: "jobPropertiesDueDateControl",
                 name: "jobPropertiesDueDateControl",
-                style: "width:200px;",
+                style: "width:250px;",
                 disabled: true,
                 onChange: lang.hitch(this, function() {
                     this.activateUpdateBtn();
@@ -396,12 +396,9 @@ function (
                             return true;
                         }
                     }
-                    if (this.currentJob.assignedTo == this.currentUser) {
-                        return true;
-                    }
                     return false;
                 }));
-            }
+            }       
             this.assignableUsers = assignableUsers;
         },
         

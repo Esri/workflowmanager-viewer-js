@@ -252,7 +252,7 @@ function (
             //makes a date box
             //is this localized?
             var self = lang.hitch(this);
-            this.date = new Date(this.data);
+            this.date = (this.data !== null) ? new Date(this.data) : null;
             this.field = new DateTextBox({
                 id: self.tableName + self.index,
                 disabled: !self.update || !self.editable,
@@ -281,7 +281,7 @@ function (
                 case Enum.ExtendedPropertyDisplayType.DOMAIN:
                     data = field.get('item');
                 default:
-                    data = field.get('value');;
+                    data = field.get('value');
             }
             var state = field.state;
             //flagging
@@ -299,7 +299,7 @@ function (
                 if (this.changed) {
                     switch (this.displayType) {
                         case Enum.ExtendedPropertyDisplayType.DATE:
-                            return data.getTime();
+                            return (data !== null) ? data.getTime() : null;
                         case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
                         case Enum.ExtendedPropertyDisplayType.DOMAIN:
                             return data.id;

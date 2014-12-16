@@ -56,12 +56,15 @@ define({
         grid: {
             promptDelete: "Are you sure you want to delete the selected job(s)?",
             promptClose: "Are you sure you want to close the selected job(s)?",
+            promptReopen: "Are you sure you want to reopen the selected job(s)?",
             yes: "Yes",
             no: "No",
-            deleteBtn: "Delete",
             closeBtn: "Close",
             closeTitle: "Close Jobs",
+            deleteBtn: "Delete",
             deleteTitle: "Delete Jobs",
+            reopenBtn: "Reopen",
+            reopenTitle: "Reopen Closed Jobs",
             numberJobs: "{0} job(s)",
             newJob: "New Job Created"
         },
@@ -114,6 +117,8 @@ define({
             currentSteps: "Current Step(s)",
             executeStep: "Execute Step",
             markStepComplete: "Mark Step Complete",
+            recreateWorkflow: "Recreate Workflow",
+            promptRecreateWorkflow: "Are you sure you want to recreate the job workflow?",
             
             questionNotes: "Notes (Optional)",
             questionResponse: "Question Response: {0}",
@@ -137,7 +142,9 @@ define({
                 7: "The step was checked as complete.",
                 8: "The step is assigned to another user.",
                 9: "The step is assigned to another group."
-            }
+            },
+            
+            stepHasJobDependency: "{0} step has a dependency on another job, some functionality unavailable."
         },
         
         attachments: {
@@ -223,6 +230,8 @@ define({
             errorMissingFields: "One or more required fields missing.",
             errorMissingHoldType: "Please select a type of hold.",
             errorMoveNextStep: "Unable to advance to the next workflow step.",
+            errorRecreateWorkflow: "Unable to recreate the job workflow.",
+            errorReopeningClosedJobs: "Unable to reopen all closed jobs",
             errorResolveConflict: "Unable to resolve the workflow conflict.",
             errorRetrievingAttachments: "Error retrieving attachements",
             errorRetrievingExtendedProperties: "Error retrieving extended properties",

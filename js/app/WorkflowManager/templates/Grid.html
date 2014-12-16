@@ -36,8 +36,10 @@
         <span class="grid-label" data-dojo-attach-point="selectedQueryName"></span><span class ="grid-label">:  </span><span class="grid-label grid-italic" data-dojo-attach-point="numberJobs"></span>
         <p class="grid-buttons" data-dojo-attach-point="gridButtons" style="display: none">
             <span data-dojo-attach-point="btnCloseContainer"><button type="button" data-dojo-type="dijit.form.Button" onclick="closeDialog.show();" data-dojo-props="class:'dojo-btn-info'" data-dojo-attach-point="btnClose">${i18n_Close}</button></span>
+            <span data-dojo-attach-point="btnReopenContainer"><button type="button" data-dojo-type="dijit.form.Button" onclick="reopenDialog.show();" data-dojo-props="class:'dojo-btn-info'" data-dojo-attach-point="btnReopen">${i18n_Reopen}</button></span>
             <span data-dojo-attach-point="btnDeleteContainer"><button type="button" data-dojo-type="dijit.form.Button" onclick="deleteDialog.show();" data-dojo-props="class:'dojo-btn-danger'" data-dojo-attach-point="btnDelete">${i18n_Delete}</button></span>
 </p>
+        <!-- Delete jobs dialog confirmation -->
         <div data-dojo-type="dijit.Dialog" data-dojo-id="deleteDialog" title="${i18n_DeleteTitle}" class="grid-dialog">
             <div class="dijitDialogPaneContentArea">
                 <br />
@@ -50,6 +52,7 @@
                 <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){deleteDialog.hide();}, class:'dojo-btn-danger'">${i18n_No}</button>
             </div>
         </div>
+        <!-- Close jobs dialog confirmation -->
         <div data-dojo-type="dijit.Dialog" data-dojo-id="closeDialog" title="${i18n_CloseTitle}" class="grid-dialog">
             <div class="dijitDialogPaneContentArea">
                 <br />
@@ -60,6 +63,19 @@
             <div class="dijitDialogPaneActionBar">
                 <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnCloseJob">${i18n_Yes}</button>
                 <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){closeDialog.hide();}, class:'dojo-btn-danger'">${i18n_No}</button>
+            </div>
+        </div>
+        <!-- Reopen closed jobs dialog confirmation -->
+        <div data-dojo-type="dijit.Dialog" data-dojo-id="reopenDialog" title="${i18n_ReopenTitle}" class="grid-dialog">
+            <div class="dijitDialogPaneContentArea">
+                <br />
+                <span class="grid-content">${i18n_PromptReopen}</span>
+                <br />
+                <br />
+            </div>
+            <div class="dijitDialogPaneActionBar">
+                <button data-dojo-type="dijit/form/Button" type="submit" data-dojo-props="class:'dojo-btn-success'" data-dojo-attach-point="btnReopenJob">${i18n_Yes}</button>
+                <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){reopenDialog.hide();}, class:'dojo-btn-danger'">${i18n_No}</button>
             </div>
         </div>
     </div>

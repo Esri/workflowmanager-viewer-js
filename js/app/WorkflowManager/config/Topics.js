@@ -14,6 +14,7 @@ define(function () {
             clearGraphics: "/map/clearGraphics",
             layer : {
                 click: "/map/layer/click",
+                clearSelection: "/map/layer/clearSelection",
                 jobQuery: "/map/layer/jobQuery",                
             },
             draw: {
@@ -52,7 +53,8 @@ define(function () {
             rowSelected: "/grid/rowSelected",
             assignJobs: "/grid/assignJobs",
             closeJobs: "/grid/closeJobs",
-            deleteJobs: "/grid/deleteJobs"
+            deleteJobs: "/grid/deleteJobs",
+            reopenClosedJobs: "/grid/reopenClosedJobs"
         },
 
         attachment: {

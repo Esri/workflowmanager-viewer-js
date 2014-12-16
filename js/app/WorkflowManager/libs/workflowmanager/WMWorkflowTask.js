@@ -140,6 +140,11 @@ define("workflowmanager/WMWorkflowTask", [
                 params.comment = comment;     
             }
             this.sendRequest(params, "/jobs/" + jobId + "/workflow/steps/" + stepId + "/logComment", successCallBack, errorCallBack);
+        },
+        recreateWorkflow: function(jobId, user, successCallBack, errorCallBack) {
+            var params = {};                 
+            params.user = this.formatDomainUsername(user);
+            this.sendRequest(params, "/jobs/" + jobId + "/workflow/recreate", successCallBack, errorCallBack);
         }
     });
 });
