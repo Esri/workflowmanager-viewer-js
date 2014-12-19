@@ -140,7 +140,7 @@ function (
                 placeHolder: i18n.common.loading,
                 id: "currentStepSelect",
                 name: "currentStepSelect",
-                onClick: lang.hitch(this, function () {
+                onChange: lang.hitch(this, function () {
                     this.setCurrentStep();
                 })
             }, this.cboCurrentStepSelect);
@@ -252,31 +252,28 @@ function (
         canRunStepHandler: function (canRun) {
             
             this.currentStepStatus.style.display = "none";
-            this.currentStepDiv.style.display = "none";
             
             if (canRun == Enum.StepRunnableStatus.CAN_RUN) {
                 var stepData = this.currentStep;
             
-                this.currentStepDiv.style.display = "block";
-                this.workflowCurrentStepName.innerHTML = stepData.name;
-                this.workflowCurrentStepName.style.display = "block";
-                this.currentStepSelectWrapper.style.display = "none";
-                this.workflowExecuteStepButton.set("disabled", true);
-                this.workflowMarkStepCompleteButton.set("disabled", true);
+                var canExecuteStep = false;
+                var canMarkStepComplete = false;
             
                 if (stepData.stepType.executionType == Enum.StepExecutionType.PROCEDURAL) {// when execution type is procedual
-                    this.workflowMarkStepCompleteButton.set("disabled", false);
+                    canMarkStepComplete = true;
                     if (stepData.autoRun) {
-                        this.workflowExecuteStepButton.set("disabled", false);
+                        canExecuteStep = true;
                     }
                 } else {// when execution type is NOT procedual
                     if (stepData.canSkip) {
-                        this.workflowMarkStepCompleteButton.set("disabled", false);
+                        canMarkStepComplete = true;
                     } else if (stepData.hasBeenExecuted) {
-                        this.workflowMarkStepCompleteButton.set("disabled", false);
+                        canMarkStepComplete = true;
                     }
-                    this.workflowExecuteStepButton.set("disabled", false);
+                    canExecuteStep = true;
                 }
+                
+                this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
             }
             else
             {
@@ -289,6 +286,39 @@ function (
                     this.currentStepStatus.style.display = "block";
                     this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
                 }
+            }
+        },
+        
+        updateWorkflowToolsStatus: function(step, canExecuteStep, canMarkStepComplete) {
+            
+            var currentSteps = this.currentSteps;
+            if (step == null || currentSteps == null || currentSteps.length == 0)
+            {
+                // Clear out everything
+                this.currentStepDiv.style.display = "none";
+                this.workflowExecuteStepButton.set("disabled", true);
+                this.workflowMarkStepCompleteButton.set("disabled", true);
+            }
+            else if (currentSteps.length == 1)
+            {
+                // Single step
+                this.currentStepDiv.style.display = "block";
+                this.workflowCurrentStepName.innerHTML = step.name;
+                this.workflowCurrentStepName.style.display = "block";
+                this.currentStepSelectWrapper.style.display = "none";
+                this.workflowExecuteStepButton.set("disabled", !canExecuteStep);
+                this.workflowMarkStepCompleteButton.set("disabled", !canMarkStepComplete);
+            }
+            else
+            {
+                // Multiple steps
+                // If multiple steps, step selection has already been made in the drop down
+                this.currentStepDiv.style.display = "block";
+                this.workflowCurrentStepName.innerHTML = "";
+                this.workflowCurrentStepName.style.display = "none";
+                this.currentStepSelectWrapper.style.display = "block";
+                this.workflowExecuteStepButton.set("disabled", !canExecuteStep);
+                this.workflowMarkStepCompleteButton.set("disabled", !canMarkStepComplete);
             }
         },
         
@@ -315,17 +345,18 @@ function (
         },
         
         setCurrentStep: function () {
-            var selectID = this.currentStepSelect.value;
+            var self = lang.hitch(this);
+            var selectID = self.currentStepSelect.value;
             if (selectID != -1) {
-               dojo.forEach(this.currentSteps, function(step){
+               dojo.forEach(self.currentSteps, function(step){
                     if (selectID == step.id) {
-                        this.currentStep = step;
+                        self.currentStep = step;
+                        self.checkCurrentStep();
                     }
                 });
-                this.checkCurrentStep();
             } else {
-                this.workflowExecuteStepButton.set("disabled", true);
-                this.workflowMarkStepCompleteButton.set("disabled", true);
+                self.workflowExecuteStepButton.set("disabled", true);
+                self.workflowMarkStepCompleteButton.set("disabled", true);
             }
         },
         
@@ -412,7 +443,7 @@ function (
                     // (server versions prior to 10.1 SP1 do not have the parseToken request)
                     self.openURL(urlToParse);
                 }
-            )
+            );
         },
         
         openURL: function (url) {
