@@ -280,6 +280,7 @@ function (
                 case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
                 case Enum.ExtendedPropertyDisplayType.DOMAIN:
                     data = field.get('item');
+                    break;
                 default:
                     data = field.get('value');
             }
