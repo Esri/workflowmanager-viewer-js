@@ -1,24 +1,35 @@
 ﻿<div style="height: 95%;">
-    <form data-dojo-attach-point="holdsForm" data-dojo-type="dijit.form.Form">
-        <div class="tab row">
-            <label>${i18n_HoldType}</label>
-            <input data-dojo-attach-point="holdType">
-        </div>
-        <div class="tab row">
-            <label>${i18n_Comment}:</label>
-            <textarea data-dojo-attach-point="holdTextarea"></textarea>
-        </div>
-        <div class="tab row">
-            <label></label>
-            <span data-dojo-attach-point="btnSaveHold"></span>
-        </div>
-    </form>
-    
     <div class="tab row">
         <label></label>
         <span data-dojo-attach-point="errorContainer" class="errorContent"></span>
     </div>
-    <div class="tab row gridContainer">
-        <div data-dojo-attach-point="gridContainer"></div>
+    <div class="tab row gridContainer" >
+        <div data-dojo-attach-point="gridContainer" ></div>
     </div>
+    
+    <form data-dojo-attach-point="holdsForm" data-dojo-type="dijit.form.Form">
+        <div class="tab row">
+            <span data-dojo-attach-point="btnSaveHold"></span>
+            <span data-dojo-attach-point="releaseHoldContainer"><span data-dojo-attach-point="btnReleaseHold"></span></span>
+        </div>
+        <div class="tab row">
+            <label/>
+        </div>
+        <div class="hold-textarea">
+            <div class="tab row" data-dojo-attach-point="holdTypeDropDown">
+                <label>${i18n_HoldType}</label>
+                <input data-dojo-attach-point="holdType">
+            </div>
+            <div class="tab row" data-dojo-attach-point="holdComment">
+                <label>${i18n_Comment}:</label>
+                <textarea data-dojo-attach-point="holdTextarea"></textarea>
+            </div>
+        </div>
+        <div class="tab row">
+            <label></label>
+            <p class="hold-submit-span" data-dojo-attach-point="submitBtnContainer">
+                <span class="hold-submit-button"><span data-dojo-attach-point="submitBtn" /></span>
+            </p>
+        </div>
+    </form>
 </div>

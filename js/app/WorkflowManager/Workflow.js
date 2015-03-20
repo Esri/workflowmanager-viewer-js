@@ -188,7 +188,7 @@ function (
             // Retrieve workflow steps and image
             this.loadWorkflowControl();
             this.loadWorkflowImage();
-            topic.publish(appTopics.manager.hideProgress, this); 
+            topic.publish(appTopics.manager.hideProgress, this);
         },
         
         loadWorkflowControl: function () {
@@ -380,32 +380,43 @@ function (
             var self = lang.hitch(this);
 
             topic.publish(appTopics.manager.showProgress, this);           
-            console.log("Executing step: " + this.currentStep.name);
-            var platform = this.currentStep.stepType.supportedPlatform;
+            console.log("Executing step: " + self.currentStep.name);
+            var platform = self.currentStep.stepType.supportedPlatform;
             if (platform == Enum.StepPlatformType.DESKTOP) {
                 console.log(i18n.workflow.executionWarning + ": " + i18n.error.errorStepNotWebEnabled);
-                this.showError(i18n.workflow.executionWarning, i18n.error.errorStepNotWebEnabled, null);              
+                self.showError(i18n.workflow.executionWarning, i18n.error.errorStepNotWebEnabled, null);              
             } else {
-                var exeType = this.currentStep.stepType.executionType;
+                var exeType = self.currentStep.stepType.executionType;
                 
                 // Execute certain step types on the server (essentially anything but questions).
                 // This is necessary in order to record that a step has been executed.
                 switch (exeType) {
                     case Enum.StepExecutionType.PROCEDURAL:  //procedual step will never have run button enabled
-                        if (!this.currentStep.autoRun)          
+                        if (!self.currentStep.autoRun)          
                             break;
                     case Enum.StepExecutionType.EXECUTABLE:
                     case Enum.StepExecutionType.FUNCTION:
                     case Enum.StepExecutionType.FILE:
                     case Enum.StepExecutionType.URL:  
                         var stepIds = new Array();
-                        stepIds[0] = this.currentStep.id;
-                        this.wmWorkflowTask.executeSteps(this.currentJob.id, stepIds, this.currentUser, true,
+                        stepIds[0] = self.currentStep.id;
+                        self.wmWorkflowTask.executeSteps(self.currentJob.id, stepIds, self.currentUser, true,
                             function (data) {
                                 self.executeStepsHandler(data);                                
                             },
                             function (error) {
-                                self.showError(i18n.error.title, i18n.error.errorExecuteStep, error);
+                                // In the case of an autoexecute sequence, reload the workflow so
+                                // that the user can view the current step.  Execution could have
+                                // stopped at any step.
+                                if (self.currentStep.autoRun)
+                                {
+                                    console.log("Got an error during an auto execution sequence, reloading the workflow");
+                                    self.loadWorkflow();
+                                }
+                                else
+                                {
+                                    self.showError(i18n.error.title, i18n.error.errorExecuteStep, error);
+                                }
                             });
                         break;
                 }

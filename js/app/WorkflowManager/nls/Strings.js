@@ -192,13 +192,17 @@ define({
         },
 
         holds: {
+            add: "Add",
             title: "Holds",
             comment: "Comment",
             holdDate: "Hold Date",
             holdType: "Hold Type",
             id: "ID",
             noHoldsForThisJob: "No holds for this job",
+            release: "Release",
+            releaseComments: "Release Comments",
             releasedBy: "Released By",
+            releaseHold: "Release Hold",
             saveHold: "Add Hold",
             type: "Type"
         },
@@ -231,6 +235,7 @@ define({
             errorMissingHoldType: "Please select a type of hold.",
             errorMoveNextStep: "Unable to advance to the next workflow step.",
             errorRecreateWorkflow: "Unable to recreate the job workflow.",
+            errorReleasingHold: "Error releasing hold",
             errorReopeningClosedJobs: "Unable to reopen all closed jobs",
             errorResolveConflict: "Unable to resolve the workflow conflict.",
             errorRetrievingAttachments: "Error retrieving attachements",

@@ -514,6 +514,7 @@ define([
                             break;
                         case self.tabWorkflow.id:
                             //refresh job data
+                            self.updateWorkflow();
                             self.getJobById({
                                 jobId : self.selectedRowId,
                                 updateWorkflow : false,
@@ -1051,7 +1052,8 @@ define([
             var self = lang.hitch(this);
 
             // reset active hold
-            self.jobHasActiveHold = false;
+            //moved to update holds
+            //self.jobHasActiveHold = false;
 
             // reset job dialog title while loading data
             self.jobDialog.set("title", "Loading");
@@ -1366,9 +1368,12 @@ define([
             return "";
         },
 
-        updateHolds : function() {
+        updateHolds: function () {
             var self = lang.hitch(this);
             var jobID = self.currentJob.id;
+
+            //reset current hold
+            this.jobHasActiveHold = false;
 
             // Get job holds
             this.wmJobTask.getHolds(jobID, function(data) {
@@ -1858,6 +1863,19 @@ define([
                     console.log(errMsg);
                     self.errorHandler(errMsg, error);
                 }
+            });
+
+            // release hold
+            topic.subscribe(appTopics.holds.releaseHold, function (sender, args) {
+                self.wmJobTask.releaseHold(self.currentJob.id, args.holdID, args.comment, self.user, function () {
+                    console.log("Hold released successfully");
+                    self.tabHolds.content.holdAddedSuccess();
+                    self.updateHolds();
+                }, function (error) {
+                    var errMsg = i18n.error.errorReleasingHold;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
             });
 
             // assign job from grid

@@ -76,7 +76,8 @@ define(function () {
         },
 
         holds: {
-            addHold: "/holds/addHold"
+            addHold: "/holds/addHold",
+            releaseHold: "/holds/releaseHold"
         },
 
         notes: {

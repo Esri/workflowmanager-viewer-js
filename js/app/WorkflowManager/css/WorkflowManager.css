@@ -367,6 +367,33 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     overflow: auto;
 }
 
+/*Holds button/span styles*/
+.hold-submit-span {
+    width: 400px;
+    display: inline-block;
+    margin: 0px;
+}
+.hold-submit-button {
+    float: right;
+}
+.hold-textarea{
+    height: 145px
+}
+
+.hold-add-text {
+    min-height:100px;
+    max-height:100px;
+    min-width:400px;
+    max-width:400px;
+}
+
+.hold-release-text {
+    min-width:400px;
+    max-width:400px;
+    min-height:130px;
+    max-height:130px;
+}
+
 /* Map Popup */
 .esriPopup .titlePane .title {
     width: 80%;
