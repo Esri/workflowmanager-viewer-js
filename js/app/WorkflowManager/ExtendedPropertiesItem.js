@@ -65,7 +65,7 @@ function (
         startup: function () {
             var self = lang.hitch(this);
             console.log("Extended Properties Item started");
-            self.index = Date.now();
+            self.index = self.generateRandomIndex();
 
             self.fieldTitle.innerHTML = self.alias;
 
@@ -119,7 +119,7 @@ function (
             //convert to data store
             var store = [];
             arrayUtil.forEach(response, function (data, index) {
-                store.push({ name: data.description, id: data.value})
+                store.push({ name: data.description, id: data.value});
             });
             this.stateStore = new Memory({ data: store });
 
@@ -311,6 +311,10 @@ function (
                     return null;
                 }
             }
+        },
+        generateRandomIndex : function() {
+            // generate a random number from 1 to specified max value (1000000000000)
+            return Math.floor((Math.random() * 1000000000000) + 1);
         }
     });
 });
