@@ -181,7 +181,7 @@ function (
             this.embedAttach.set('checked', true);
             this.linkAttach.set('checked', false);
             this.urlAttach.set('checked', false);
-            this.attachDojoTextBox.set('value', "")
+            this.attachDojoTextBox.set('value', "");
         },
 
         showErrorDialog: function () {
@@ -270,7 +270,7 @@ function (
 
             //list only altered when signle removes happen
                 for (key in this.attachmentList) {
-                    var selected = this.attachmentList[key]
+                    var selected = this.attachmentList[key];
                     if (selected.attachmentId == args.attachmentId) {
                         break;
                     }

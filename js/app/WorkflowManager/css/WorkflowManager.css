@@ -104,8 +104,14 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     top: 0 !important;
     left: 0 !important;
 }
+#jobDialog {
+    text-align: left;
+    height: 90% !important;
+    width: 90% !important;
+}
+
 /* Left justify tab labels */
-#jobDialog #tabs_tablist div {
+#tabs_tablist div {
     text-align: left;
 }
 

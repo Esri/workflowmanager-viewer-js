@@ -100,7 +100,7 @@ function (
             this.createNotesTextarea.set("value", data);
             var contentPane = dom.byId("tabNotes");
             var textarea = dom.byId("createNotesTextarea");
-            var height = contentPane.style.height.split("px")[0] - 80 + "px"
+            var height = contentPane.style.height.split("px")[0] - 80 + "px";
             textarea.style.minHeight = height;
         },
         

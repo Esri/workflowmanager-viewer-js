@@ -139,7 +139,11 @@ define([
                     if (self.rows.length == 1) {
                         var row = self.rows[0];
                         self.selectedRow = row;
-                        topic.publish(appTopics.grid.rowSelected, self, { selectedId: row.id, selectedFromGrid: event.grid.focused });
+                        topic.publish(appTopics.grid.rowSelected, self, { 
+                            selectedId: row.id, 
+                            selectedFromGrid: event.grid.focused,
+                            zoomToPolygon: true 
+                        });
                     }
                 }
             });
@@ -243,7 +247,7 @@ define([
                             } else {
                                 return object;
                             }
-                        }
+                        };
                         break;
                     //DATE
                     case 5:
@@ -257,7 +261,7 @@ define([
                             } else {
                                 return object;
                             }                            
-                        }
+                        };
                         break;
                         //STRING (4)
                     default:
@@ -270,13 +274,13 @@ define([
                 //format int
                 arrayUtil.forEach(intFields, function (intItem, index) {
                     item[intItem] = parseInt(item[intItem]);
-                })
+                });
                 //format date
                 arrayUtil.forEach(dateFields, function (dateItem, index) {
                     if (item[dateItem]) {
                         item[dateItem] = new Date(item[dateItem]);
                     }
-                })
+                });
             });
 
             this.dataGrid.set("columns", columns);

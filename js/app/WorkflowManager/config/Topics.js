@@ -34,7 +34,6 @@ define(function () {
         },
 
         filter: {
-            clearSearch: "/filter/clearSearch",
             jobQueriesChanged: "/filter/jobQueriesChanged",
             jobSearch: "/filter/jobSearch",
             jobTypeSelect: "/filter/jobTypeSelect"    ,     

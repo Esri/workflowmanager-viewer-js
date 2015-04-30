@@ -18,7 +18,9 @@ define([
     "dojo/store/Memory",
     "dojo/dom-style",
     "dijit/registry",
+    "dojo/dom",
     
+    "dijit/layout/ContentPane",
     "dijit/Dialog",
     "dijit/form/FilteringSelect",
     "dijit/form/TextBox",
@@ -26,6 +28,8 @@ define([
     "dijit/form/Button",
     "dijit/form/DropDownButton",
     
+    "app/WorkflowManager/WorkflowImage",
+
     "workflowmanager/Enum",    
     "./utils/URLUtil",
     "./Alert"
@@ -34,8 +38,9 @@ define([
 function (
     topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
     template, i18n, appTopics,
-    arrayUtil, lang, connect, parser, query, on, Memory, domStyle, registry,
-    Dialog, FilteringSelect, TextBox, Textarea, Button, DropDownButton,
+    arrayUtil, lang, connect, parser, query, on, Memory, domStyle, registry, dom,
+    ContentPane, Dialog, FilteringSelect, TextBox, Textarea, Button, DropDownButton,
+    WorkflowImage,
     Enum, URLUtil, Alert) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -152,7 +157,13 @@ function (
                 id: "stepConflictsSelect",
                 name: "stepConflictsSelect"
             }, this.cboStepConflictsSelect);
-            this.stepConflictsSelect.startup();            
+            this.stepConflictsSelect.startup();
+
+            this.workflowImageContainer = new ContentPane({
+                id: "workflowImageContainer",
+                content: new WorkflowImage
+            }).placeAt(this.workflowContainer);
+           
         },
         
         initializeProperties: function (args) {
@@ -165,17 +176,24 @@ function (
             this.canRecreateWorkflow = args.canRecreateWorkflow;
         },
         
+        resize: function(){
+            var contentPane = dom.byId("tabWorkflow");
+            var workflowContainerPane = dom.byId("workflowImageContainer");
+            workflowContainerPane.style.maxHeight = contentPane.style.height.split("px")[0] - 100 + "px";
+        },
+
         initializeWorkflow: function() {
             // Reset fields and disable items
             this.currentStepStatus.style.display = "none";
-            this.currentStepDiv.style.display = "none";
+            this.currentStepDiv.style.display = "block";
             this.workflowCurrentStepName.innerHTML = "";
             this.workflowCurrentStepName.style.display = "none";
             this.currentStepSelectWrapper.style.display = "none";
             this.workflowExecuteStepButton.set("disabled", true);
             this.workflowMarkStepCompleteButton.set("disabled", true);
             this.workflowRecreateWorkflowButton.set("disabled", !this.canRecreateWorkflow);
-            this.workflowImageContainer.src = "";
+            this.resize();
+            this.workflowImageContainer.content.setImage("");
 
             if (this.currentJob == null) {
                 console.log("Unable to load workflow for null job");
@@ -213,7 +231,7 @@ function (
         
         loadWorkflowImage: function () {
             var urlString = this.wmWorkflowTask.getWorkflowImageURL(this.currentJob.id);
-            this.workflowImageContainer.src = urlString;
+            this.workflowImageContainer.content.setImage(urlString);
         },
         
         getCurrentStepsHandler: function(steps) {
@@ -232,7 +250,9 @@ function (
             } else if (steps.length == 0) {
                 // no current step
                 this.currentStepStatus.style.display = "none";
-                this.currentStepDiv.style.display = "none";
+                this.workflowExecuteStepButton.set("disabled", true);
+                this.workflowMarkStepCompleteButton.set("disabled", true);
+                this.workflowRecreateWorkflowButton.set("disabled", true);
             }
         },
         
@@ -295,14 +315,12 @@ function (
             if (step == null || currentSteps == null || currentSteps.length == 0)
             {
                 // Clear out everything
-                this.currentStepDiv.style.display = "none";
                 this.workflowExecuteStepButton.set("disabled", true);
                 this.workflowMarkStepCompleteButton.set("disabled", true);
             }
             else if (currentSteps.length == 1)
             {
                 // Single step
-                this.currentStepDiv.style.display = "block";
                 this.workflowCurrentStepName.innerHTML = step.name;
                 this.workflowCurrentStepName.style.display = "block";
                 this.currentStepSelectWrapper.style.display = "none";
@@ -313,7 +331,6 @@ function (
             {
                 // Multiple steps
                 // If multiple steps, step selection has already been made in the drop down
-                this.currentStepDiv.style.display = "block";
                 this.workflowCurrentStepName.innerHTML = "";
                 this.workflowCurrentStepName.style.display = "none";
                 this.currentStepSelectWrapper.style.display = "block";
@@ -324,7 +341,6 @@ function (
         
         checkMultiSteps: function () {
             this.currentStepStatus.style.display = "none";
-            this.currentStepDiv.style.display = "block";
             this.workflowCurrentStepName.style.display = "none";
             this.currentStepSelectWrapper.style.display = "block";
             this.workflowExecuteStepButton.set("disabled", true);
@@ -572,7 +588,7 @@ function (
                                 label: answer.name,
                                 onClick: lang.hitch(this, function () {
                                     questionStepDialog.hide();
-                                    this.moveToNextStep(i);
+                                    this.handleNextStepSelection(i);
                                 }) 
                             }); 
                             // place the button item into the dom
@@ -597,20 +613,13 @@ function (
 
         questionStepHandler: function() {
             topic.publish(appTopics.manager.showProgress, this);
-            var selectedOptionId = this.questionStepsSelect.get("value");
+            var returnCode = this.questionStepsSelect.get("value");
+            var answerLabel = this.questionStepsSelect.get("displayedValue");
             questionStepDialog.hide();
-            this.moveToNextStep(selectedOptionId);        
+            this.moveToNextStep(returnCode, answerLabel);        
         },
         
-        moveToNextStep: function (answerIndex) {
-            var self = lang.hitch(this);
-            
-            var notes = null;
-            if (this.lastQuestionCollectNotes) {              
-                notes = this.stepNotesTextarea.value;
-                this.stepNotesTextarea.value = "";
-            }
-    
+        handleNextStepSelection: function (answerIndex) {
             answerIndex = parseInt(answerIndex);
             if (this.lastQuestionAnswers == null || answerIndex < 0 || answerIndex >= this.lastQuestionAnswers.length) {
                 return;
@@ -618,7 +627,18 @@ function (
             var answer = this.lastQuestionAnswers[answerIndex];
             var returnCode = answer.code;
             var answerLabel = answer.name;
-    
+            this.moveToNextStep(returnCode, answerLabel);
+        },
+
+        moveToNextStep: function (returnCode, answerLabel) {
+            var self = lang.hitch(this);
+
+            var notes = null;
+            if (this.lastQuestionCollectNotes) {              
+                notes = this.stepNotesTextarea.value;
+                this.stepNotesTextarea.value = "";
+            }
+                
             if (answerLabel != null) {
                 // Log a comment with the question response
                 var comment = "";

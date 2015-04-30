@@ -38,6 +38,9 @@ define(function() {
             url: "proxy/proxy.ashx",
             alwaysUseProxy: false
         },
+        
+        //geometry Service
+        geometryServiceURL : "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",       
 
         map: {
             // select default basemap (ArcGIS basemap or custom basemap Id)

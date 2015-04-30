@@ -90,7 +90,7 @@ function (
             var record = { recordId: self.record.id, properties: {}, tableName: self.tableName, length: 0 };
             arrayUtil.forEach(this.itemList, function (data, index) {
                 if (data && self.record.recordValues[index].canUpdate) {
-                    var item = data.getUpdateItem()
+                    var item = data.getUpdateItem();
                     if (item != null) {
                         //if there is an item to update add it to the list
                         //use the field name as an index

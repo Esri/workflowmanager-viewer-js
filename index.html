@@ -82,7 +82,7 @@
         ]
     };
 </script>
-<script type="text/javascript" src="//js.arcgis.com/3.10/"></script>
+<script type="text/javascript" src="//js.arcgis.com/3.13/"></script>
 <script type="text/javascript">
     if (window.attachEvent && !window.addEventListener) {
         // unsupported browsers (IE8 or older)
@@ -109,6 +109,12 @@
         
         // Windows authetication not used
         Controller.startup();
+        
+        //Uncomment out the following lines for testing purposes only.  
+        //Use this to determine the organization's domain when using windows authentication.
+        //var windowsUser = "<%= User.Identity.Name %>";     // get the username from Windows
+        //var loadingMsgElem = document.getElementById("loadingMessage");
+        //loadingMsgElem.innerHTML = "windowsUser = " + windowsUser;        
     });
 </script>
 

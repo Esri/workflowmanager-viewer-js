@@ -208,12 +208,47 @@ define([
             });
         },
         
-        drawAoi: function(polygon) {
-            if (polygon.rings.length > 0) {
-                this.addBoundaryGraphic(polygon, true);
+        drawAoi: function(jobId, aoi, zoomToPolygon) {
+            if (aoi && aoi.rings && aoi.rings.length > 0) {
+                if (this.map.spatialReference == aoi.spatialReference) {
+                    this._drawAoi(aoi, zoomToPolygon);
+                } else {
+                    // Get the correct geometry for the map's spatial reference
+                    this._getAndDrawAoi(jobId, zoomToPolygon);
+                }
             } else {
                 this.graphicsLayer.clear();
             }
+        },
+        
+        _drawAoi : function(aoi, zoomToPolygon) {
+            this.addBoundaryGraphic(aoi, true);
+            if (zoomToPolygon) {
+                //zoom to aoi
+                this.zoomToPolygon(aoi);
+            }            
+        },
+        
+        _getAndDrawAoi : function(jobId, zoomToPolygon) {
+            var self = lang.hitch(this);
+            var query = new Query();
+            query.returnGeometry = true;
+            query.outSpatialReference = self.map.spatialReference;
+            query.where = self.jobIdField + "=" + jobId;
+
+            //Execute task and call showResults on completion
+            self.queryTask.execute(query, 
+                function (fset) {
+                    if (fset.features.length === 1) {
+                        self._drawAoi(fset.features[0].geometry, zoomToPolygon);
+                    } else {
+                        self.graphicsLayer.clear();
+                    }
+                },
+                function (error) {
+                    console.log("Error retrieving jobAOI: " + error);        
+                }
+            );            
         },
 
         zoomToPolygon: function (polygon) {
@@ -318,6 +353,7 @@ define([
             this.query = new esri.tasks.Query();
             this.query.returnGeometry = true;
             this.query.outFields = [this.jobIdField];
+            this.query.outSpatialReference = this.map.spatialReference;  
 
             this.symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 0.5]));
             this.singleFeature = this.showFeature;
@@ -335,6 +371,7 @@ define([
             //onClick event returns the evt point where the user clicked on the map.
             //This contains the mapPoint (esri.geometry.point) and the screenPoint (pixel xy where the user clicked).
             self.query.geometry = evt.mapPoint;
+            self.query.outSpatialReference = self.map.spatialReference;
             //Filter also on jobIds currently selected
             self.query.where = self.jobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
 

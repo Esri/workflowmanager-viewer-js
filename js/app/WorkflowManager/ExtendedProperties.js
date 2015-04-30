@@ -88,13 +88,17 @@ function (
             this.editable = editable;
         },
 
-        populateExtendedProperties: function (containers) {
-            var self = lang.hitch(this);
-            //resizing the contentPane dynamically
+        resize: function (){
             var contentPane = dom.byId("tabExtendedProperties");
             var tableListContainer = dom.byId("extendedPropertiesTableListContianer");
             tableListContainer.style.maxHeight = contentPane.style.height.split("px")[0] - 80 + "px";
+        },
 
+
+        populateExtendedProperties: function (containers) {
+            var self = lang.hitch(this);
+            //resizing the contentPane dynamically
+            self.resize();
             self.btnUpdateRecords.set('disabled', true);
             self.buttonContainer.style.display = "none";
             self.textContainer.style.display = "";

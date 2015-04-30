@@ -1,8 +1,9 @@
 define("workflowmanager/WMConfigurationTask", [
     "dojo/_base/declare",
+    "dojo/_base/lang",
     "workflowmanager/_BaseTask",
     "workflowmanager/_Util"
-], function(declare, BaseTask, Util) {
+], function(declare, lang, BaseTask, Util) {
     return declare([BaseTask], {
         constructor: function (url) {
             this.url = url;
@@ -22,13 +23,14 @@ define("workflowmanager/WMConfigurationTask", [
             }, errorCallBack);
         },
         getDataWorkspaceDetails: function (dataWorkspaceId, user, successCallBack, errorCallBack) {
-            // Try the 10.1 operation first
+            var self = lang.hitch(this);
+            // Try the 10.1+ operation first
             var params = {};
             params.user = this.formatDomainUsername(user);
             this.sendRequest(params, "/dataWorkspaces/" + dataWorkspaceId + "/info", successCallBack, function(err) {
-                // Fallback to the 10.1 resource
+                // Fallback to the 10.0 resource
                 //  (which does not support data workspaces with individual logins)
-                this.sendRequest(params, "/dataWorkspaces/" + dataWorkspaceId, successCallBack, errorCallBack);
+                self.sendRequest(params, "/dataWorkspaces/" + dataWorkspaceId, successCallBack, errorCallBack);
             });
         },
         getTableRelationshipsDetails: function (successCallBack, errorCallBack) {

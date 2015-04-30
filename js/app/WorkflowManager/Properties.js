@@ -164,7 +164,7 @@ function (
                 onChange: lang.hitch(this, function() {
                     var newStartDate = this.jobStartDateControl.get("value");
                     if ((newStartDate > this.jobDueDateControl.get("value")) && (this.jobDueDateControl.get("value"))) {
-                        this.jobDueDateControl.set("value", newStartDate)
+                        this.jobDueDateControl.set("value", newStartDate);
                     }
                     this.jobDueDateControl.constraints.min = newStartDate;
                     this.activateUpdateBtn();
@@ -491,7 +491,7 @@ function (
                 this.userAssignedType = 1;
             } else if (checkedButtons[0].value == "group") {
                 this.jobAssignmentTypeWrapper.style.visibility = "visible";
-                this.jobAssignmentTypeUserWrapper.style.display = "none"
+                this.jobAssignmentTypeUserWrapper.style.display = "none";
                 this.jobAssignmentTypeGroupWrapper.style.display = "inline";
                 this.initAssignmentType = Enum.JobAssignmentType.ASSIGNED_TO_GROUP;
                 //set a type var for detecting change

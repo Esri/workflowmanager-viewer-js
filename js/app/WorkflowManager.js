@@ -38,6 +38,9 @@ define([
     //esri dijit
     "esri/dijit/Geocoder",
     
+    //esri tasks
+    "esri/tasks/GeometryService",
+    
     // WM API
     "workflowmanager/WMAOILayerTask", 
     "workflowmanager/WMConfigurationTask", 
@@ -97,7 +100,7 @@ define([
 ], function (
     topic, dom, domStyle, domConstruct, domClass, domGeom, arrayUtil, lang, win, json, connect, string, when, aspect, coreFx, baseFx, locale, query, QueryTask, Query,
     registry, Dialog, BorderContainer, TabContainer, ContentPane, FilteringSelect, TextBox, Button, DropDownButton, ComboBox, RadioButton,
-    Geocoder,
+    Geocoder, GeometryService,
     WMAOILayerTask, WMConfigurationTask, WMJobTask, WMReportTask, WMTokenTask, WMWorkflowTask, Enum, JobQueryParameters,
     appTopics, Alert, Header, Filter, Grid, Statistics, Properties, ExtendedProperties, Notes, Workflow, Attachments, AttachmentItem, History, Aoi, Holds, mapTemplate, AoiFunctionsTemplate,
     MapUtil, WMUtil,
@@ -352,7 +355,10 @@ define([
 
             // proxy defaults
             esri.config.defaults.io.proxyUrl = config.proxy.url;
-            esri.config.defaults.io.alwaysUseProxy = config.proxy.alwaysUseProxy;
+            esri.config.defaults.io.alwaysUseProxy = config.proxy.alwaysUseProxy;         
+            
+            // geometry service
+            this.geometryService = new GeometryService(config.geometryServiceURL);
 
             this.wmAOILayerTask = new WMAOILayerTask(this.aoiMapServiceQueryLayerUrl);
             this.wmConfigurationTask = new WMConfigurationTask(this.wmServerUrl);
@@ -714,7 +720,7 @@ define([
             this.selectedQuery = this.savedQuery;
             //console.log("Query ID:", queryID);
             //if results aren't returned within 2 seconds it will show progress bar
-            var progressTimer = setTimeout(function () { self.showProgress() }, 10000);
+            var progressTimer = setTimeout(function () { self.showProgress(); }, 10000);
 
             //query function
             var queryById = function () {
@@ -758,7 +764,7 @@ define([
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
                 });
-            }
+            };
 
             //create timeout function to be run every 10 seconds
             var queryTimeout = setInterval(function () {
@@ -898,7 +904,7 @@ define([
         //filter the rows in a grid via the inputed field types, and there corresponding fields
         //also accounts for N/A
         filterRow: function(filterField1Type, filterField2Type, filterField1, filterField2) {
-            filterRows = []
+            filterRows = [];
             this.columns[this.queryResults.fields[1].name].hidden = false;
             var rows = this.rows;
             var columns = this.columns;
@@ -940,7 +946,7 @@ define([
             // search jobs by the text input value
             // returns all objects that contain the string
             var progressTimer = setTimeout(function() {
-                self.showProgress()
+                self.showProgress();
             }, 2000);
             this.wmJobTask.searchJobs(args.value, this.user, function(data) {
                 self.hideProgress();
@@ -1059,7 +1065,7 @@ define([
             self.jobDialog.set("title", "Loading");
 
             var progressTimer = setTimeout(function() {
-                self.showProgress()
+                self.showProgress();
             }, 2000);
 
             this.wmJobTask.getJob(args.jobId, function(data) {
@@ -1082,7 +1088,7 @@ define([
 
                 // set map aoi
                 topic.publish(appTopics.map.clearGraphics, null);
-                self.setMapAoi(data.aoi, args.zoomToPolygon);
+                self.selectJobAOI(args.jobId, data.aoi, args.zoomToPolygon);
 
                 //set draw tool buttons
                 self.drawTool.drawButtonDeactivation();
@@ -1108,25 +1114,12 @@ define([
         },
 
         //sets and refreshes map aoi
-        setMapAoi : function(aoi, zoomToPolygon) {
+        selectJobAOI : function(jobId, aoi, zoomToPolygon) {
             var self = lang.hitch(this);
-
             if (aoi) {
                 //set aoi
-                self.myMap.drawAoi(aoi);
-                if (zoomToPolygon) {
-                    //zoom to aoi
-                    self.myMap.zoomToPolygon(aoi);
-                    //self.tabAoi.content.aoiMap.zoomToPolygon(aoi);
-                }
-            } else {
-                this.wmJobTask.getJob(self.currentJob.id, function(data) {
-                    self.myMap.zoomToPolygon(data.aoi);
-                    //self.tabAoi.content.aoiMap.zoomToPolygon(data.aoi);
-                }, function(error) {
-                    console.log("Error retrieving jobs with job ID ", jobID);
-                });
-            }
+                self.myMap.drawAoi(jobId, aoi, zoomToPolygon);
+            } 
         },
 
         updateGridButtons: function() {
@@ -1271,7 +1264,7 @@ define([
                 //get atachment data and populate the tab
                 var jobAttachments = [];
                 self.wmJobTask.getAttachments(jobID, function (data) {
-                    jobAttachments = data
+                    jobAttachments = data;
                     if (jobAttachments.length > 0) {
                         console.log("Attachments for " + jobID + ": " + jobAttachments);
                         self.tabAttachments.content.populateAttachments(jobAttachments);
@@ -1310,7 +1303,7 @@ define([
 
         updateWorkflow : function() {
             var self = lang.hitch(this);
-
+            var canUserRecreateThisWorkflow = self.userPrivileges.canRecreateWorkflow && self.currentJob.stage != Enum.JobStage.CLOSED;
             self.tabWorkflow.content.initializeProperties({
                 workflowTask : self.wmWorkflowTask,
                 jobTask : self.wmJobTask,
@@ -1318,7 +1311,7 @@ define([
                 commentActivityType : self.commentActivityTypeId,
                 currentUser : self.user,
                 currentJob : self.currentJob,
-                canRecreateWorkflow : self.userPrivileges.canRecreateWorkflow
+                canRecreateWorkflow : canUserRecreateThisWorkflow
             });
             self.tabWorkflow.content.initializeWorkflow();
         },
@@ -1506,7 +1499,6 @@ define([
             //Create dialog
             this.jobDialog = new Dialog({
                 id : "jobDialog",
-                style : "width: " + dialogWidth + "px; height: " + dialogHeight + "px;",
                 isLayoutContainer : true,
                 draggable : false,
                 autofocus : false,
@@ -1557,7 +1549,8 @@ define([
             this.tabProperties.startup();
 
             this.tabWorkflow = new ContentPane({
-                title : i18n.workflow.title,
+                title: i18n.workflow.title,
+                id: "tabWorkflow",
                 content : new Workflow()
             });
             this.tabs.addChild(this.tabWorkflow);
@@ -1627,6 +1620,8 @@ define([
                 dialogHeight = window.innerHeight - 100;
                 self.jobDialog.set("style", "width: " + dialogWidth + "px; height: " + dialogHeight + "px;");
                 self.grid.content.resizeGrid();
+                self.tabWorkflow.content.resize();
+                self.tabExtendedProperties.content.resize();
             };
         },
 
@@ -1709,7 +1704,7 @@ define([
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
                 });
-            }),
+            });
 
             topic.subscribe(appTopics.extendedProperties.getFieldValues, function (sender, args) {
                  self.wmJobTask.listFieldValues(self.currentJob.id, args.tableName, args.field, self.user, function (response) {
@@ -1720,7 +1715,7 @@ define([
                      self.errorHandler(errMsg, error);
                  });
 
-             })
+             });
 
             //new topics for selecting bar/charts
             topic.subscribe(appTopics.manager.serviceConfigurationLoaded, function(sender, args) {
@@ -1766,7 +1761,7 @@ define([
                 self.getJobById({
                     jobId : args.selectedId,
                     updateWorkflow : false,
-                    zoomToPolygon : args.selectedFromGrid
+                    zoomToPolygon : args.zoomToPolygon
                 });
                 self.selectedRowId = args.selectedId;
 
@@ -1797,34 +1792,56 @@ define([
             topic.subscribe(appTopics.map.draw.saveGraphics, function(sender, args) {
                 console.log("draw graphics save clicked:", args);
                 var progressTimer = setTimeout(function() {
-                    self.showProgress()
+                    self.showProgress();
                 }, 2000);
-                self.wmJobTask.updateAOI(self.currentJob.id, args.graphics.graphics[0].geometry, self.user, function(success) {
-                    console.log("AOI updated successfully");
+                
+                var currentGraphic = args.graphics.graphics[0];
+                currentGraphic.geometry.spatialReference = self.myMap.map.spatialReference;
+
+                // simplify the polygon to remove any self-intersecting rings
+                self.geometryService.simplify([currentGraphic.geometry], simplifyCallback, errorUpdatingAOI);
+
+                function simplifyCallback(geometries) {
+                    currentGraphic.setGeometry(geometries[0]);
+                    var jobId = self.currentJob.id;
+                    var aoi = currentGraphic.geometry;
+        
+                    self.wmJobTask.updateAOI(jobId, aoi, self.user,
+                        function (data) {
+                            console.log("AOI updated successfully");
+                            self.hideProgress();
+                            clearTimeout(progressTimer);
+                            
+                            if (data.error) {
+                                errorUpdatingAOI(error);
+                            }
+                              
+                            //clear graphics
+                            sender.clearGraphics();
+                            self.drawTool.btnClearAoi.set("disabled", false);
+        
+                            //reload job
+                            topic.publish(appTopics.grid.rowSelected, this, {
+                                selectedId : self.selectedRowId,
+                                selectedFromGrid : true,
+                                zoomToPolygon : false
+                            });
+        
+                            self.myMap.setMapExtent();
+                            self.myMap.refreshLayers();
+                            
+                        }, errorUpdatingAOI );
+                }
+                
+                function errorUpdatingAOI(error) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
-
-                    //clear graphics
-                    sender.clearGraphics();
-                    self.drawTool.btnClearAoi.set("disabled", false);
-
-                    //reload job
-                    topic.publish(appTopics.grid.rowSelected, this, {
-                        selectedId : self.selectedRowId,
-                        selectedFromGrid : true
-                    })
-
-                    self.myMap.setMapExtent();
-                    self.myMap.refreshLayers();
-                }, function(error) {
-                    self.hideProgress();
-                    clearTimeout(progressTimer);
-
+                    
                     var errMsg = i18n.error.errorUpdatingJobAOI;
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
                     self.drawTool.graphics.clear();
-                });
+                }
             });
 
             topic.subscribe(appTopics.grid.jobDialog, function(sender, args) {
@@ -1836,13 +1853,6 @@ define([
                 //hide and show popups
                 self.myMap.map.infoWindow.hide();
                 self.jobDialog.show();
-            });
-
-            topic.subscribe(appTopics.filter.clearSearch, function(sender) {
-                self.filter.content.jobSearchInput.set("value", "");
-                // TODO Fix this so that it uses the first job query.  Not all repositories have an "All Jobs" query
-                self.filter.content.jobQueries.set("value", "All Jobs");
-                self.getJobsByQueryID(selectedFilter);
             });
 
             // add hold
@@ -2056,7 +2066,7 @@ define([
 
             topic.subscribe("clearAoiConfirmed", function() {
                 var progressTimer = setTimeout(function() {
-                    self.showProgress()
+                    self.showProgress();
                 }, 2000);
                 self.wmJobTask.deleteAOI(self.currentJob.id, self.user, function(success) {
                     console.log("AOI successfully deleted");
@@ -2104,12 +2114,12 @@ define([
             topic.subscribe(appTopics.map.layer.click, function(jobId) {
                 //query for job data
                 var progressTimer = setTimeout(function() {
-                    self.showProgress()
+                    self.showProgress();
                 }, 2000);
                 self.wmJobTask.getJob(jobId, function(data) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
-                    self.setMapAoi(self.currentJob.aoi, false);
+                    self.selectJobAOI(jobId, self.currentJob.aoi, false);
                     topic.publish(appTopics.map.layer.jobQuery, data, self.serviceInfo.jobStatuses, self.serviceInfo.jobPriorities);
                 }, function(error) {
                     self.hideProgress();
