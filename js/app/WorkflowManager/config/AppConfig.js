@@ -4,10 +4,10 @@ define(function() {
         // valid themes: "claro", "nihilo", "soria", "tundra", "bootstrap"
         theme: "bootstrap",
         
-        // Note: If using https, replace http with https and update the port number from
-        //       6080 to 6443 as needed.
+        // Note: If using https, replace http with https and include port numbers
+        //       6080 or 6443 as needed.
         app: {
-            ServiceRoot: "http://workflowsample.esri.com:6080/arcgis/rest/services/Workflow/WMServer",
+            ServiceRoot: "http://workflowsample.esri.com/arcgis/rest/services/Workflow/WMServer",
             // Determines authentication mode to use for the application
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
@@ -22,7 +22,7 @@ define(function() {
 
             jobAOILayer: {
                 type: "dynamic",
-                url: "http://workflowsample.esri.com:6080/arcgis/rest/services/AOI/MapServer",
+                url: "http://workflowsample.esri.com/arcgis/rest/services/AOI/MapServer",
                 AOILayerID: 0,
                 options: {
                     id: "jobsAoi",
