@@ -7,6 +7,7 @@ define(function () {
         },
 
         map: {
+            setup: "/map/setup",
             loaded: "/map/loaded",
             zoom: {
                 extent: "/map/zoom/extent"	
@@ -14,8 +15,11 @@ define(function () {
             clearGraphics: "/map/clearGraphics",
             layer : {
                 click: "/map/layer/click",
+                multiClick: "/map/layer/multiClick",
                 clearSelection: "/map/layer/clearSelection",
-                jobQuery: "/map/layer/jobQuery",                
+                select: "/map/layer/select",
+                jobQuery: "/map/layer/jobQuery",
+                multiJobQuery: "/map/layer/multiJobQuery",
             },
             draw: {
                 start: "/map/draw/start",
@@ -27,6 +31,7 @@ define(function () {
         },
 
         manager: {
+			logoutUser: "/manager/logoutUser",
             logAction: "/manager/logAction",
             showProgress: "/manager/showProgress",
             hideProgress: "/manager/hideProgress",
@@ -87,6 +92,8 @@ define(function () {
             enableButton: "/extendedProperties/enableButton",
             updateExtendedProperties: "/extendedProperties/updateExtendedProperties",
             getFieldValues: "/extendedProperties/getFieldValues",
+            getMultiListValues: "/extendedProperties/getMultiListValues",
+            getMultiListStores: "/extendedProperties/getMultiListStores",
             invalidUpdate: "/extendedProperties/invalidUpdate",
             errorUpdating: "/extendedProperties/errorUpdating"
         }

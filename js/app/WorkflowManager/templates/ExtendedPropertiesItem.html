@@ -1,10 +1,15 @@
 ﻿<div>
-    <div class="tab row">
+    <div class="tab row" data-dojo-attach-point="extendedItem">
         <p class="extendedProperty-item extendedProperty-item-label"><label data-dojo-attach-point="fieldTitle"></label></p>
         <p class="extendedProperty-item extendedProperty-item-field" data-dojo-attach-point="fieldError">
-            <input data-dojo-attach-point="fieldValue">
-            <span class="extendedProperty-item-required" data-dojo-attach-point="fieldRequired" style="display: none;">* </span>
+            <span>
+                <label class="extendedProperty-item-multi-label-top" data-dojo-attach-point="multiLevel1" style="display: none;"></label>
+                <span>
+                    <input data-dojo-attach-point="fieldValue" style="float:right;">
+                    <span class="extendedProperty-item-required" data-dojo-attach-point="fieldRequired" style="display: none; float: right;">* </span>
+                </span>
+            </span>
         </p>
-            <div class="clear-fix"></div>
+        <div class="clear-fix"></div>
     </div>
 </div>

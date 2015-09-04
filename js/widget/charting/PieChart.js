@@ -65,8 +65,6 @@ define([
         expanderTB: null,
 
         //additional variables
-        categoryType: null,
-        groupType: null,
         fieldArr: [],
 
         constructor: function () {
@@ -166,13 +164,6 @@ define([
 
        
         //store the category and group
-        updateGroup: function (group) {
-            this.groupType = group;
-        },
-        updateCategory: function (category) {
-            this.categoryType = category;
-        },
-       
         prepareData: function (arrKeys, arrData) {
             var self = lang.hitch(this);
             var categoryType = arguments[3];
@@ -225,9 +216,7 @@ define([
                             topic.publish(appTopics.chart.handleShape, this, { shape: evt.shape });
                             evt.shape.fillStyle.a = .5;
                             evt.shape.setFill(evt.shape.fillStyle);
-                            var filterCategory = (self.categoryType ? self.categoryType : categoryType);
-                            var filterGroup = (self.groupType ? self.groupType : groupType);
-                            topic.publish(appTopics.grid.filter, self, { filterField1Type: filterCategory, filterField2Type: filterGroup, filterField1: filterField1, filterField2: filterField2 });
+                            topic.publish(appTopics.grid.filter, self, { filterField1: filterField1, filterField2: filterField2 });
                         }
                     }
                 } else if (type == "onmouseout") {

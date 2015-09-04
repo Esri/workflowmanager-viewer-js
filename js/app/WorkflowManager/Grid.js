@@ -13,6 +13,7 @@ define([
     "dojo/date/locale",
     "dojo/number",
     "dojo/on",
+    "dojox/gesture/tap",
     
     "dojo/_base/lang",
     "dojo/string",
@@ -38,7 +39,7 @@ define([
     ], 
     function(
         declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, arrayUtil,
-        topic, dom, domStyle, domConstruct, domClass, locale, localeNumber, on,
+        topic, dom, domStyle, domConstruct, domClass, locale, localeNumber, on, tap,
         lang, string, 
         Memory,
         OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
@@ -139,10 +140,14 @@ define([
                     if (self.rows.length == 1) {
                         var row = self.rows[0];
                         self.selectedRow = row;
+                        var gridArr = self.gridContainer.children[1].firstChild.children;
+                        var gridArrPos = self.findGridArrPos(gridArr, self.selectedRow.id);
                         topic.publish(appTopics.grid.rowSelected, self, { 
                             selectedId: row.id, 
                             selectedFromGrid: event.grid.focused,
-                            zoomToPolygon: true 
+                            zoomToPolygon: true,
+                            gridArr: gridArr,
+                            gridArrPos: gridArrPos
                         });
                     }
                 }
@@ -169,8 +174,25 @@ define([
                 topic.publish(appTopics.grid.jobDialog, this, { event: event, selectedId: self.selectedRow.id });
             });
 
+            //enable open dialog on touch screens
+            on(this.dataGrid.bodyNode, tap.doubletap, function (event) {
+                topic.publish(appTopics.grid.jobDialog, this, { event: event, selectedId: self.selectedRow.id });
+            });
+
             this.dataGrid.startup();
         },
+
+        findGridArrPos: function(gridArr, selID){
+            var pos = 1;
+            for(pos = 1; pos < (gridArr.length -1); pos++)
+            {
+                if(gridArr[pos].firstChild.firstChild.firstChild.innerText == selID)
+                    break;
+            }
+            
+            return pos;
+        },
+
 
         setPrivileges: function(canDelete, canClose, canReopen){
             this.canClose = canClose;

@@ -57,6 +57,7 @@ function (
         i18n_BarChart: i18n.statistics.barChart,
         i18n_PieChart: i18n.statistics.pieChart,
         i18n_Reset: i18n.statistics.reset,
+        i18n_SelectACategory: i18n.statistics.selectACategory,
         
         //store categoryType, groupType
         categoryType: null,
@@ -135,8 +136,6 @@ function (
                         topic.publish(appTopics.grid.resetFilter, self, {});
                         //save label and pass it to stackBarChart
                         self.categoryType = this.item.id;
-                        self.statsPieChart.updateCategory(self.categoryType);
-                        self.statsBarChart.updateCategory(self.categoryType);
                         topic.publish(appTopics.statistics.chartCategorizedBy, self, { });
                     }
                 }
@@ -165,15 +164,13 @@ function (
                     topic.publish(appTopics.grid.resetFilter, self, {});
                     //save label and pass it to barChart
                     self.groupType = this.item.id;
-                    self.statsPieChart.updateGroup(self.groupType);
-                    self.statsStackedBarChart.updateGroup(self.groupType);
                     topic.publish(appTopics.statistics.chartGroupedBy, self, { id: this.item.id, item: this.item });
                 }
             }, this.cboChartGroupedBy);
             this.chartGroupedBy.set("value", chartGroupedByStore.getIdentity(chartGroupedByStore.data[0]));
             this.chartGroupedBy.startup();
             on.once(this.chartGroupedBy, "onChange", this.chartGroupedBy.set("placeHolder", i18n.common.selectOption));
-            
+
             // initialize the pie chart
             this.statsBarChart = new BarChart({}).placeAt(this.statsBarChartContainer);
             this.statsBarChart.startup();
@@ -191,8 +188,8 @@ function (
         resetRow: function () {
             topic.publish(appTopics.grid.resetFilter, self, {});
         },
-
-        populateDropdowns: function (customColumns) {
+        
+        populateDropdowns: function (customColumns, selectFirstCategory) {
             var self = lang.hitch(this);
             var selectedIndex;
             this.customColumns = customColumns;
@@ -200,8 +197,10 @@ function (
             this.categorizedByStore = new Memory({
                 idProperty: "index",
                 data: [
+                    { label: "Select", index: -1 }
                 ]
             });
+            
             arrayUtil.forEach(customColumns, function (item, i) {
                 if ((item.id.toLowerCase().indexOf("JOB_ID".toLowerCase()) != -1) || (item.id.toLowerCase().indexOf("JOB_NAME".toLowerCase()) != -1)) {
                     item.hidden = true;
@@ -214,7 +213,10 @@ function (
             this.chartCategorizedBy.set("store", this.categorizedByStore);
 
             //query store for previously selected option in the new store
-            if (this.currentSelection) {
+            if (selectFirstCategory) {
+                varFirstCategoryIndex = this.getFirstCategoryIndex();
+                selectedIndex = this.chartCategorizedBy.store.query({ index: varFirstCategoryIndex });
+            } else if (this.currentSelection) {
                 selectedIndex = this.chartCategorizedBy.store.query({ id: this.currentSelection.id });
             } else {
                 selectedIndex = [{ index: 0 }];
@@ -223,14 +225,21 @@ function (
             //select first option if no option is already selected
             if ((!this.chartCategorizedBy.get("value")) || (selectedIndex.length < 1)) {
                 this.categoryType = this.categorizedByStore.data[0].id;
-                this.statsPieChart.updateCategory(this.categoryType);
-                this.statsBarChart.updateCategory(this.categoryType);
                 this.chartCategorizedBy.set("value", this.categorizedByStore.getIdentity(this.categorizedByStore.data[0]));
             } else {
                 this.chartCategorizedBy.set("value", selectedIndex[0].index);
             }
 
             this.populateGroupedByDropdown();
+        },
+        
+        getFirstCategoryIndex: function () {
+            var storeData = this.chartCategorizedBy.store.data;
+            for (var i=0; i < storeData.length; i++) {
+                if (storeData[i].index > 0)
+                    return storeData[i].index;
+            }
+            return -1;
         },
         
         populateGroupedByDropdown: function (index) {
@@ -251,6 +260,7 @@ function (
             
             //if an index is passed in with call, remove that item from store
             //for grouped by filtering select
+            index = this.chartCategorizedBy.value;
             if (index > -1) {
                 self.groupedByStore.remove(index);
             }
@@ -280,7 +290,13 @@ function (
             //reset filter before changing grid
             topic.publish(appTopics.grid.resetFilter, self, {});
 
-            if (this.chartGroupedBy.value > 0) { // grouped by
+            if (this.chartCategorizedBy.value <= 0) {
+                domStyle.set(this.messageStatsChartContainer, "display", "block");
+                domStyle.set(this.simpleStatsChartContainer, "display", "none");
+                domStyle.set(this.groupedStatsChartContainer, "display", "none");
+                
+            } else if (this.chartGroupedBy.value > 0) { // grouped by
+                domStyle.set(this.messageStatsChartContainer, "display", "none");
                 domStyle.set(this.simpleStatsChartContainer, "display", "none");
                 domStyle.set(this.groupedStatsChartContainer, "display", "block");
                 
@@ -293,6 +309,7 @@ function (
                 }
                 
             } else { // NOT grouped by
+                domStyle.set(this.messageStatsChartContainer, "display", "none");
                 domStyle.set(this.simpleStatsChartContainer, "display", "block");
                 domStyle.set(this.groupedStatsChartContainer, "display", "none");
                 
@@ -303,6 +320,12 @@ function (
                     domStyle.set(this.statsPieChartContainer, "display", "block");
                     domStyle.set(this.statsBarChartContainer, "display", "none");
                 }
+            }
+        },
+        
+        clearGroupedBySelection: function() {
+            if (this.chartGroupedBy.value > 0) {
+                this.chartGroupedBy.set("value", this.chartGroupedBy.store.data[0].index);
             }
         },
         

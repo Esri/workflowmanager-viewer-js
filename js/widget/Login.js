@@ -63,21 +63,27 @@ define([
                 console.log("Login page started");
                 
                 // TODO Check if there is a user/token cookie
-                
-                // set default user
-                this.usernameInput.set("value", self.defaultUser);
+
+				// set user
+                if (user && user != null && user != "")
+                    this.usernameInput.set("value", user);
+                else
+                    this.usernameInput.set("value", self.defaultUser);                
                 this.usernameInput.set("required", true);
 
                 if (self.authenticationMode == "token")
                     self.useTokenAuthentication = true;
 
                 if (self.useTokenAuthentication) {
-                    console.log("password is required");
+                    console.log("Token authentication, password is required");
                     //show password stuff
                     self.passwordInput.set("required", true);
                     domStyle.set(self.passwordContainer, "display", "inline");
                 } else {
-                    console.log("password is not required");
+                    if (self.authenticationMode == "portal")
+                        console.log("Portal authentication ...");
+                    else
+                        console.log("Password is not required");
                     //hide show password stuff
                     self.passwordInput.set("required", false);
                     domStyle.set(self.passwordContainer, "display", "none");

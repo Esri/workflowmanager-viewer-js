@@ -9,7 +9,10 @@
         createdBy: "Created By",
         assignedTo: "Assigned To",
         priority: "Priority",
-        status: "Status"
+        status: "Status",
+        navInfo: "{0} of {1}",
+        next: "Next",
+        back: "Back"
     }),
     
     es: true,

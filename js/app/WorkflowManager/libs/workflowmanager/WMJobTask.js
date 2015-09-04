@@ -360,9 +360,9 @@ define("workflowmanager/WMJobTask", [
                 successCallBack(response.values);
             }, errorCallBack);
         },
-        listMultiLevelFieldValues: function (jobId, field, previousSelectedValues, user, successCallback, errorCallback) {
+        listMultiLevelFieldValues: function (jobId, field, previousSelectedValues, user, successCallBack, errorCallBack) {
             var isFillingLastField = false;
-            if (field.data != null 
+            if (field != null 
                 && field.displayType == Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST)
             {
                 var displayFields = field.tableListDisplayField.split(",");
@@ -448,7 +448,7 @@ define("workflowmanager/WMJobTask", [
                 successCallBack([]);
             }
         },
-        queryMultiLevelSelectedValues: function (jobId, field, user, successCallback, errorCallback) {
+        queryMultiLevelSelectedValues: function (jobId, field, user, successCallBack, errorCallBack) {
             if (field.data != null 
                 && field.displayType == Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST)
             {
@@ -471,10 +471,10 @@ define("workflowmanager/WMJobTask", [
                     {
                         values = result.rows[0];
                     }
-                    successCallback(values);
+                    successCallBack(values);
                 }, errorCallBack);
             } else {
-                successCallback([]);
+                successCallBack([]);
             }
         }
     });

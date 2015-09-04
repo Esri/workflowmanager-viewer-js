@@ -2,7 +2,8 @@ define([
     
     // dojo
     "dojo/topic", 
-    "dojo/dom", 
+    "dojo/dom",
+    "dojo/on",
     "dojo/dom-style", 
     "dojo/dom-construct", 
     "dojo/dom-class", 
@@ -81,6 +82,12 @@ define([
     "widget/gis/BasemapGallery", 
     "widget/gis/DrawTool", 
     "widget/Login",
+    "widget/gis/EsriSearchDropDown",
+    
+    // Identity
+    "esri/arcgis/Portal",
+    "esri/arcgis/OAuthInfo",
+    "esri/IdentityManager",    
     
     // Utils
     "utils/Expander",
@@ -98,13 +105,14 @@ define([
     "./WorkflowManager/WorkflowConfiguration"
 
 ], function (
-    topic, dom, domStyle, domConstruct, domClass, domGeom, arrayUtil, lang, win, json, connect, string, when, aspect, coreFx, baseFx, locale, query, QueryTask, Query,
+    topic, dom, on, domStyle, domConstruct, domClass, domGeom, arrayUtil, lang, win, json, connect, string, when, aspect, coreFx, baseFx, locale, query, QueryTask, Query,
     registry, Dialog, BorderContainer, TabContainer, ContentPane, FilteringSelect, TextBox, Button, DropDownButton, ComboBox, RadioButton,
     Geocoder, GeometryService,
     WMAOILayerTask, WMConfigurationTask, WMJobTask, WMReportTask, WMTokenTask, WMWorkflowTask, Enum, JobQueryParameters,
     appTopics, Alert, Header, Filter, Grid, Statistics, Properties, ExtendedProperties, Notes, Workflow, Attachments, AttachmentItem, History, Aoi, Holds, mapTemplate, AoiFunctionsTemplate,
     MapUtil, WMUtil,
-    EsriMap, EsriLegend, Coordinates, BasemapGallery, DrawTool, Login,
+    EsriMap, EsriLegend, Coordinates, BasemapGallery, DrawTool, Login, SearchDropDown,
+    ArcGISPortal, ArcGISOAuthInfo, IdentityManager,
     Expander,
     Memory,
     i18n,
@@ -196,10 +204,20 @@ define([
         queryIDInURL : null, 
 
         // Current query results
+        initialQueryResultsLoaded: false,
+        queryResultsThreshold: 300,
         queryResults: null,
         currentQueryId: null,
         selectedQuery: null,
         savedQuery: null,
+        
+        // Grid Array
+        gridArr: null,
+        gridArrPos: null,
+        fromGrid: null,
+        curJobDialogID: null,
+        navigating: null,
+        zoomToPolygon: null,
 
         //i18n
         i18n_SearchResults: i18n.filter.results,
@@ -214,7 +232,7 @@ define([
        
         handleURL: function() {
             //grab url and parse it,
-            //pass teh appropriate id to teh correct variable
+            //pass the appropriate id to the correct variable
             var url = window.location.toString().split("#")[0];
             var index = url.indexOf("?");
             if (index > -1) {
@@ -278,9 +296,14 @@ define([
                 case "token" :
                     this.initLogin();
                     break;
+                case "portal" :
+					this.isPortalUser = true;
+                    this.signInToPortal();
+                    break;
                 case "none" :
+                case null :
                     if (config.app.AutoLogin == false || config.app.Reloaded) {
-                        this.initLogin();
+                        this.initLogin(null);
                     } else if (config.app.AutoLogin ) {
                         this.initLogin(config.app.DefaultUser);
                     }
@@ -291,7 +314,60 @@ define([
                     break;
             }
         },
-
+        
+        signInToPortal : function() {
+            this.portalUrl = config.app.PortalURL;
+            
+            var info = new ArcGISOAuthInfo({
+                appId: config.app.AppId,
+                // Uncomment this line to prevent the user's signed in state from being shared
+                // with other apps on the same domain with the same authNamespace value.
+                authNamespace: "portal_oauth_inline",
+                popup: false,
+                portalUrl: this.portalUrl
+            });
+            IdentityManager.registerOAuthInfos([info]);
+            
+            afterSignIn = lang.hitch(this, function (portalUser) {
+                console.log("Signed in to the portal: ", portalUser);
+                this.initLogin(portalUser.username);
+				this.portalUsername = portalUser.username;
+				
+				var token = null;
+				var expires = null;
+				if (portalUser.credential)
+				{
+                    token = portalUser.credential.token;
+                    expires = portalUser.credential.expires;	    
+				}
+				// For portal authenticated requests, this is only really needed for URLs that 
+				// the API constructs itself.  Requests using esri.request will already have the
+				// token appended to it by IdentityManager
+				this.setToken(token, expires);
+            });
+            signIn = lang.hitch(this, function () {
+                new ArcGISPortal.Portal(this.portalUrl).signIn().then(afterSignIn);
+            });
+			IdentityManager.getCredential(this.portalUrl + "/sharing/");
+            IdentityManager.checkSignInStatus(this.portalUrl + "/sharing/").then(signIn).otherwise(
+                function (error) {
+                    console.log("Error occurred while signing in: ", error);
+                }
+            );
+        },
+		
+		logoutUser : function(reload) {
+			if (this.isPortalUser) {
+				var credential = IdentityManager.findCredential(this.portalUrl, this.portalUsername);
+				if (credential)
+					credential.destroy();
+				this.portalUsername = null;
+			}
+			
+			if (this.isPortalUser || reload)
+				location.reload();
+		},
+        
         initTheme : function(theme) {
             var css;
             switch (theme) {
@@ -366,18 +442,8 @@ define([
             this.wmJobTask = new WMJobTask(this.wmServerUrl);
             this.wmWorkflowTask = new WMWorkflowTask(this.wmServerUrl);
             this.wmTokenTask = new WMTokenTask(this.wmServerUrl);
-
-            // associate the token with each task
-            if (this.token != null && this.token != "") {
-                this.wmAOILayerTask.token = this.token;
-                this.wmConfigurationTask.token = this.token;
-                this.wmReportTask.token = this.token;
-                this.wmJobTask.token = this.token;
-                this.wmWorkflowTask.token = this.token;
-                this.wmTokenTask.token = this.token;
-            }
         },
-
+        
         initConfig : function() {
             console.log("initConfig called");
             var self = lang.hitch(this);
@@ -491,6 +557,7 @@ define([
                 return function(page) {
                     var oldVal = self.tabs.get("selectedChildWidget");
                     var newVal = arguments[0];
+                    self.curJobDialogID = newVal.id;
                     //console.log("selected child changed from ", oldVal.title, " to ", newVal.title);
                     
                     self.doSelectChild = selectChild;
@@ -716,6 +783,12 @@ define([
             var queryTryTotal = 2;
             var queryTryCount = 0;
 
+            if (self.queryIDInURL) {
+                self.setQueryNameFromId(self.queryIDInURL);
+                queryID = self.queryIDInURL;
+                self.queryIDInURL = null;
+            }
+
             this.currentQueryId = queryID;
             this.selectedQuery = this.savedQuery;
             //console.log("Query ID:", queryID);
@@ -737,17 +810,9 @@ define([
                     //first check jobIDInURL, if true then short circuit and only grab one job
                     //then check queryIDInURL, if true set it to false to avoid loop and call getjobsbyqueryid again
                     //otherwise continue as usual and get all jobs
-                    if (self.jobIDInURL) {
-                        self.selectedQuery = self.i18n_SearchResults;
-                        self.getJobsByJobIDs([self.jobIDInURL]);
-                        self.jobIDInURL = null;
-                    } else if (self.queryIDInURL) {
-                        self.setQueryNameFromId(self.queryIDInURL);
-                        self.getJobsByQueryID(self.queryIDInURL);
-                        self.queryIDInURL = null;
-                    } else {
-                        self.populateQueryResults(data);
-                    }
+                    
+                    self.populateQueryResults(data);
+                    
                     if (reset) {
                         self.resetQueryLabel();
                     }
@@ -760,7 +825,7 @@ define([
                     //clear timeout function so it stops retrying
                     clearInterval(queryTimeout);
 
-                    var errMsg = i18n.error.errorRunningQuery.replace("{0}", queryId);
+                    var errMsg = i18n.error.errorRunningQuery.replace("{0}", self.currentQueryId);
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
                 });
@@ -778,7 +843,15 @@ define([
                 }
             }, 20000);
 
-            queryById();
+            if (self.jobIDInURL) {
+                clearInterval(queryTimeout);
+                self.selectedQuery = self.i18n_SearchResults;
+                self.getJobsByJobIDs([self.jobIDInURL]);
+                clearTimeout(progressTimer);
+                self.jobIDInURL = null;
+            } else {
+                queryById();
+            }
 
             // TODO Application should load with or without a query being selected
             // CLEAR LOADING SCREEN WHEN ALL THE INFORMATION IS RETRIEVED
@@ -864,7 +937,20 @@ define([
             this.grid.content.numberJobs.innerHTML = this.i18n_NumberJobs.replace("{0}", rows.length);
             this.grid.content.setGridData(columns, rows, this.queryResults.fields[0].name);
             // populate filtering selects in statistics
-            this.statisticsContainer.content.populateDropdowns(customColumns);
+            var numRows = (rows.length) ? rows.length : 0;
+            if (!this.initialQueryResultsLoaded) {
+                // If this is the first time we're processing query results (loading the app)
+                // and if the number of results are great than the threshold value, then do not
+                // prepopulate the categorized by values
+                this.initialQueryResultsLoaded = true;
+                if (numRows > this.queryResultsThreshold) {
+                    this.statisticsContainer.content.populateDropdowns(customColumns, false);
+                } else {
+                    this.statisticsContainer.content.populateDropdowns(customColumns, true);
+                }
+            } else {
+                this.statisticsContainer.content.populateDropdowns(customColumns, true);
+            }
 
             //update the feature definition expression
             this.myMap.getUpdatedFeatures(rowIds);
@@ -903,12 +989,23 @@ define([
         
         //filter the rows in a grid via the inputed field types, and there corresponding fields
         //also accounts for N/A
-        filterRow: function(filterField1Type, filterField2Type, filterField1, filterField2) {
+        filterRow: function (filterField1, filterField2) {
             filterRows = [];
             this.columns[this.queryResults.fields[1].name].hidden = false;
             var rows = this.rows;
             var columns = this.columns;
             var jobIdField = this.getJobIdColumnField(columns);
+            var filterField1Type = null;
+            var filterField2Type = null;
+
+            if (filterField1) {
+                var filterField1Type = this.statisticsContainer.content.chartCategorizedBy.item.id;
+                if (filterField2)
+                    filterField2Type = this.statisticsContainer.content.chartGroupedBy.item.id;
+            } else {
+                var filterField1Type = this.statisticsContainer.content.chartGroupedBy.item.id;
+                filterField1 = filterField2;
+            }
 
             if (filterField1 == "N/A") {
                 filterField1 = "";
@@ -971,57 +1068,68 @@ define([
         populateChart : function() {
             if (this.grid.content.dataGrid.store == null)
                 return;
-
+                
             var self = lang.hitch(this);
             var intIndex = 0;
             var currentCategorizedByValue = this.getCategorizedValue();
             var currentGroupedByValue = this.getGroupedValue();
-
-            // prepare data based on grid rows (store)
-            var uniqueValues = new Array();
-            var uniqueValuesKeys = new Array();
-            arrayUtil.forEach(this.grid.content.dataGrid.store.data, function(row) {
-                if (uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] === undefined) {
-                    uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] = 0;
-                    uniqueValuesKeys.push(row[self.queryResults.fields[currentCategorizedByValue].name]);
-                }
-                uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] += 1;
-            });
-
-            // if currentGroupedByValue is not 'none'}
-            if (this.getGroupedValue() > 0) {// grouped by selected
-                // prepare the charts (based on grouped by value)
-                var uniqueGroupedByValues = new Array();
-                var uniqueGroupedByValuesKeys = new Array();
-
-                // gather and prepare the grouped data
+            
+            if (currentCategorizedByValue < 0) {
+                // Clear grouped by selection
+                this.statisticsContainer.content.clearGroupedBySelection();
+                // Reset data in bar chart
+                this.statisticsContainer.content.statsBarChart.prepareData(new Array(), new Array());
+                // Reset data in pie chart
+                this.statisticsContainer.content.statsPieChart.prepareData(new Array(), new Array());
+                
+            } else {
+                
+                // prepare data based on grid rows (store)
+                var uniqueValues = new Array();
+                var uniqueValuesKeys = new Array();
                 arrayUtil.forEach(this.grid.content.dataGrid.store.data, function(row) {
-                    if (uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]] === undefined) {
-                        uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]] = [];
-                        uniqueGroupedByValuesKeys.push(row[self.queryResults.fields[currentGroupedByValue].name]);
+                    if (uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] === undefined) {
+                        uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] = 0;
+                        uniqueValuesKeys.push(row[self.queryResults.fields[currentCategorizedByValue].name]);
                     }
-                    if (uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] === undefined) {
-                        uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] = 0;
-                    }
-                    uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] += 1;
+                    uniqueValues[row[self.queryResults.fields[currentCategorizedByValue].name]] += 1;
                 });
-                console.log("Grouped by data gathering done.");
-
-                // remove all previous pie charts (there isn't really one only but multiple that change quite drastically)
-                this.statisticsContainer.content.clearGroupedByCharts();
-
-                // apply data to pie charts
-                arrayUtil.forEach(uniqueGroupedByValuesKeys, lang.hitch(this, function(key) {
-                    this.statisticsContainer.content.addPieChart(key, uniqueValuesKeys, uniqueGroupedByValues[key]);
-                }));
-                // apply data to stacked bar chart
-                this.statisticsContainer.content.statsStackedBarChart.prepareData(uniqueValuesKeys, uniqueGroupedByValuesKeys, uniqueGroupedByValues);
-            } else {// no grouped by needed
-
-                // apply data to bar chart
-                this.statisticsContainer.content.statsBarChart.prepareData(uniqueValuesKeys, uniqueValues);
-                // apply data to pie chart
-                this.statisticsContainer.content.statsPieChart.prepareData(uniqueValuesKeys, uniqueValues);
+            
+                // if currentGroupedByValue is not 'none'}    
+                if (currentGroupedByValue > 0) {// grouped by selected
+                    // prepare the charts (based on grouped by value)
+                    var uniqueGroupedByValues = new Array();
+                    var uniqueGroupedByValuesKeys = new Array();
+    
+                    // gather and prepare the grouped data
+                    arrayUtil.forEach(this.grid.content.dataGrid.store.data, function(row) {
+                        if (uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]] === undefined) {
+                            uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]] = [];
+                            uniqueGroupedByValuesKeys.push(row[self.queryResults.fields[currentGroupedByValue].name]);
+                        }
+                        if (uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] === undefined) {
+                            uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] = 0;
+                        }
+                        uniqueGroupedByValues[row[self.queryResults.fields[currentGroupedByValue].name]][row[self.queryResults.fields[currentCategorizedByValue].name]] += 1;
+                    });
+                    console.log("Grouped by data gathering done.");
+    
+                    // remove all previous pie charts (there isn't really one only but multiple that change quite drastically)
+                    this.statisticsContainer.content.clearGroupedByCharts();
+    
+                    // apply data to pie charts
+                    arrayUtil.forEach(uniqueGroupedByValuesKeys, lang.hitch(this, function(key) {
+                        this.statisticsContainer.content.addPieChart(key, uniqueValuesKeys, uniqueGroupedByValues[key]);
+                    }));
+                    // apply data to stacked bar chart
+                    this.statisticsContainer.content.statsStackedBarChart.prepareData(uniqueValuesKeys, uniqueGroupedByValuesKeys, uniqueGroupedByValues);
+                } else {// no grouped by needed
+    
+                    // apply data to bar chart
+                    this.statisticsContainer.content.statsBarChart.prepareData(uniqueValuesKeys, uniqueValues);
+                    // apply data to pie chart
+                    this.statisticsContainer.content.statsPieChart.prepareData(uniqueValuesKeys, uniqueValues);
+                }
             }
 
             // show the appropriate chart
@@ -1094,8 +1202,14 @@ define([
                 self.drawTool.drawButtonDeactivation();
                 self.drawTool.drawButtonActivation(data.aoi.rings.length);
 
-                //update job properties
-                self.updateProperties();
+                
+                // execute alternative function
+                // if not execute update properties
+                if (args.thenFunction)
+                    args.thenFunction();
+                else
+                    //update job properties
+                    self.updateProperties();
 
                 //check privileges
                 //this should probably be moved to a .then for this function
@@ -1524,6 +1638,55 @@ define([
             // Warning label
             this.jobWarning = domConstruct.create("span", { class: "warning-label", innerHTML: "" });
             domConstruct.place(this.jobWarning, this.jobDialog.titleBar, 2);
+            this.jobDialogRight = domConstruct.create("span", { class : "jobDialogRightButton", innerHTML: ">"});
+            domConstruct.place(this.jobDialogRight, this.jobDialog.titleBar, 3);
+            this.jobDialogLeft = domConstruct.create("span", { class: "jobDialogLeftButton", innerHTML: "<"});
+            domConstruct.place(this.jobDialogLeft, this.jobDialog.titleBar, 3);
+
+            this.navInfo = domConstruct.create("span", { class: "jobDialogNavInfo", innerHTML: "" });
+            domConstruct.place(this.navInfo, this.jobDialog.titleBar, 3);
+
+            on(this.jobDialogRight, 'mouseenter', function(e){
+                self.jobDialogRight.style.opacity = '1';
+            });
+            on(this.jobDialogRight, 'mouseleave', function(e) {
+                self.jobDialogRight.style.opacity = '0.65';
+            });
+
+            on(this.jobDialogLeft, 'mouseenter', function(e) {
+                self.jobDialogLeft.style.opacity = '1';
+            });
+
+            on(this.jobDialogLeft, 'mouseleave', function(e) {
+                self.jobDialogLeft.style.opacity = '0.65';
+            });
+
+            on(this.jobDialogRight, 'click', function(e) {
+                //code to move traverse forward
+                self.gridArrPos++;
+                if (self.fromGrid) {
+                    if (self.gridArrPos == (self.gridArr.length - 1))
+                        self.gridArrPos = 1;
+                } else {
+                    if (self.gridArrPos > self.gridArr.length)
+                        self.gridArrPos = 1;
+                }
+                self.updateJobDialog();
+            });
+
+            on(this.jobDialogLeft, 'click', function (e) {
+                //code to traverse back ward
+                self.gridArrPos--;
+                if (self.gridArrPos == 0) {
+                    if (self.fromGrid) {
+                        self.gridArrPos = self.gridArr.length - 2;
+                    }
+                    else {
+                        self.gridArrPos = self.gridArr.length;
+                    }
+                }
+                self.updateJobDialog();
+            });
 
             // Tabs
             this.tabs = new TabContainer({
@@ -1622,7 +1785,95 @@ define([
                 self.grid.content.resizeGrid();
                 self.tabWorkflow.content.resize();
                 self.tabExtendedProperties.content.resize();
+                self.myMap.resize();
             };
+        },
+
+        updateNavInfo: function(){
+            if (this.fromGrid)
+                this.navInfo.innerHTML = i18n.header.navInfo.replace("{0}", this.gridArrPos).replace("{1}", (this.gridArr.length -2));
+            else
+                this.navInfo.innerHTML = i18n.header.navInfo.replace("{0}", this.gridArrPos).replace("{1}", (this.gridArr.length));
+        },
+
+        updateJobDialog: function () {
+            this.updateNavInfo();
+            var jobID = this.gridArrPosToJobID(this.gridArr, this.gridArrPos);
+            this.navigating = true;
+            this.grid.content.dataGrid.clearSelection();
+            this.grid.content.dataGrid.select(jobID);
+            this.grid.content.dataGrid.row(jobID).element.scrollIntoView();
+
+            this.reloadJobDialog(jobID);
+            this.navigating = false;
+        },
+
+        gridArrPosToJobID: function (gridArr, gridArrPos) {
+            var jobID;
+            if (this.fromGrid)
+                jobID = gridArr[gridArrPos].firstChild.firstChild.firstChild.innerText;
+            else
+                jobID = gridArr[gridArrPos - 1];
+            return jobID;
+        },
+
+        reloadJobDialog: function (jobID) {
+            var self = lang.hitch(this);
+            
+            var thenFunction = null;
+            switch (self.curJobDialogID) {
+                case self.tabProperties.id:
+                    //refresh job data
+                    //temp clear update properties notification
+                    self.tabProperties.content.updateCallback("");
+                    break;
+                case self.tabWorkflow.id:
+                    //refresh job data
+                    thenFunction = function () {
+                        self.updateWorkflow();
+                    };
+                    break;
+                case self.tabHistory.id:
+                    //update tab
+                    thenFunction = function () {
+                        self.updateHistory();
+                    };
+                    break;
+                case self.tabNotes.id:
+                    //update tab
+                    thenFunction = function () {
+                        self.updateNotes();
+                    };
+                    break;
+                case self.tabHolds.id:
+                    //update tab
+                    thenFunction = function () {
+                        self.updateHolds();
+                    };
+                    break;
+                case self.tabExtendedProperties.id:
+                    //update tab
+                    thenFunction = function () {
+                        // Do nothing and Skip update properties
+                    };
+                    self.updateExtendedProperties(jobID);
+                    break;
+                case self.tabAttachments.id:
+                    thenFunction = function () {
+                        // Do nothing and Skip update properties
+                    };
+                    self.updateAttachments(jobID);
+                    break;
+                default:
+                    break;
+
+            }
+            self.getJobById({
+                jobId: jobID,
+                updateWorkflow: false,
+                zoomToPolygon: self.zoomToPolygon,
+                thenFunction: thenFunction
+            });
         },
 
         initMap : function() {
@@ -1632,7 +1883,7 @@ define([
                 aoiLayerID : config.app.jobAOILayer.AOILayerID,
                 mapTopics : appTopics.map,
                 mapId : self.mapPanel.id,
-                controller : self
+                controller: self
             });
 
             // TODO Is there a reason initWidgets is called during map onLoad?
@@ -1677,6 +1928,14 @@ define([
                 }, "drawContainer");
                 this.drawTool.startup();
             }
+
+            this.searchTool = new SearchDropDown({
+                map: this.myMap.map,
+                zoomLevel: config.map.search.zoomLevel,
+                customSources: config.map.search.customSources,
+                sources: config.map.search.locatorSources
+            }, "searchContainer");
+            this.searchTool.startup();
         },
 
         addAOIDynamicMapLayerToMap: function () {
@@ -1696,6 +1955,11 @@ define([
             this.selectedRowId = null;
             var selectedFilter = 1;
             
+			//topic for logging out a user
+			topic.subscribe(appTopics.manager.logoutUser, function (sender, args) {
+				self.logoutUser(true);
+			});
+			
             //topic for updating Extended Properties
             topic.subscribe(appTopics.extendedProperties.updateExtendedProperties, function (sender, args) {
                 self.wmJobTask.updateRecord(self.currentJob.id, args.record, self.user, function (success) {
@@ -1708,7 +1972,7 @@ define([
 
             topic.subscribe(appTopics.extendedProperties.getFieldValues, function (sender, args) {
                  self.wmJobTask.listFieldValues(self.currentJob.id, args.tableName, args.field, self.user, function (response) {
-                     sender.setResponse(response);
+                     args.callback(sender,response);
                  }, function (error) {
                      var errMsg = i18n.error.errorGettingFieldValues;
                      console.log(errMsg, error);
@@ -1716,6 +1980,28 @@ define([
                  });
 
              });
+
+            topic.subscribe(appTopics.extendedProperties.getMultiListValues, function (sender, args) {
+                self.wmJobTask.queryMultiLevelSelectedValues(self.currentJob.id, args.field, self.user, function (response) {
+                    args.callback(sender, response);
+                }, function (error) {
+                    var errMsg = i18n.error.errorGettingMultiFieldValues;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
+
+            });
+
+            topic.subscribe(appTopics.extendedProperties.getMultiListStores, function (sender, args) {
+                self.wmJobTask.listMultiLevelFieldValues(self.currentJob.id, args.field, args.curSelectedValues, self.user, function (response) {
+                    args.callback(sender, response, args.storeLevel);
+                }, function (error) {
+                    var errMsg = i18n.error.errorGettingMultiFieldValues;
+                    console.log(errMsg, error);
+                    self.errorHandler(errMsg, error);
+                });
+
+            });
 
             //new topics for selecting bar/charts
             topic.subscribe(appTopics.manager.serviceConfigurationLoaded, function(sender, args) {
@@ -1729,6 +2015,7 @@ define([
                 self.onServiceConfigurationLoaded();
 
                 self.addAOIDynamicMapLayerToMap();
+                topic.publish(appTopics.map.setup, { jobPriorities: args.serviceInfo.jobPriorities, jobStatuses: args.serviceInfo.jobStatuses });
             });
             
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
@@ -1758,12 +2045,21 @@ define([
             });
 
             topic.subscribe(appTopics.grid.rowSelected, function(sender, args) {
-                self.getJobById({
-                    jobId : args.selectedId,
-                    updateWorkflow : false,
-                    zoomToPolygon : args.zoomToPolygon
-                });
+                if (!self.navigating) {
+                    self.fromGrid = true;
+                    self.gridArr = args.gridArr;
+                    self.gridArrPos = args.gridArrPos;
+                    if(self.gridArr)
+                        self.updateNavInfo();
+
+                    self.getJobById({
+                        jobId: args.selectedId,
+                        updateWorkflow: false,
+                        zoomToPolygon: args.zoomToPolygon
+                    });
+                }
                 self.selectedRowId = args.selectedId;
+                self.zoomToPolygon = args.zoomToPolygon;
 
                 //clear map job popup
                 self.myMap.map.infoWindow.hide();
@@ -1846,7 +2142,12 @@ define([
 
             topic.subscribe(appTopics.grid.jobDialog, function(sender, args) {
                 self.selectedRowId = args.selectedId;
-
+                if (args.gridArr) {
+                    self.fromGrid = false;
+                    self.gridArr = args.gridArr;
+                    self.gridArrPos = args.gridArrPos;
+                    self.updateNavInfo();
+                }
                 //select props tab on open
                 self.tabs.selectChild(self.tabProperties);
 
@@ -1899,7 +2200,7 @@ define([
             });
             //filter current grid
             topic.subscribe(appTopics.grid.filter, function (sender, args) {
-                self.filterRow(args.filterField1Type, args.filterField2Type, args.filterField1, args.filterField2);
+                self.filterRow(args.filterField1, args.filterField2);
             });
             
             // close job from grid
@@ -1929,6 +2230,8 @@ define([
                 self.wmJobTask.deleteJobs(args.jobs, true, self.user, function (data) {
                     console.log("Jobs deleted successfully: ", args.jobs);
                     self.getJobsByQueryID(self.currentQueryId, true);
+                    self.myMap.graphicsLayer.clear();
+                    self.myMap.map.infoWindow.hide();
                 }, function (error) {
                     var errMsg = i18n.error.errorDeletingJob;
                     console.log(errMsg, error);
@@ -2119,8 +2422,8 @@ define([
                 self.wmJobTask.getJob(jobId, function(data) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
-                    self.selectJobAOI(jobId, self.currentJob.aoi, false);
-                    topic.publish(appTopics.map.layer.jobQuery, data, self.serviceInfo.jobStatuses, self.serviceInfo.jobPriorities);
+                    self.selectJobAOI(jobId, data.aoi, false);
+                    topic.publish(appTopics.map.layer.jobQuery, data);
                 }, function(error) {
                     self.hideProgress();
                     clearTimeout(progressTimer);
@@ -2128,12 +2431,63 @@ define([
                     console.log("error retrieving job info for popup id:", jobId, error);
                 });
 
+                self.navigating = true;
                 self.grid.content.dataGrid.clearSelection();
                 self.grid.content.dataGrid.select(jobId);
                 if (self.grid.content.dataGrid.row(jobId).element) {
                     //an error trips up the app if it tries to scroll to an element not in dom
                     self.grid.content.dataGrid.row(jobId).element.scrollIntoView();
                 }
+                self.navigating = false;
+            });
+
+            topic.subscribe(appTopics.map.layer.multiClick, function(jobIds, aoi) {
+                //query for job data
+                var progressTimer = setTimeout(function() {
+                    self.showProgress();
+                }, 2000);
+                var parameters = new JobQueryParameters();
+                parameters.fields = "JTX_JOBS.JOB_ID,JTX_JOBS.JOB_NAME,JTX_JOBS.CREATED_BY,JTX_JOBS.ASSIGNED_TO,JTX_JOBS.PRIORITY,JTX_JOBS.STATUS";
+                parameters.tables = "JTX_JOBS";
+                parameters.aliases = "ID,Name,Created_By,Assigned_To,Priority,Status";
+                parameters.where = "JTX_JOBS.JOB_ID IN (" + jobIds.join(",") + ")";
+                self.wmJobTask.queryJobsAdHoc(parameters, self.user, function(data) {
+                    self.hideProgress();
+                    clearTimeout(progressTimer);
+                    self.selectJobAOI(jobIds[0], aoi, false);
+                    topic.publish(appTopics.map.layer.multiJobQuery, data);
+                    }, function(error) {
+                    self.hideProgress();
+                    clearTimeout(progressTimer);
+
+                    console.log("getJobsAdHoc (parameters " + parameters + ") failed: " + errMsg);
+                    var errMsg = i18n.error.errorFindingJobsById.replace("{0}", jobIDs.join());
+                    self.errorHandler(errMsg, error);
+                });
+
+                
+                self.navigating = true;
+                self.grid.content.dataGrid.clearSelection();
+                self.grid.content.dataGrid.select(jobIds[0]);
+                if (self.grid.content.dataGrid.row(jobIds[0]).element) {
+                    //an error trips up the app if it tries to scroll to an element not in dom
+                    self.grid.content.dataGrid.row(jobIds[0]).element.scrollIntoView();
+                }
+                self.navigating = false;
+            });
+
+            topic.subscribe(appTopics.map.layer.select, function (jobId, aoi) {
+                topic.publish(appTopics.map.clearGraphics, null);
+                self.selectJobAOI(jobId, aoi, false);
+
+                self.navigating = true;
+                self.grid.content.dataGrid.clearSelection();
+                self.grid.content.dataGrid.select(jobId);
+                if (self.grid.content.dataGrid.row(jobId).element) {
+                    //an error trips up the app if it tries to scroll to an element not in dom
+                    self.grid.content.dataGrid.row(jobId).element.scrollIntoView();
+            }
+                self.navigating = false;
             });
 
             topic.subscribe("Properties/SaveDialog/Continue", function() {
@@ -2210,6 +2564,7 @@ define([
                     } else {
                         // show error on login screen
                         self.loginPage.invalidUser();
+						self.logoutUser();
                     }
                 } else {
                     // user details
@@ -2232,6 +2587,7 @@ define([
                     self.errorHandler(errMsg, error);
                 } else {
                     self.loginPage.invalidUser();
+					self.logoutUser();
                 }
             });
         },

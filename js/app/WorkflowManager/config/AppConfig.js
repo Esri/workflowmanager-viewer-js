@@ -1,4 +1,4 @@
-define(function() {
+define( function() {
     return {
         
         // valid themes: "claro", "nihilo", "soria", "tundra", "bootstrap"
@@ -11,9 +11,13 @@ define(function() {
             // Determines authentication mode to use for the application
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
+            //  "portal"    - ArcGIS Portal authentication
             //  "none"      - not authenticated
             AuthenticationMode: "none",
             TokenService: "https://your-server/arcgis/tokens",
+            // Portal URL and AppId only apply if using portal authentication
+            PortalURL: "https://your-server/arcgis",
+            AppId: "your-application-id",
             // When specifying a domain with the default user, use "\\" to separate domain and username
             // e.g.  DefaultUser: "myDomain\\username"
             DefaultUser: "demo",
@@ -107,6 +111,20 @@ define(function() {
                 }
             },
             
+            // Search widget provides a way to perform search capabilities based on locator service(s). 
+            search: {
+                // If the result does not have an associated extent, specify this number to use as the zoom scale for the result.
+                zoomLevel: 1000,
+                
+                // false - use default locator service
+                // true  - use custom locator service(s)
+                customSources: false,
+                
+                // An array of source objects used to find search results. Only applicable if using custom locator sources.
+                // Refer to the esri/dijit/Search widget documentation for customizing locator sources.
+                locatorSources: []
+            },
+
             showAttribution: false,
             showLogo: false,
             

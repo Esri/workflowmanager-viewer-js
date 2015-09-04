@@ -65,7 +65,7 @@ function (
             if (record) {
                 arrayUtil.forEach(record.recordValues, function (data, index) {
                     if (data.userVisible) {
-                        self.addExtendedPropertiesItem({ alias: data.alias, data: data.data, dataType: data.dataType, displayType: data.displayType, required: data.required, update: data.canUpdate, tableName: self.tableName, name: data.name, editable: self.editable});
+                        self.addExtendedPropertiesItem({ alias: data.alias, data: data.data, dataType: data.dataType, displayType: data.displayType, required: data.required, update: data.canUpdate, tableName: self.tableName, name: data.name, editable: self.editable, tableField : data});
                     } else {
                         self.itemList.push(null);
                     }

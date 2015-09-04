@@ -56,8 +56,6 @@ function (
         color: null,
         //expanderTB: null,
 
-        categoryType: null,
-
         constructor: function () {
         },
 
@@ -117,10 +115,6 @@ function (
             this.updateSeries("", dataStore);
         },
         
-        updateCategory: function(category) {
-            this.categoryType = category;
-        },
-
         updateSeries: function (title, dataStore) {
             var animArray = [];
             
@@ -141,9 +135,8 @@ function (
                     topic.publish(appTopics.chart.handleShape, this, { shape: currentShape});
                     currentShape.style.opacity = .5;
                     
-                    var filterCategory = self.categoryType;
                     var filterField1 = (bar.text != "") ? bar.text : "N/A";
-                    topic.publish(appTopics.grid.filter, self, { filterField1Type: filterCategory, filterField2Type: null, filterField1: filterField1, filterField2: null });
+                    topic.publish(appTopics.grid.filter, self, { filterField1: filterField1, filterField2: null });
 
                 });
 

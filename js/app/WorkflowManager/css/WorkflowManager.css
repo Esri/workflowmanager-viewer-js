@@ -52,6 +52,44 @@ body .dijitComboBox {
     margin-right: 5px;
 }
 
+.jobDialogRightButton{
+    position: absolute;
+    top: 6.5px;
+    right: 45px;
+    height: 17px;
+    width: 12px;
+    opacity: 0.65;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.jobDialogLeftButton{
+    position: absolute;
+    top: 6.5px;
+    right: 63px;
+    height: 17px;
+    width: 12px;
+    opacity: 0.65;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.jobDialogNavInfo {
+    top: 6.5px;
+    height: 17px;
+    margin: 0px;
+    float: right;
+    margin-right: 73px;
+}
+
+.esriPopup .contentPane p.popupNav,
+.popupNav{
+    float: right;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    margin-left: 8px;
+}
+
 /* Text button */
 body .text-button.dijitButton .dijitButtonNode {
     margin-top: -3px;
@@ -289,6 +327,15 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+.extendedProperty-item-multi-label-top {
+    float: left;
+    margin-bottom: 3px;
+}
+.extendedProperty-item-multi-label {
+    float: left;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
 .extendedProperty-item-field {
     width: 232px;
     height: 28px;
@@ -356,12 +403,14 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 }
 
 /* History grid styles */
-.dgrid-column-type, .dgrid-column-date {
-    width: 12em;
+.dgrid-column-type, .dgrid-column-date, .dgrid-column-user {
+    width: 20%;
 }
-.dgrid-column-user {
-    width: 10em;
+
+.dgrid-column-message {
+    width: 40%;
 }
+
 
 /* Holds grid styles */
 #tabHolds .dgrid, #tabHistory .dgrid {
@@ -413,7 +462,15 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 
 /* Map tools */
 #mapTL {
-    width: 75%;
+    width: 60%;
+}
+
+#mapTR {
+    width: 40%;
+}
+
+#mapTR .wrapper {
+    float: right;
 }
 
 /* MAP */

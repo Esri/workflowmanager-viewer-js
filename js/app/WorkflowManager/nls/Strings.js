@@ -14,7 +14,8 @@ define({
             logout: "Logout",
             welcome: "Welcome",
             onHold: "Job is currently on hold, some functionality unavailable.",
-            closed: "Job is currently closed, some functionality unavailable."
+            closed: "Job is currently closed, some functionality unavailable.",
+            navInfo: "{0} of {1}"
         },
         
         common: {
@@ -50,7 +51,8 @@ define({
             none: "None",
             barChart: "Bar",
             pieChart: "Pie",
-            reset: "Reset"
+            reset: "Reset",
+            selectACategory: "Select a category"
         },
         
         grid: {
@@ -218,6 +220,7 @@ define({
             errorExecuteStep: "Unable to execute the workflow step.",
             errorFindingJobsById: "Unable to find job(s) {0}",
             errorGettingFieldValues: "Error getting field values",
+            errorGettingMultiFieldValues: "Error getting multi-list field values",
             errorInvalidAuthenticationMode: "Invalid authentication mode: {0}",
             errorInvalidFields: "One or more fields invalid.",
             errorInvalidUsername: "Invalid username {0}",

@@ -12,6 +12,7 @@ define([
     "dojo/parser",
     "dojo/query",
     "dojo/on",
+	"dojo/topic",
     "dojo/dom-style",
     "dijit/registry",
     
@@ -20,15 +21,16 @@ define([
     "dijit/form/Button",
     "dijit/form/DropDownButton",
 
-    "app/WorkflowManager/config/AppConfig"
+    "app/WorkflowManager/config/AppConfig",
+	"app/WorkflowManager/config/Topics"
     ],
 
 function (
     declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
     template, i18n,
-    lang, connect, parser, query, on, domStyle, registry,
+    lang, connect, parser, query, on, topic, domStyle, registry,
     FilteringSelect, TextBox, Button, DropDownButton,
-    config) {
+    config, appTopics) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         
@@ -73,7 +75,7 @@ function (
                 var URL = location.toString().split("#")[0] + "?true";
                 location.replace(URL);
             } else {
-                location.reload();
+				topic.publish(appTopics.manager.logoutUser, null);
             }
         },
 

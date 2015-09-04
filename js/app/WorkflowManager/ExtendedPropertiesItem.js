@@ -15,6 +15,8 @@ define([
     "dojo/parser",
     "dojo/query",
     "dojo/on",
+    "dojo/dom-construct",
+    "dojo/dom",
     "dojo/dom-style",
     "dojo/store/Memory",
     "dijit/registry",
@@ -36,7 +38,7 @@ define([
 function (
     topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, locale,
     template, i18n,
-    lang, connect, arrayUtil, parser, query, on, domStyle, Memory, registry,
+    lang, connect, arrayUtil, parser, query, on, domConstruct, dom, domStyle, Memory, registry,
     FilteringSelect, TextBox, Button, DropDownButton, DateTextBox, ComboBox, ValidationTextBox, Tooltip,
     appTopics, Enum) {
 
@@ -78,7 +80,13 @@ function (
                 case Enum.ExtendedPropertyDisplayType.DOMAIN:
                 case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
                     //combo display
-                    topic.publish(appTopics.extendedProperties.getFieldValues, this, { tableName: self.tableName, field: self.name });
+                    topic.publish(appTopics.extendedProperties.getFieldValues, self, { tableName: self.tableName, field: self.name, callback: self.fieldValuesResponse });
+                    break;
+                case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
+                    //multi combo display
+                    this.fieldError.style.height = "auto";
+                    self.fieldTitle.innerHTML += " (" + self.tableField.tableListStoreField + ")";
+                    topic.publish(appTopics.extendedProperties.getMultiListValues, self, { field: self.tableField, callback: self.multiFieldValuesResponse });
                     break;
                 case Enum.ExtendedPropertyDisplayType.FILE:
                 case Enum.ExtendedPropertyDisplayType.FOLDER:
@@ -108,33 +116,120 @@ function (
             }
 
             if (self.field) {
-                this.setRequired();
+                self.setRequired();
             }
 
            
         },
 
-        setResponse: function (response) {
+        // first multi level response
+        multiFieldValuesResponse: function (self, response) {
+            self.curSelectedValues = response;
+            self.populateMultiLevelList();
+            self.setRequired();
+
+            //cascade populating the stores
+            //// if a default value is set there will be a response
+            //// if so run through the response and populate the fields
+            //// otherwise just set up the first one and disable the rest
+            for (var i = 0; i < self.curSelectedValues.length; i++)
+            {
+                topic.publish(appTopics.extendedProperties.getMultiListStores, self, { field: self.tableField, curSelectedValues: self.curSelectedValues.slice(0, i), storeLevel: i, callback: self.setMultiListStores });
+            }
+            if (self.curSelectedValues.length == 0)
+                topic.publish(appTopics.extendedProperties.getMultiListStores, self, { field: self.tableField, curSelectedValues: self.curSelectedValues, storeLevel: i, callback: self.setMultiCurrentStore });
+
+        },
+
+        // second multi level response
+        setMultiListStores: function (self, response, storeLevel) {
+            var store = [];
+            arrayUtil.forEach(response, function (data, index) {
+                store.push({ name: data.description, id: data.value });
+            });
+            var ListStore = new Memory({ data: store });
+            var ListItem;
+            if (storeLevel < self.levelHeight - 1)
+                var itemID = self.curSelectedValues[storeLevel];
+            else
+                var itemID = self.data;
+            if (self.curSelectedValues[storeLevel] != undefined && self.curSelectedValues[storeLevel] != null) {
+                ListItem = ListStore.get(itemID);
+            } else {
+                ListItem = null;
+            }
+            self.setup[storeLevel] = true;
+            self.fields[storeLevel].set('store', ListStore);
+            self.fields[storeLevel].set('item', ListItem);
+        },
+
+        cascadeMultiList: function (index) {
+            var self = lang.hitch(this);
+            var newItems = self.curSelectedValues.slice(0, index);
+            var item = self.fields[index].get('item')
+            if (item) {
+                newItems[index] = item.name;
+                index++
+            }
+            self.curSelectedValues = newItems;
+            if (index < self.levelHeight)
+                topic.publish(appTopics.extendedProperties.getMultiListStores, self, {
+                    field: self.tableField, curSelectedValues: newItems, storeLevel: index, callback: self.setMultiCurrentStore
+                });
+        },
+
+        setMultiCurrentStore: function (self, response, index) {
+            var store = [];
+            arrayUtil.forEach(response, function (data, index) {
+                store.push({ name: data.description, id: data.value });
+            });
+            var ListStore = new Memory({ data: store });
+            self.setup[index] = true;
+            self.fields[index].set('disabled', false);
+            self.fields[index].set('store', ListStore);
+            if (response.length == 1) {
+                var listItem = ListStore.get(response[0].value);
+                self.setup[index] = false;
+                self.fields[index].set('item', listItem);
+            } else {
+                self.fields[index].set('item', null);
+                for (var i = index + 1; i < self.levelHeight; i++) {
+                    self.setup[i] = true;
+                    self.fields[i].set('disabled', true);
+                    self.fields[i].set('item', null);
+                }
+                self.setHighlight();
+                if (response.length == 1) {
+                    var listItem = ListStore.get(response[0].value);
+                    self.setup[index] = false;
+                    self.fields[index].set('item', listItem);
+                }
+            }
+        },
+
+        // combo response
+        fieldValuesResponse: function (self, response) {
             //get the data for drop down lists
             //convert to data store
             var store = [];
             arrayUtil.forEach(response, function (data, index) {
                 store.push({ name: data.description, id: data.value});
             });
-            this.stateStore = new Memory({ data: store });
+            self.stateStore = new Memory({ data: store });
 
-            if (this.data != null) {
-                this.item = this.stateStore.get(this.data);
+            if (self.data != null) {
+                self.item = self.stateStore.get(self.data);
             } else {
-                this.item = null;
+                self.item = null;
             }
 
-            this.populateComboField();
-            this.setRequired();
+            self.populateComboField();
+            self.setRequired();
         },
 
-        setRequired: function () {
+        setRequired: function (index) {
             // toggle the required asterisk
+           
             var field = this.field;
             var data = field.get('value');
             if (this.required) {
@@ -146,12 +241,13 @@ function (
 
         setHighlight: function () {
             //mostly for handling required fields, invalid fields generally handle themselves
+           
             var field = this.field;
             var data = field.get('value');
-            if (((data == null || data == "") && this.required) || this.field.state == "Error") {
-                this.field.set('state', "Error");
+            if (((data == null || data == "") && this.required) || field.state == "Error") {
+                field.set('state', "Error");
             } else {
-                this.field.set('state', "");
+                field.set('state', "");
             }
         },
 
@@ -159,9 +255,9 @@ function (
             //make a textbox that validates the contents
             //also allows for required fields to be marked when empty
             var self = lang.hitch(this);
-            this.field = new ValidationTextBox({
+            self.field = new ValidationTextBox({
                 id: self.tableName + self.index,
-                value: this.data,
+                value: self.data,
                 regExp: regex,
                 disabled: !self.update || !self.editable,
                 invalidMessage: self.i18n_InvalidMessage,
@@ -169,7 +265,7 @@ function (
                 onChange: function () {
                     self.changed = true;
                     wholeText.set('label', self.field.get('value'));
-                    topic.publish(appTopics.extendedProperties.enableButton, this, {});
+                    topic.publish(appTopics.extendedProperties.enableButton, self, {});
                 },
                 onFocus: function () {
                     if (self.field.state == "Error") {
@@ -183,7 +279,7 @@ function (
                 onBlur: function () {
                     self.setHighlight();
                 }
-            }, this.fieldValue);
+            }, self.fieldValue);
 
             var wholeText = new Tooltip({
                 id: "tooltip" + self.index,
@@ -191,6 +287,66 @@ function (
                 label: self.data,
                 position: ["below"]
             });
+        },
+
+        populateMultiLevelList: function () {
+            var self = lang.hitch(this);
+
+            self.displayFields = self.tableField.tableListDisplayField.split(",");
+            self.levelHeight = self.displayFields.length;
+            self.setup = [];
+            self.fields = [];
+            var input = [self.fieldValue];
+            self.multiLevel1.style.display = "";
+            self.multiLevel1.innerHTML = self.displayFields[0];
+
+            for (var i = 1; i < self.levelHeight; i++)
+            {
+                var span = domConstruct.create("span", {});
+                domConstruct.place(span, self.fieldError, i + 1);
+
+                var label = domConstruct.create("label", { "class": "extendedProperty-item-multi-label", innerHTML: self.displayFields[i] });
+                domConstruct.place(label, span, 0);
+                var innerSpan = domConstruct.create("span", {});
+                domConstruct.place(innerSpan, span, 1);
+                input[i] = domConstruct.create("input", {});
+                domConstruct.place(input[i], innerSpan, 0);
+                domConstruct.place(self.fieldRequired, innerSpan, 1);
+            }
+
+            for (var i = 0; i < this.levelHeight; i++) {
+                self.fields[i] = new ComboBox({
+                    index: i,
+                    id: self.tableName + self.index + i,
+                    item: self.item,
+                    store: self.stateStore,
+                    disabled: !self.update || !self.editable,
+                    searchAttr: "name",
+                    "class": "",
+                    style: "float: left",
+                    onChange: function () {
+                        if (!self.setup[this.index]) {
+                            self.changed = true;
+                            self.cascadeMultiList(this.index);
+                            topic.publish(appTopics.extendedProperties.enableButton, this, {});
+                        } else {
+                            self.setup[this.index] = false;
+                        }
+                    },
+                    // allows for the error highlight to be constantly updated
+                    onFocus: function () {
+                        self.setHighlight();
+                        self.setup[this.index] = false;
+                    },
+                    onBlur: function () {
+                        self.setHighlight();
+                        self.setup[this.index] = false;
+                    }
+                }, input[i]);
+            }
+
+
+            self.field = self.fields[self.fields.length - 1];
         },
 
         populateComboField: function () {
@@ -203,6 +359,7 @@ function (
                 store: self.stateStore,
                 disabled: !self.update || !self.editable,
                 searchAttr: "name",
+                "class":"",
                 style: "float: left",
                 onChange: function () {
                     self.changed = true;
@@ -224,7 +381,7 @@ function (
             this.field = new TextBox({
                 id: self.tableName + self.index,
                 disabled: !self.update || !self.editable,
-                value: this.data,
+                value: self.data,
                 style: "float: left; margin-right: 5px",
                 onChange: function () {
                     self.changed = true;
@@ -252,15 +409,15 @@ function (
             //makes a date box
             //is this localized?
             var self = lang.hitch(this);
-            this.date = (this.data !== null) ? new Date(this.data) : null;
-            this.field = new DateTextBox({
+            self.date = (self.data !== null) ? new Date(self.data) : null;
+            self.field = new DateTextBox({
                 id: self.tableName + self.index,
                 disabled: !self.update || !self.editable,
                 style: "float: left",
                 value: this.date,
                 onChange: function () {
                     self.changed = true;
-                    topic.publish(appTopics.extendedProperties.enableButton, this, {});
+                    topic.publish(appTopics.extendedProperties.enableButton, self, {});
                 },
                 onFocus: function () {
                     self.setHighlight();
@@ -268,7 +425,7 @@ function (
                 onBlur: function () {
                     self.setHighlight();
                 }
-            }, this.fieldValue);
+            }, self.fieldValue);
         },
 
         getUpdateItem: function () {
@@ -279,6 +436,9 @@ function (
             switch (this.displayType) {
                 case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
                 case Enum.ExtendedPropertyDisplayType.DOMAIN:
+                    data = field.get('item');
+                    break;
+                case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
                     data = field.get('item');
                     break;
                 default:
@@ -303,7 +463,8 @@ function (
                             return (data !== null) ? data.getTime() : null;
                         case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
                         case Enum.ExtendedPropertyDisplayType.DOMAIN:
-                            return data.id;
+                        case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
+                            return (data !== null) ? data.id : "";
                         default:
                             return data;
                     }

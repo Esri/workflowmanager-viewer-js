@@ -55,9 +55,6 @@ function (
         barChart: null,
         barLegend: null,
 
-        //stored groupType
-        groupType: null,
-
         color: null,
         colors: [
             "#2D64A0",
@@ -131,10 +128,6 @@ function (
             this.updateSeries(dataStore);
         },
 
-        //changes GroupType when it is changed
-        updateGroup: function(group){
-            this.groupType = group;
-        },
 
         updateSeries: function (dataStore) {
             var animArray = [];
@@ -156,9 +149,8 @@ function (
                     var currentShape = this.lastChild;
                     topic.publish(appTopics.chart.handleShape, this, { shape: currentShape });
                     currentShape.style.opacity = .5;
-                    var filterGroup = self.groupType;
                     var filterField1 = (serie.title != "") ? serie.title : "N/A";
-                    topic.publish(appTopics.grid.filter, self, { filterField1Type: filterGroup, filterField2Type: null, filterField1: filterField1, filterFiled2: null });
+                    topic.publish(appTopics.grid.filter, self, { filterField1: null, filterField2: filterField1 });
 
                 });
 

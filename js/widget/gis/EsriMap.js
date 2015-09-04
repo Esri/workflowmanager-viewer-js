@@ -65,7 +65,7 @@ define([
         widgetsInTemplate: true,
         map: null,
         graphicsLayer: null,
-        returnedFeatures: {},
+        returnedFeatures: [],
         isDrawToolEnabled: false,
 
         postCreate: function() {
@@ -149,13 +149,27 @@ define([
             //catch click events on links inside popup
             on(this.map.infoWindow.domNode, "a:click", function (event) {
                 var featureId = event.target.attributes["data-feature-id"].value;
-                
-                if (event.target.attributes["data-feature-single"].value == "true") {
+
+                if (event.target.attributes["data-feature-single"]) {
                     //open job dialog with selected id
-                    topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event });
-                } else  {
-                    //repopulate popup with single job info
-                    self.singleFeature(self.returnedFeatures[featureId].feature, self.returnedFeatures[featureId].event);
+                    
+                    topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event, gridArr: self.returnedFeatures, gridArrPos: self.featureSetPos +1 });
+                } else if (event.target.attributes["data-feature-next"].value == "true") {
+                    //move to next
+                    self.featureSetPos++;
+                    if (self.featureSetPos == self.jobList.length)
+                        self.featureSetPos = 0;
+                    self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
+                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featureSetPos], self.featureSet.features[self.featureSetPos].geometry);
+                    self.populateInfoWindow(self.jobList[self.featureSetPos], self.mapJobStatuses, self.mapJobPriorities);
+                } else if (event.target.attributes["data-feature-next"].value == "false") {
+                    //move back
+                    self.featureSetPos--;
+                    if (self.featureSetPos < 0)
+                        self.featureSetPos = self.jobList.length -1;
+                    self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
+                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featureSetPos], self.featureSet.features[self.featureSetPos].geometry);
+                    self.populateInfoWindow(self.jobList[self.featureSetPos], self.mapJobStatuses, self.mapJobPriorities);
                 }
             });
             
@@ -205,6 +219,11 @@ define([
             });
             topic.subscribe(appTopics.map.draw.end, function () {
                 self.isDrawToolEnabled = false;
+            });
+
+            topic.subscribe(appTopics.map.setup, function (args) {
+                self.mapJobPriorities = args.jobPriorities;
+                self.mapJobStatuses = args.jobStatuses;
             });
         },
         
@@ -289,7 +308,7 @@ define([
             var self = lang.hitch(this);
             var l;
             //empty features
-            this.returnedFeatures = {};
+            this.featureSetPos = 0;
 
             //console.log("running getLayerObject with: ", layer);
             if (layer.type == 'dynamic') {
@@ -305,46 +324,77 @@ define([
             
             var jobQueryContent = "";
             
-            topic.subscribe(this.mapTopics.layer.jobQuery, function(args, jobStatuses, jobPriorities) {
-                jobQueryContent = "";
-                self.infoWindowSelectedId = args.id;
-
-                //get status name by id
-                args.status = jobStatuses[self.findWithAttr(jobStatuses, "id", args.status)].name;
-                
-                //get priority name by id
-                args.priority = jobPriorities[self.findWithAttr(jobPriorities, "value", args.priority)].name;
-                
-                for (var key in args) {
-                    if ((args.hasOwnProperty(key)) && ((key == "createdBy") || (key == "assignedTo") || (key == "priority") || (key == "status"))) {
-                        var obj = args[key];
-
-                        switch (key) {
-                            case "createdBy":
-                                key = i18n.createdBy;
-                                break;
-                            case "assignedTo":
-                                key = i18n.assignedTo;
-                                break;
-                            case "priority":
-                                key = i18n.priority;
-                                break;
-                            case "status":
-                                key = i18n.status;
-                                break;
-                        }
-                        
-                        jobQueryContent = jobQueryContent + "<p>" + key + ": " + obj + "</p>";
-                    }
-                }
-                jobQueryContent = jobQueryContent + "<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + i18n.openJob + "</a>";
-                self.map.infoWindow.setTitle("<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + args.name + "</a>");
-                self.map.infoWindow.setContent(jobQueryContent);
-                self.map.infoWindow.show(self.screenPoint);
+            topic.subscribe(this.mapTopics.layer.jobQuery, function (args) {
+                self.populateInfoWindow(args);
             });
+
+            topic.subscribe(this.mapTopics.layer.multiJobQuery, function(args) {
+                var jList =[];
+                var rows = args.rows;
+                //fields are known from ad hoc query
+                // ID Name Created_by Assigned_to Priority Status 
+                for (var i = 0; i < rows.length; i++) {
+                    var job = {};
+                    job.id = rows[i][0];
+                    job.name = rows[i][1];
+                    job.createdBy = rows[i][2];
+                    job.assignedTo = rows[i][3];
+                    job.priority = Number(rows[i][4]);
+                    job.status = Number(rows[i][5]);
+                    jList[i] = job;
+                }
+                self.jobList = jList;
+                
+                
+                self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
+                self.populateInfoWindow(jList[0]);
+                });
             return l;
         },
         
+        populateInfoWindow: function(args) {
+            var self = lang.hitch(this);
+            
+            jobQueryContent = "";
+            self.infoWindowSelectedId = args.id;
+            if (self.featureSet)
+                var numFeatures = self.featureSet.features.length;
+                
+            for (var key in args) {
+                if ((args.hasOwnProperty(key)) && ((key == "createdBy") || (key == "assignedTo") || (key == "priority") || (key == "status"))) {
+                    var obj = args[key];
+
+                    switch (key) {
+                        case "createdBy":
+                            key = i18n.createdBy;
+                            break;
+                        case "assignedTo":
+                            key = i18n.assignedTo;
+                            break;
+                        case "priority":
+                            key = i18n.priority;
+                            obj = self.mapJobPriorities[self.findWithAttr(self.mapJobPriorities, "value", obj)].name;
+                            break;
+                        case "status":
+                            key = i18n.status;
+                            obj = self.mapJobStatuses[self.findWithAttr(self.mapJobStatuses, "id", obj)].name;
+                            break;
+                    }
+                        
+                    jobQueryContent = jobQueryContent + "<p>" + key + ": " + obj + "</p>";
+                }
+            }
+            //jobQueryContent = jobQueryContent + "<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + i18n.openJob + "</a>";
+            if (numFeatures > 1) {
+                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='true' data-feature-id='" + self.featureSetPos + "'>" + i18n.next + "</a>";
+                jobQueryContent = jobQueryContent + "<p  class='popupNav'> " + i18n.navInfo.replace("{0}", (self.featureSetPos +1)).replace("{1}", self.featureSetLength) + " </p>";
+                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='false' data-feature-id='" + self.featureSetPos + "'>" + i18n.back + "</a>";
+            }
+            self.map.infoWindow.setTitle("<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + args.name + "</a>");
+            self.map.infoWindow.setContent(jobQueryContent);
+            self.map.infoWindow.show(self.screenPoint);
+        },
+
         initializeQueryTask: function(queryLayerUrl) {
             //build query task
             this.queryTask = new esri.tasks.QueryTask(queryLayerUrl);
@@ -379,8 +429,6 @@ define([
             self.queryTask.execute(self.query, function (fset) {
                 if (fset.features.length === 0) { 
                     self.clearSelection();
-                } else if (fset.features.length === 1) {
-                    self.showFeature(fset.features[0], evt);
                 } else {
                     self.showFeatureSet(fset, evt);
                 }
@@ -407,22 +455,28 @@ define([
             //remove all graphics on the maps graphics layer
             self.graphicsLayer.clear();
 
-            var featureSet = fset;
-            var numFeatures = featureSet.features.length;
-
-            //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the infowindow.
-            var content = "";
+            self.featureSet = fset;
+            var numFeatures = self.featureSet.features.length;
+            var feature = fset.features[0];
+            self.featureSetPos = 0;
+            self.featureSetLength = numFeatures;
+            self.returnedFeatures = [];
+            //QueryTask returns a featureSet.  Loop through features in the featureSet and build a an array of them.
             for (var i = 0; i < numFeatures; i++) {
-                var graphic = featureSet.features[i];
-                var jobId = graphic.attributes[self.jobIdField];
-                content = content + "<a href='#' data-feature-single='false' data-feature-id='" + jobId + "'>" + jobId + "</a><br/>";
-                //create feature and event object of all returned
-                //to be parsed upon item selection using id as key
-                self.returnedFeatures[jobId] = { "feature": graphic, "event": evt };
+                var graphic = fset.features[i];
+                self.returnedFeatures[i] = graphic.attributes[self.jobIdField];
             }
-            self.map.infoWindow.setContent(content);
-            self.map.infoWindow.setTitle(i18n.selectAJob);
-            self.map.infoWindow.show(evt.screenPoint);
+
+            // if only one publish to the normal topic
+            // otherwise publish the array to the multiple get job topic
+            if (numFeatures == 1) {
+                feature.setSymbol(self.symbol);
+                topic.publish(this.mapTopics.layer.click, feature.attributes[self.jobIdField]);
+            }
+            else {
+                feature.setSymbol(self.symbol);
+                topic.publish(this.mapTopics.layer.multiClick, self.returnedFeatures, fset.features[0].geometry);
+            }
         },
 
         resize: function () {

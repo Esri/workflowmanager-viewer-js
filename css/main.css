@@ -5,6 +5,28 @@
 @import url(themes/bootstrap/dojo/form/Common.css);
 @import url(themes/bootstrap/dojo/dijit.css);
 
+.esriPopup .titleButton.maximize {
+    top: 9.5px;
+}
+.arcgisSearch .searchClear {
+    top: 4px;
+    height: 26px;    
+}
+.arcgisSearch .searchGroup .searchInput {
+    margin-top: 2.880px;
+    height: 16px;
+}
+.arcgisSearch .searchBtn {
+    background-color: #2f96b4;
+    background-image: linear-gradient(to bottom, #5bc0de, #2f96b4);
+    background-repeat: repeat-x;
+    border: 1px solid #3b9ebb;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+    height: 16px;
+    margin-top: 2.880px;
+}
+
 html, body {
 	height: 100%; 
 	width: 100%; 
