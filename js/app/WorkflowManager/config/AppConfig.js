@@ -12,6 +12,7 @@ define( function() {
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
             //  "portal"    - ArcGIS Portal authentication
+            //                  (available in ArcGIS Workflow Manager Server 10.3.1 and later versions)
             //  "none"      - not authenticated
             AuthenticationMode: "none",
             TokenService: "https://your-server/arcgis/tokens",
@@ -120,7 +121,7 @@ define( function() {
                 // true  - use custom locator service(s)
                 customSources: false,
                 
-                // An array of source objects used to find search results. Only applicable if using custom locator sources.
+                // An array of locator sources used to find search results. Only applicable if using custom locator sources.
                 // Refer to the esri/dijit/Search widget documentation for customizing locator sources.
                 locatorSources: []
             },
