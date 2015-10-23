@@ -57,6 +57,7 @@ function (
         i18n_BarChart: i18n.statistics.barChart,
         i18n_PieChart: i18n.statistics.pieChart,
         i18n_Reset: i18n.statistics.reset,
+        i18n_Select: i18n.statistics.select,
         i18n_SelectACategory: i18n.statistics.selectACategory,
         
         //store categoryType, groupType
@@ -192,23 +193,24 @@ function (
         populateDropdowns: function (customColumns, selectFirstCategory) {
             var self = lang.hitch(this);
             var selectedIndex;
-            this.customColumns = customColumns;
 
             this.categorizedByStore = new Memory({
                 idProperty: "index",
                 data: [
-                    { label: "Select", index: -1 }
+                    { label: self.i18n_Select, index: -1 }
                 ]
             });
-            
+
+            var x = 0;            
+            var columns = [];
             arrayUtil.forEach(customColumns, function (item, i) {
-                if ((item.id.toLowerCase().indexOf("JOB_ID".toLowerCase()) != -1) || (item.id.toLowerCase().indexOf("JOB_NAME".toLowerCase()) != -1)) {
-                    item.hidden = true;
-                }
-                if (item.hidden == false) {
+                if ((item.id.toLowerCase().indexOf("JOB_ID".toLowerCase()) == -1) && (item.id.toLowerCase().indexOf("JOB_NAME".toLowerCase()) == -1)) {
                     self.categorizedByStore.put(item);
+                    columns[x] = item;
+                    x++; 
                 }
             });
+            this.columns = columns;
 
             this.chartCategorizedBy.set("store", this.categorizedByStore);
 
@@ -249,13 +251,11 @@ function (
             this.groupedByStore = new Memory({
                 idProperty: "index",
                 data: [
-                    { label: "None", index: -1 }
+                    { label: self.i18n_Select, index: -1 }
                 ]
             });
-            arrayUtil.forEach(this.customColumns, function (entry, i) {
-                if (entry.hidden == false) {
-                    self.groupedByStore.put(entry);
-                }
+            arrayUtil.forEach(self.columns, function (item, i) {
+                self.groupedByStore.put(item);
             });
             
             //if an index is passed in with call, remove that item from store

@@ -24,6 +24,10 @@ define( function() {
             DefaultUser: "demo",
             // Auto login flag - only applies if AuthenticationMode is set to 'none' and a default user is specified
             AutoLogin: false,
+            //Default Query - uncomment to use and set via a path, be sure to include all containing folders
+            //DefaultQuery: "Public Queries\\Personal Queries\\all jobs",
+
+
 
             jobAOILayer: {
                 type: "dynamic",

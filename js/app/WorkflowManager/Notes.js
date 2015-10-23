@@ -61,9 +61,6 @@ function (
             var self = lang.hitch(this);
             console.log("Notes started");
 
-           
-
-
             // job notes
             this.createNotesTextarea = new Textarea({
                 placeHolder: i18n.common.loading,

@@ -33,9 +33,8 @@ define([
             this.wmConfigurationTask = args.wmConfigurationTask;
             
             if (!this.wmAOILayerTask && !this.wmConfigurationTask) {
-                var errMsg = "Unable to load Workflow Manager configuration: AOI layer task or configuration task is null";
                 console.log("Unable to load Workflow Manager configuration: AOI layer task or configuration task is null");
-                self.errorHandler(errMsg, error);
+                self.errorHandler(i18n.error.errorLoadingWorkflowConfiguration, error);
             }
             
             //load service information
@@ -59,9 +58,8 @@ define([
                 self.loadUsers();
 
             }, function(error) {
-                var errMsg = i18n.error.errorLoadingServiceInfo;
-                console.log(errMsg, error);
-                self.errorHandler(errMsg, error);
+                console.log("Unable to load service info", error);
+                self.errorHandler(i18n.error.errorLoadingServiceInfo, error);
             });
 
         },
@@ -73,9 +71,8 @@ define([
                 console.log("AOI Job Id Field: ", data);
                 self.aoiJobIdField = data;
             }, function (error) {
-                var errMsg = i18n.error.errorLoadingJobIdField;
-                console.log(errMsg, error);
-                self.errorHandler(errMsg, error);
+                console.log("Unable to load job Id field from job AOI map service", error);
+                self.errorHandler(i18n.error.errorLoadingJobIdField, error);
             });
         },
 
@@ -87,9 +84,8 @@ define([
                 self.users = data;
                 self.loadGroups();
             }, function(error) {
-                var errMsg = i18n.error.errorLoadingUsers;
-                console.log(errMsg, error);
-                self.errorHandler(errMsg, error);
+                console.log("Unable to load users", error);
+                self.errorHandler(i18n.error.errorLoadingUsers, error);
                 self.loadGroups();
             });
         },
@@ -102,9 +98,8 @@ define([
                 self.groups = data;
                 self.loadDataWorkspaces();
             }, function(error) {
-                var errMsg = i18n.error.errorLoadingGroups;
-                console.log(errMsg, error);
-                self.errorHandler(errMsg, error);
+                console.log("Unable to load groups", error);
+                self.errorHandler(i18n.error.errorLoadingGroups, error);
                 self.loadDataWorkspaces();
             });
         },
@@ -120,10 +115,9 @@ define([
                 this.wmConfigurationTask.getDataWorkspaceDetails(dataWorkspaces[i].id, this.user, function(data) {
                     self.dataWorkspaceDetails.push(data);
                 }, function(error) {
-                    var errMsg = i18n.error.errorLoadingDataWorkspaceDetails;
-                    console.log(errMsg, error);
+                    console.log("Unable to load data workspace details", error);
                     // Suppress any errors on the UI.  Errors will be logged to server
-                    //self.errorHandler(errMsg, error);
+                    //self.errorHandler(i18n.error.errorLoadingDataWorkspaceDetails, error);
                 });
             }
             

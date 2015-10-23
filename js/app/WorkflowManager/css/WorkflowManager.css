@@ -52,6 +52,11 @@ body .dijitComboBox {
     margin-right: 5px;
 }
 
+.report-URL{
+   float : right;
+   margin-right : 36px; 
+}
+
 .jobDialogRightButton{
     position: absolute;
     top: 6.5px;
@@ -319,8 +324,10 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     margin-left: 40px;
 }
 
-.extendedProperty-item-label {
-    width: 200px;
+.extendedProperty-item-label, .tab.row label.extendedProperty-item-label {
+    width: 100%;
+    margin-bottom: 5px;
+
 }
 .extendedProperty-item {
     float: left;
@@ -337,6 +344,7 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     margin-bottom: 3px;
 }
 .extendedProperty-item-field {
+    margin-left: 20px;
     width: 232px;
     height: 28px;
 }
@@ -449,6 +457,14 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     max-height:130px;
 }
 
+.filter-bar-item{
+        display: -webkit-inline-box;
+}
+
+.report-label{
+    margin-left: 125px;
+}
+
 /* Map Popup */
 .esriPopup .titlePane .title {
     width: 80%;
@@ -510,6 +526,11 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 }
 
 /* IE style fixes */
+
+.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header{
+    left: auto;
+}
+
 .bootstrap .dijitDialogPaneContent .dijitDialogPaneActionBar {
     padding: 0 8px 8px 8px;
 }

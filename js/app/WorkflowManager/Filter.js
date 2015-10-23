@@ -7,6 +7,7 @@ define([
     "dojo/text!./templates/Filter.html",
     "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
+    "app/WorkflowManager/config/AppConfig",
     
     "dojo/_base/array",
     "dojo/_base/lang",
@@ -38,7 +39,7 @@ define([
 
 function (
     declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
-    template, i18n, appTopics,
+    template, i18n, appTopics, config,
     arrayUtil, lang, connect, parser, query, on, domStyle, topic, registry,
     Memory, ObjectStoreModel,
     JobCreationParameters, Enum,
@@ -52,6 +53,7 @@ function (
         // i18n
         i18n_Queries: i18n.filter.queries,
         i18n_OrFindJob: i18n.filter.orFindJob,
+        i18n_Reports: i18n.filter.reports,
         i18n_CreateNewJob: i18n.filter.createNewJob,
         i18n_CreateJob: i18n.filter.createJob,
         i18n_Cancel: i18n.common.cancel,
@@ -112,11 +114,21 @@ function (
         initUI: function() {
             var self = lang.hitch(this);
             this.queryName = i18n.filter.initialQueryTitle;
+            this.reportName = i18n.filter.initialReportTitle;
 
             //Tree store
             this.myStore = new Memory({
                 data: [
                     { id: 'allQueries', name: 'All Queries', directory: true }
+                ],
+                getChildren: function (object) {
+                    return this.query({ parent: object.id });
+                }
+            });
+
+            this.reportStore = new Memory({
+                data: [
+                    { id: 'allReports', name: 'All Reports', directory: true }
                 ],
                 getChildren: function (object) {
                     return this.query({ parent: object.id });
@@ -129,6 +141,11 @@ function (
                 query: { id: 'allQueries' }
             });
             
+            this.reportModel = new ObjectStoreModel({
+                store: this.reportStore,
+                query: { id: 'allReports' }
+            });
+
             this.tree = new Tree({
                 model: self.myModel,
                 style: "padding: 10px;",
@@ -148,9 +165,33 @@ function (
                     }
                 }
             });
+            
+            this.reportTree = new Tree({
+                model: self.reportModel,
+                style: "padding: 10px;",
+                openOnClick: true,
+                autoExpand: true, //all nodes expanded
+                showRoot: false,
+                getIconClass: function (item, opened) {
+                    return item.directory ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+                },
+                onClick: function (item) {
+                    if (item.directory == false) {
+                        
+                        topic.publish(appTopics.filter.generateReport, this, { reportID: item.id, title: item.name });
+                        //hide drop down
+                        self.reportTreeButton.closeDropDown();
+                    }
+                }
+            });
 
             this.queryTreePanel = new TooltipDialog({                
                 content: self.tree,
+                className: "tree-tooltipDialog"
+            });
+
+            this.reportTreePanel = new TooltipDialog({
+                content: self.reportTree,
                 className: "tree-tooltipDialog"
             });
 
@@ -161,6 +202,14 @@ function (
                 dropDown: self.queryTreePanel
             }).placeAt(this.queryTreeBtn);
             this.queryTreeButton.startup();
+
+            this.reportTreeButton = new DropDownButton({
+                label: self.reportName,
+                title: self.reportName,
+                className: "tree-dropDownButton",
+                dropDown: self.reportTreePanel
+            }).placeAt(this.reportTreeBtn);
+            this.reportTreeButton.startup();
 
             //displayed none for testing query dropdown box with tree
             //should be deleted when tree is fully implemented
@@ -331,6 +380,49 @@ function (
                 this.jobQueries.set("value", queries[0].name);
         },
         
+        setReportStore: function (reports) {
+            var self = lang.hitch(this);
+            var parents = [];
+           
+            arrayUtil.forEach(reports, function (data, index) {
+                handleParent(data.hierarchy);
+                var obj = {};
+                obj.id = data.id;
+                obj.name = data.name;
+                obj.directory = false;
+                obj.parent = data.hierarchy;
+                self.reportStore.put(obj);
+            });
+            
+            function handleParent(parent) {
+                if (parents.indexOf(parent) >= 0)
+                    return;
+                parents.push(parent);
+                var obj = {};
+                obj.id = parent;
+                obj.name = parent;
+                obj.directory = true;
+                obj.parent = 'allReports';
+                self.reportStore.put(obj);
+            }
+
+            //refresh tree rendering
+            // Completely delete every node from the dijit.Tree     
+            this.reportTree._itemNodesMap = {};
+            this.reportTree.rootNode.state = "UNCHECKED";
+            this.reportTree.model.root.children = null;
+
+            // Destroy the widget
+            this.reportTree.rootNode.destroyRecursive();
+
+            // Recreate the model, (with the model again)
+            this.reportTree.model.constructor(this.reportTree.model);
+
+            // Rebuild the tree
+            this.reportTree.postMixInProperties();
+            this.reportTree._load();
+        },
+
         setQueryStore: function (publicQueries, userQueries) {
             console.log(publicQueries, userQueries);
             var self = lang.hitch(this);
@@ -422,6 +514,39 @@ function (
             // Rebuild the tree
             this.tree.postMixInProperties();
             this.tree._load();
+
+
+            if (config.app.DefaultQuery) {
+                var defaultQuery = config.app.DefaultQuery.split("\\");
+                var queryCon = null;
+                if (defaultQuery[0].toLowerCase() == publicQueries.name.toLowerCase()) {
+                    queryCon = publicQueries;
+                } else if (defaultQuery[0].toLowerCase() == userQueries.name.toLowerCase()) {
+                    queryCon = userQueries;
+                }
+                var i = 1;
+                var bConFound = true;
+                for (i = 1; i < defaultQuery.length - 1 && bConFound; i++) {
+                    bConFound = false;
+                    queryCon = queryCon.containers;
+                    var targetCon = defaultQuery[i].toLowerCase();
+                    for (var j = 0; j < queryCon.length; j++)
+                        if (queryCon[j].name.toLowerCase() == targetCon) {
+                            queryCon = queryCon[j];
+                            bConFound = true;
+                            break;
+                        }
+                }
+                if (bConFound) {
+                    queryCon = queryCon.queries;
+                    for (var j = 0; j < queryCon.length; j++)
+                        if (queryCon[j].name.toLowerCase() == defaultQuery[i].toLowerCase()) {
+                            self.initialQueryId = queryCon[j].id;
+                            self.initialQueryName = queryCon[j].name;
+                            break;
+                        }
+                }
+            }
 
             //set query title
             this.queryTreeButton.set("label", (self.initialQueryName != undefined ? self.initialQueryName : self.queryName));

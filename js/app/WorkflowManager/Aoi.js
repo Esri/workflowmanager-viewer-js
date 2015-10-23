@@ -6,10 +6,10 @@
     "dijit/_WidgetsInTemplateMixin",
     
     "dojo/text!./templates/Aoi.html",
+    "dojo/text!./templates/AoiMap.html",
     "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
     "./config/AppConfig",
-    "dojo/text!./templates/AoiMap.html",
     
     "dojo/_base/lang",
     "dojo/_base/connect",
@@ -38,7 +38,7 @@
 
 function (
     topic, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
-    template, i18n, appTopics, config, mapTemplate,
+    template, mapTemplate, i18n, appTopics, config,
     lang, connect, parser, query, on, string, domStyle, registry,
     Memory,
     EsriMap, BasemapGallery, DrawTool,
@@ -51,6 +51,7 @@ function (
         
         i18n_JobName: i18n.properties.jobName,
         i18n_NotApplicable: i18n.properties.notApplicable,
+        i18n_Resize: i18n.properties.resize,
 
         constructor: function () {
 
@@ -79,7 +80,7 @@ function (
             this.aoiMapPanel.startup();
 
             this.resizeMapBtn = new Button({
-                label: "Resize",
+                label: this.i18n_Resize,
                 onClick: function () {
                     self.aoiMap.resize();
                 }

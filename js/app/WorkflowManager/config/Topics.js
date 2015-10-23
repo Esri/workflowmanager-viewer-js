@@ -39,10 +39,11 @@ define(function () {
         },
 
         filter: {
+            generateReport: "/filter/generateReport",
             jobQueriesChanged: "/filter/jobQueriesChanged",
             jobSearch: "/filter/jobSearch",
             jobTypeSelect: "/filter/jobTypeSelect"    ,     
-            newJob: "/filter/newJob"         
+            newJob: "/filter/newJob"
         },
         
         statistics: {

@@ -130,6 +130,7 @@ function (
                 noDataMessage: i18n.history.noActivityForThisJob,
                 columns: columns
             }, this.gridContainer);
+            this.historyGrid.headerNode.style.minHeight = "29px";
             this.historyGrid.startup();
         },
 

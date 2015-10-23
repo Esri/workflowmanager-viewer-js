@@ -20,7 +20,6 @@ define([
     "dojo/store/Memory",
     "./config/Topics",
     
-    
     "workflowmanager/supportclasses/JobUpdateParameters",
     "workflowmanager/Enum",
 
@@ -74,6 +73,7 @@ function (
         i18n_JobAssignmentUser: i18n.properties.jobAssignmentUser,
         i18n_JobAssignmentGroup: i18n.properties.jobAssignmentGroup,
         i18n_JobAssignmentUnassigned: i18n.properties.jobAssignmentUnassigned,
+        i18n_JobAssignmentUnknownUser: i18n.properties.jobAssignmentUnknownUser,
         i18n_AoiDefined: i18n.properties.aoiDefined,
         i18n_AoiUndefined: i18n.properties.aoiUndefined,
         i18n_Update: i18n.common.update,
@@ -260,6 +260,9 @@ function (
                 case 1:
                     this.jobAssignmentTypeUser.set("checked", true);
                     this.assignmentUsersSelect.set("value", job.assignedTo);
+                    // If no user was selected, the user does not exist so display Unknown User
+                    if (this.assignmentUsersSelect.item == null)
+                        this.assignmentUsersSelect.set("displayedValue", this.i18n_JobAssignmentUnknownUser);
                     break;
                 case 2:
                     this.jobAssignmentTypeGroup.set("checked", true);
@@ -273,11 +276,14 @@ function (
             // Ownedby
             //get owner full name
             var ownerFullName;
-            arrayUtil.forEach(serviceInfo.users, function (item, index) {
+            dojo.some(serviceInfo.users, function (item, index) {
                 if (item.userName == job.ownedBy) {
                     ownerFullName = item.fullName;
+                    return true;   // found entry, break from the loop
                 }
             });
+            if (!ownerFullName)
+                ownerFullName = this.i18n_JobAssignmentUnknownUser;
             this.cboUsers.innerHTML = ownerFullName;
             
             // Priority

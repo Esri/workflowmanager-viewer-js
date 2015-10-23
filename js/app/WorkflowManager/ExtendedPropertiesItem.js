@@ -166,10 +166,10 @@ function (
         cascadeMultiList: function (index) {
             var self = lang.hitch(this);
             var newItems = self.curSelectedValues.slice(0, index);
-            var item = self.fields[index].get('item')
+            var item = self.fields[index].get('item');
             if (item) {
                 newItems[index] = item.name;
-                index++
+                index++;
             }
             self.curSelectedValues = newItems;
             if (index < self.levelHeight)
