@@ -58,8 +58,8 @@ define("workflowmanager/_BaseTask", [
         formatDomainUsername: function(username) {
             if (username && username.length > 0)
             {
-                // replace all occurences of backslash with "*" in the string
-                username = username.replace(/\\/g, '*');
+                // replace all occurences of backslash with "|" in the string
+                username = username.replace(/\\/g, '|');
             }
             return username;
         }     

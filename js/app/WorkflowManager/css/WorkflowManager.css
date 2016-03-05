@@ -95,6 +95,32 @@ body .dijitComboBox {
     margin-left: 8px;
 }
 
+.workflowButtonRow {
+  position: relative;
+  min-height: 1px;
+
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  float: left;
+  width: 150px; 
+}
+
+/*
+.workflowButtonRow :hover {
+   background-color:#149BDF;
+}
+
+.workflowButtonRow label:hover {
+   background:none;
+}
+*/
+
+.workflowContainerRow {
+   clear: left;
+}
+
 /* Text button */
 body .text-button.dijitButton .dijitButtonNode {
     margin-top: -3px;
@@ -254,6 +280,40 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 }
 .search-button .dijitReset.dijitInline.dijitButtonText {
     line-height: 0;
+}
+
+.icon-btn .dijitButtonNode {
+    width: 150px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+}
+
+.executeIcon {
+  background-image: url('../images/GenericRun32.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 32px;
+  height: 50px;
+  text-align: center;
+}
+
+.markCompleteIcon {
+  background-image: url('../images/GenericCheckMark32.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 32px;
+  height: 50px;
+  text-align: center;
+}
+
+.refreshWorkflowIcon {
+  background-image: url('../images/RefreshWorkflow32.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 32px;
+  height: 50px;
+  text-align: center;
 }
 
 /* AttachmentItem Widget */

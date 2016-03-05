@@ -13,11 +13,13 @@ define([
     "esri/dijit/OverviewMap",
     "esri/dijit/Scalebar",
     "esri/layers/FeatureLayer",
+    "esri/geometry/screenUtils",
     "esri/geometry/webMercatorUtils",
     "esri/geometry/Polygon",
     "esri/geometry/Extent",
     "esri/SpatialReference",
     "esri/layers/GraphicsLayer",
+    "esri/symbols/SimpleMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/tasks/QueryTask",
@@ -30,6 +32,9 @@ define([
     "dojo/dom-construct",
     "dojo/dom-class",
     
+    "dojo/promise/Promise",
+    "dojo/promise/all",
+    
     "dojo/_base/lang",
     "dojo/string",
     "dojo/i18n!./EsriMap/nls/Strings",
@@ -39,8 +44,9 @@ define([
     ], 
     function(
         declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, arrayUtil,
-        Map, Popup, Attribution, Basemap, BasemapLayer, OverviewMap, Scalebar, FeatureLayer, webMercatorUtils, Polygon, Extent, SpatialReference, GraphicsLayer, SimpleFillSymbol, SimpleLineSymbol, QueryTask, Query,
+        Map, Popup, Attribution, Basemap, BasemapLayer, OverviewMap, Scalebar, FeatureLayer, screenUtils, webMercatorUtils, Polygon, Extent, SpatialReference, GraphicsLayer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol, QueryTask, Query,
         topic, on, dom, domStyle, domConstruct, domClass,
+        Promise, all,
         lang, string, i18n,
         mapTemplate, appTopics
     ) {
@@ -140,6 +146,10 @@ define([
             // add a graphics layer to the map
             this.graphicsLayer = new GraphicsLayer();
             this.map.addLayer(this.graphicsLayer);
+            
+            // point tolerance
+            if (this.mapConfig.drawTool.pointTolerance && this.mapConfig.drawTool.pointTolerance > 0)
+                this.toleranceInPixels = this.mapConfig.drawTool.pointTolerance;
         },
 
         startup: function () {
@@ -153,23 +163,23 @@ define([
                 if (event.target.attributes["data-feature-single"]) {
                     //open job dialog with selected id
                     
-                    topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event, gridArr: self.returnedFeatures, gridArrPos: self.featureSetPos +1 });
+                    topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event, gridArr: self.returnedFeatures, gridArrPos: self.featurePos +1 });
                 } else if (event.target.attributes["data-feature-next"].value == "true") {
                     //move to next
-                    self.featureSetPos++;
-                    if (self.featureSetPos == self.jobList.length)
-                        self.featureSetPos = 0;
-                    self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
-                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featureSetPos], self.featureSet.features[self.featureSetPos].geometry);
-                    self.populateInfoWindow(self.jobList[self.featureSetPos], self.mapJobStatuses, self.mapJobPriorities);
+                    self.featurePos++;
+                    if (self.featurePos == self.jobList.length)
+                        self.featurePos = 0;
+                    self.features[self.featurePos].setSymbol(self.symbol);
+                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
+                    self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
                 } else if (event.target.attributes["data-feature-next"].value == "false") {
                     //move back
-                    self.featureSetPos--;
-                    if (self.featureSetPos < 0)
-                        self.featureSetPos = self.jobList.length -1;
-                    self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
-                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featureSetPos], self.featureSet.features[self.featureSetPos].geometry);
-                    self.populateInfoWindow(self.jobList[self.featureSetPos], self.mapJobStatuses, self.mapJobPriorities);
+                    self.featurePos--;
+                    if (self.featurePos < 0)
+                        self.featurePos = self.jobList.length -1;
+                    self.features[self.featurePos].setSymbol(self.symbol);
+                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
+                    self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
                 }
             });
             
@@ -227,88 +237,142 @@ define([
             });
         },
         
-        drawAoi: function(jobId, aoi, zoomToPolygon) {
-            if (aoi && aoi.rings && aoi.rings.length > 0) {
-                if (this.map.spatialReference == aoi.spatialReference) {
-                    this._drawAoi(aoi, zoomToPolygon);
+        drawLoi: function(jobId, loi, zoomToFeature) {
+            if (loi && (loi.type == "point" || loi.type == "multipoint" ||
+                (loi.type == "polygon" && (loi.rings && loi.rings.length > 0)))) {
+                if (this.map.spatialReference == loi.spatialReference) {
+                    this._drawLoi(loi, zoomToFeature);
                 } else {
                     // Get the correct geometry for the map's spatial reference
-                    this._getAndDrawAoi(jobId, zoomToPolygon);
+                    this._getAndDrawLoi(jobId, zoomToFeature);
                 }
             } else {
                 this.graphicsLayer.clear();
             }
         },
         
-        _drawAoi : function(aoi, zoomToPolygon) {
-            this.addBoundaryGraphic(aoi, true);
-            if (zoomToPolygon) {
-                //zoom to aoi
-                this.zoomToPolygon(aoi);
+        _drawLoi : function(loi, zoomToFeature) {
+            this.addBoundaryGraphic(loi, true);
+            if (zoomToFeature) {
+                //zoom to loi
+                this.zoomToFeature(loi);
             }            
         },
         
-        _getAndDrawAoi : function(jobId, zoomToPolygon) {
+        _getAndDrawLoi : function(jobId, zoomToFeature) {
             var self = lang.hitch(this);
             var query = new Query();
             query.returnGeometry = true;
             query.outSpatialReference = self.map.spatialReference;
             query.where = self.jobIdField + "=" + jobId;
 
-            //Execute task and call showResults on completion
-            self.queryTask.execute(query, 
-                function (fset) {
-                    if (fset.features.length === 1) {
-                        self._drawAoi(fset.features[0].geometry, zoomToPolygon);
+            //Execute tasks and call showResults on completion
+            var aoiReq = self.aoiQueryTask.execute(query);
+            var poiReq = (self.poiQueryTask) ? self.poiQueryTask.execute(query) : null;
+            var promises = (poiReq) ? all([aoiReq, poiReq]) : all([aoiReq]);
+            promises.then(
+                function (results) {
+                    if (results.length === 1 && results[0].features) {
+                        // AOI only
+                        self._drawLoi(results[0].features[0].geometry, zoomToFeature);
+                    } else if (results.length === 2) {
+                        // AOI and POI
+                        var hasAOIs = results[0].features && results[0].features.length > 0;
+                        var hasPOIs = results[1].features && results[1].features.length > 0;
+                        if (hasAOIs && hasPOIs) {
+                            // There can only be one job LOI, so select the first one
+                            self._drawLoi(results[0].features[0].geometry, zoomToFeature);
+                        } else if (hasAOIs) {
+                            self._drawLoi(results[0].features[0].geometry, zoomToFeature);
+                        } else if (hasPOIs) {
+                            self._drawLoi(results[1].features[0].geometry, zoomToFeature);
+                        } else {
+                            self.graphicsLayer.clear();
+                        }
                     } else {
+                        // No results
                         self.graphicsLayer.clear();
                     }
                 },
-                function (error) {
-                    console.log("Error retrieving jobAOI: " + error);        
+                function(error) {
+                    console.log("Error retrieving jobLOIs: " + error);
                 }
-            );            
+            );
         },
-
-        zoomToPolygon: function (polygon) {
-            if (polygon.rings.length > 0) {
-                this.map.setExtent(polygon.getExtent().expand(1.5));
+        
+        zoomToFeature: function (geometry) {
+            if (geometry.type == "point") {
+                this.map.centerAt(geometry);
+            } else if (geometry.type == "multipoint") {
+                this.map.setExtent(geometry.getExtent().expand(1.5));
+            } else if (geometry.type == "polygon" && geometry.rings.length > 0) {
+                this.map.setExtent(geometry.getExtent().expand(1.5));
             }
         },
     
         //add a boundary graphic of a selected state 
-        addBoundaryGraphic: function(geometry, clearGraphics) {
+        addBoundaryGraphic: function (geometry, clearGraphics) {
             if (clearGraphics) {
                 this.graphicsLayer.clear();
             }
-            var graphic = new esri.Graphic(geometry, this.getBoundarySymbol());
+            
+            var symbol = (geometry.type == "point" || geometry.type == "multipoint") ? this.getMarkerSymbol(): this.getBoundarySymbol();
+            var graphic = new esri.Graphic(geometry, symbol);
             this.graphicsLayer.add(graphic);
+        },
+        
+        getMarkerSymbol: function() {
+            return new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 1.0]));
         },
 
         getBoundarySymbol: function() {
             return new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color([150, 11, 8, 0.9]), 1), new dojo.Color([209, 57, 42, 0.6]));
         },
         
-        addAOIDynamicLayer: function(layerConfig, queryLayerUrl) {
+        addLOIDynamicLayers: function(args) {
             var self = lang.hitch(this);
             
-            self.aoiDynamicLayer = self.getLayerObject(layerConfig);
+            self.aoiDynamicLayer = self.getLayerObject(args.layerConfig);
             self.map.addLayer(self.aoiDynamicLayer);
-            self.initializeQueryTask(queryLayerUrl);
-            
+            self.initializeQueryTasks(args.aoiQueryLayerUrl, args.poiQueryLayerUrl);
+
             self.map.on("click", function(event) {
                 if (!self.isDrawToolEnabled) {
                     self.screenPoint = event.screenPoint;
-                    self.executeQueryTask(event);
+                    
+                    if (self.toleranceInPixels) {
+                        self.executeQueryTask(event, self.pointToExtent(event.mapPoint));
+                    } else {
+                        self.executeQueryTask(event);
+                    }
                 }
             });
         },
-
+        
+        pointToExtent: function(point) {
+            if (!point)
+                return;
+            
+            //calculate map coords represented per pixel
+            var pixelWidth = this.map.extent.getWidth() / this.map.width;
+            
+            //calculate map coords for tolerance in pixel
+            var toleraceInMapCoords = this.toleranceInPixels * pixelWidth;
+            
+            //calculate & return computed extent
+            return new esri.geometry.Extent(
+                point.x - toleraceInMapCoords,
+                point.y - toleraceInMapCoords,
+                point.x + toleraceInMapCoords,
+                point.y + toleraceInMapCoords,
+                this.map.spatialReference ); 
+        },
+        
         getLayerObject: function(layer) {
             var self = lang.hitch(this);
             var l;
             //empty features
-            this.featureSetPos = 0;
+            this.featurePos = 0;
 
             //console.log("running getLayerObject with: ", layer);
             if (layer.type == 'dynamic') {
@@ -346,7 +410,7 @@ define([
                 self.jobList = jList;
                 
                 
-                self.featureSet.features[self.featureSetPos].setSymbol(self.symbol);
+                self.features[self.featurePos].setSymbol(self.symbol);
                 self.populateInfoWindow(jList[0]);
                 });
             return l;
@@ -357,8 +421,8 @@ define([
             
             jobQueryContent = "";
             self.infoWindowSelectedId = args.id;
-            if (self.featureSet)
-                var numFeatures = self.featureSet.features.length;
+            if (self.features)
+                var numFeatures = self.features.length;
                 
             for (var key in args) {
                 if ((args.hasOwnProperty(key)) && ((key == "createdBy") || (key == "assignedTo") || (key == "priority") || (key == "status"))) {
@@ -386,31 +450,39 @@ define([
             }
             //jobQueryContent = jobQueryContent + "<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + i18n.openJob + "</a>";
             if (numFeatures > 1) {
-                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='true' data-feature-id='" + self.featureSetPos + "'>" + i18n.next + "</a>";
-                jobQueryContent = jobQueryContent + "<p  class='popupNav'> " + i18n.navInfo.replace("{0}", (self.featureSetPos +1)).replace("{1}", self.featureSetLength) + " </p>";
-                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='false' data-feature-id='" + self.featureSetPos + "'>" + i18n.back + "</a>";
+                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='true' data-feature-id='" + self.featurePos + "'>" + i18n.next + "</a>";
+                jobQueryContent = jobQueryContent + "<p  class='popupNav'> " + i18n.navInfo.replace("{0}", (self.featurePos +1)).replace("{1}", self.featureCount) + " </p>";
+                jobQueryContent = jobQueryContent + "<a href='#' class='popupNav' data-feature-next='false' data-feature-id='" + self.featurePos + "'>" + i18n.back + "</a>";
             }
             self.map.infoWindow.setTitle("<a href='#' data-feature-single='true' data-feature-id='" + args.id + "'>" + args.name + "</a>");
             self.map.infoWindow.setContent(jobQueryContent);
             self.map.infoWindow.show(self.screenPoint);
         },
 
-        initializeQueryTask: function(queryLayerUrl) {
-            //build query task
-            this.queryTask = new esri.tasks.QueryTask(queryLayerUrl);
+        initializeQueryTasks: function(aoiQueryLayerUrl, poiQueryLayerUrl) {
+            //build AOI query task and filter
+            this.aoiQueryTask = new esri.tasks.QueryTask(aoiQueryLayerUrl);
+            this.aoiQuery = new esri.tasks.Query();
+            this.aoiQuery.returnGeometry = true;
+            this.aoiQuery.outFields = [this.jobIdField];
+            this.aoiQuery.outSpatialReference = this.map.spatialReference;  
 
-            //build query filter
-            this.query = new esri.tasks.Query();
-            this.query.returnGeometry = true;
-            this.query.outFields = [this.jobIdField];
-            this.query.outSpatialReference = this.map.spatialReference;  
+            if (poiQueryLayerUrl) {
+                //build POI query task and filter
+                this.poiQueryTask = new esri.tasks.QueryTask(poiQueryLayerUrl);
+                this.poiQuery = new esri.tasks.Query();
+                this.poiQuery.returnGeometry = true;
+                this.poiQuery.outFields = [this.jobIdField];
+                this.poiQuery.outSpatialReference = this.map.spatialReference;  
+            }
 
+            this.markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 1.0]));
             this.symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 0.5]));
             this.singleFeature = this.showFeature;
         },
         
         //map click feature
-        executeQueryTask: function (evt) {
+        executeQueryTask: function (evt, geometry) {
             var self = lang.hitch(this);
             self.graphicsLayer.clear();
 
@@ -420,19 +492,55 @@ define([
 
             //onClick event returns the evt point where the user clicked on the map.
             //This contains the mapPoint (esri.geometry.point) and the screenPoint (pixel xy where the user clicked).
-            self.query.geometry = evt.mapPoint;
-            self.query.outSpatialReference = self.map.spatialReference;
+            self.aoiQuery.geometry = geometry ? geometry : evt.mapPoint;
+            self.aoiQuery.outSpatialReference = self.map.spatialReference;
             //Filter also on jobIds currently selected
-            self.query.where = self.jobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
-
-            //Execute task and call showResults on completion
-            self.queryTask.execute(self.query, function (fset) {
-                if (fset.features.length === 0) { 
-                    self.clearSelection();
-                } else {
-                    self.showFeatureSet(fset, evt);
+            self.aoiQuery.where = self.jobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
+            
+            if (self.poiQuery) {
+                self.poiQuery.geometry = geometry ? geometry : evt.mapPoint;
+                self.poiQuery.outSpatialReference = self.map.spatialReference;
+                //Filter also on jobIds currently selected
+                self.poiQuery.where = self.jobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
+            }
+            
+            var aoiReq = self.aoiQueryTask.execute(self.aoiQuery);
+            var poiReq = (self.poiQueryTask) ? self.poiQueryTask.execute(self.poiQuery) : null;
+            var promises = (poiReq) ? all([aoiReq, poiReq]) : all([aoiReq]);
+            promises.then(
+                function (results) {
+                    if (results.length === 1) {
+                        // AOI only
+                        if (results[0].features) {
+                            self.showFeatures(results[0].features, evt);
+                        }
+                    } else if (results.length === 2) {
+                        // AOI and POI
+                        var hasAOIs = results[0].features && results[0].features.length > 0;
+                        var hasPOIs = results[1].features && results[1].features.length > 0;
+                        if (hasAOIs && hasPOIs) {
+                            // TODO Show AOIs and POIs
+                            console.log("AOIs and POIs found for map selection.");
+                            var combinedFeatures = results[0].features.concat(results[1].features); 
+                            self.showFeatures(combinedFeatures, evt);
+                        } else if (hasAOIs) {
+                            console.log("AOIs found for map selection.");
+                            self.showFeatures(results[0].features, evt);
+                        } else if (hasPOIs) {
+                            console.log("POIs found for map selection.");
+                            self.showFeatures(results[1].features, evt);
+                        } else {
+                            self.clearSelection();
+                        }
+                    } else {
+                        // No results
+                        self.clearSelection();
+                    }
+                },
+                function(error) {
+                    console.log("Error retrieving jobLOIs: " + error);
                 }
-            });
+            );
         },
         
         clearSelection: function() {
@@ -449,21 +557,20 @@ define([
             topic.publish(this.mapTopics.layer.click, feature.attributes[self.jobIdField]);
         },
         
-        showFeatureSet: function(fset, evt) {
+        showFeatures: function(features, evt) {
             var self = lang.hitch(this);
-            //console.log("Showing feature set:", fset, evt);
             //remove all graphics on the maps graphics layer
             self.graphicsLayer.clear();
 
-            self.featureSet = fset;
-            var numFeatures = self.featureSet.features.length;
-            var feature = fset.features[0];
-            self.featureSetPos = 0;
-            self.featureSetLength = numFeatures;
+            self.features = features;
+            var numFeatures = self.features.length;
+            var feature = features[0];
+            self.featurePos = 0;
+            self.featureCount = numFeatures;
             self.returnedFeatures = [];
-            //QueryTask returns a featureSet.  Loop through features in the featureSet and build a an array of them.
+            //Loop through features and build a an array of them.
             for (var i = 0; i < numFeatures; i++) {
-                var graphic = fset.features[i];
+                var graphic = features[i];
                 self.returnedFeatures[i] = graphic.attributes[self.jobIdField];
             }
 
@@ -475,7 +582,7 @@ define([
             }
             else {
                 feature.setSymbol(self.symbol);
-                topic.publish(this.mapTopics.layer.multiClick, self.returnedFeatures, fset.features[0].geometry);
+                topic.publish(this.mapTopics.layer.multiClick, self.returnedFeatures, features[0].geometry);
             }
         },
 

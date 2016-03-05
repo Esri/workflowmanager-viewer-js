@@ -8,13 +8,19 @@ define(function() {
             return (str != null) && (suffix != null) 
                 && (str.substring(str.length - suffix.length) == suffix);
         },
-        /*
-        public static function endsWith(str:String, suffix:String):Boolean
-        {
-            return (str != null) && (suffix != null) 
-                && (str.substring(str.length - suffix.length) == suffix);
-        }
-        */
+        
+        /**
+         * Removed a string from the end 
+         */
+        removeFromEnd: function(str, suffix) {
+            if (str != null && suffix != null) 
+            {
+                var i = str.indexOf(suffix);
+                if (i != -1)
+                    return str.substring(0, i);
+            }
+            return str;
+        },
         
         /**
          * Determines whether two field names are equivalent.
@@ -29,18 +35,6 @@ define(function() {
             expectedFieldName = expectedFieldName.toUpperCase();
             return (actualFieldName == expectedFieldName) || this.endsWith(actualFieldName, "."+expectedFieldName);
         }
-        /*
-        public static function isField(actualFieldName:String, expectedFieldName:String):Boolean
-        {
-            if (actualFieldName == null || expectedFieldName == null)
-            {
-                return false;
-            }
-            actualFieldName = actualFieldName.toUpperCase();
-            expectedFieldName = expectedFieldName.toUpperCase();
-            return (actualFieldName == expectedFieldName) || endsWith(actualFieldName, "."+expectedFieldName);
-        }
-        */
-        
+       
     };
 });

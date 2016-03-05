@@ -108,7 +108,7 @@ define([
                 noDataMessage: i18n.filter.noJobsForThisQuery,
                 store: new Memory()
             }, this.gridContainer);
-            
+
             this.grid = dom.byId("grid");
 
             var self = lang.hitch(this);
@@ -145,7 +145,7 @@ define([
                         topic.publish(appTopics.grid.rowSelected, self, { 
                             selectedId: row.id, 
                             selectedFromGrid: event.grid.focused,
-                            zoomToPolygon: true,
+                            zoomToFeature: true,
                             gridArr: gridArr,
                             gridArrPos: gridArrPos
                         });

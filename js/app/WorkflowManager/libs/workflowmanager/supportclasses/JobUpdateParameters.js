@@ -3,20 +3,25 @@ define("workflowmanager/supportclasses/JobUpdateParameters", [
 ], function(declare) {
     return declare(null, {
         // instance properties
-        jobId: null,
-        name: null,
-        startDate: null,
-        dueDate: null,
-        clearStartDate: null,
-        clearDueDate: null,
-        priority: null,
-        status: null,
-        dataWorkspaceId: null,
-        parentVersion: null,
-        description: null,
-        ownedBy: null,
-        assignedType: null,
+        aoi: null,
         assignedTo: null,
-        percent: null
+        assignedType: null,
+        clearAOI: null,
+        clearDueDate: null,
+        clearStartDate: null,
+        dataWorkspaceId: null,
+        description: null,
+        dueDate: null,
+        jobId: null,
+        loi: null,
+        name: null,
+        ownedBy: null,
+        parentJobId: null,
+        parentVersion: null,
+        percent: null,
+        priority: null,
+        startDate: null,
+        status: null,
+        versionName: null
     });
 });

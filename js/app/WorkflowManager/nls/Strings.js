@@ -31,6 +31,7 @@ define({
         filter: {
             initialQueryTitle: "Select Query",
             initialReportTitle: "Select Report",
+            initialJobTypeTitle: "Select Job Type",
             createNewJob: "Create New Job",
             createJob: "Create Job",
             findJob: "Find job",
@@ -43,7 +44,8 @@ define({
             queryTypeUser: "User Queries",
             reports: "Reports",
             reportWindow: "Open in New Window",
-            results: "Search Results"
+            results: "Search Results",
+            uncategorized: "Uncategorized"
         },
         
         statistics: {

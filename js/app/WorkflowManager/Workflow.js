@@ -88,11 +88,12 @@ function (
             
             // Execute step button
             this.workflowExecuteStepButton = new Button({
-                label: i18n.workflow.executeStep,
                 id: "workflowExecuteStepButton",
                 name: "workflowExecuteStepButton",
                 disabled: true,
-                "class": "wide-btn dojo-btn-info",
+                iconClass: "executeIcon",
+                "class": "icon-btn",
+                baseClass: "icon-btn",
                 onClick: lang.hitch(this, function () {
                     this.executeStepButtonClicked();
                 })
@@ -101,11 +102,12 @@ function (
 
             // Mark step complete button
             this.workflowMarkStepCompleteButton = new Button({
-                label: i18n.workflow.markStepComplete,
                 id: "workflowMarkStepCompleteButton",
                 name: "workflowMarkStepCompleteButton",
                 disabled: true,
-                "class": "wide-btn dojo-btn-success",
+                iconClass: "markCompleteIcon",
+                "class": "icon-btn",
+                baseClass: "icon-btn",
                 onClick: lang.hitch(this, function () {
                     this.markStepCompleteButtonClicked();
                 })
@@ -114,11 +116,12 @@ function (
             
             // Recreate workflow button
             this.workflowRecreateWorkflowButton = new Button({
-                label: i18n.workflow.recreateWorkflow,
                 id: "workflowRecreateWorkflowButton",
                 name: "workflowRecreateWorkflowButton",
                 disabled: true,
-                "class": "wide-btn dojo-btn-danger",
+                iconClass: "refreshWorkflowIcon",
+                "class": "icon-btn",
+                baseClass: "icon-btn",
                 onClick: lang.hitch(this, function () {
                     recreateWorkflowDialog.show();
                 })
@@ -252,7 +255,9 @@ function (
                 this.currentStepStatus.style.display = "none";
                 this.workflowExecuteStepButton.set("disabled", true);
                 this.workflowMarkStepCompleteButton.set("disabled", true);
-                this.workflowRecreateWorkflowButton.set("disabled", true);
+                // recreate button should only be disabled if the job is closed
+                if (this.currentJob.stage == Enum.JobStage.CLOSED)
+                    this.workflowRecreateWorkflowButton.set("disabled", true);
             }
         },
         

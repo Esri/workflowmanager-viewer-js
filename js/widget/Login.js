@@ -61,7 +61,7 @@ define([
             startup: function (user) {
                 var self = lang.hitch(this);
                 console.log("Login page started");
-                
+
                 // TODO Check if there is a user/token cookie
 
 				// set user
@@ -146,6 +146,11 @@ define([
             
             invalidUser: function() {
                 // handle an invalid user login
+                // for bug 21591
+                //if (this.controller.useDomain == "TRUE" && this.currentUsername.indexOf('\\') == -1)
+                //{
+                //    this.loginErrorContainer.innerHTML = i18n.error.missingDomain;
+                //}
                 if (this.useTokenAuthentication) {
                     this.loginErrorContainer.innerHTML = i18n.error.invalidUsernameOrPassword;
                 } else {

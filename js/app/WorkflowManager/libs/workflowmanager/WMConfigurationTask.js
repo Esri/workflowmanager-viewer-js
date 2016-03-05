@@ -22,6 +22,18 @@ define("workflowmanager/WMConfigurationTask", [
                 successCallBack(response);
             }, errorCallBack);
         },
+
+        getVisibleJobTypes: function (user, successCallBack, errorCallBack) {
+            var params = {};
+            params.user = this.formatDomainUsername(user);
+            this.sendRequest(params, "/visibleJobTypes", function (response) {
+                var util = new Util();
+                response.defaultStartDate = util.convertToDate(response.defaultStartDate);
+                response.defaultDueDate = util.convertToDate(response.defaultDueDate);
+                successCallBack(response);
+            }, errorCallBack);
+        },
+
         getDataWorkspaceDetails: function (dataWorkspaceId, user, successCallBack, errorCallBack) {
             var self = lang.hitch(this);
             // Try the 10.1+ operation first

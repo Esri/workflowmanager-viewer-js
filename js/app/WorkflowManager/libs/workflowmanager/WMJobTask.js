@@ -3,8 +3,9 @@ define("workflowmanager/WMJobTask", [
     "dojo/dom",
     "workflowmanager/_BaseTask",
     "workflowmanager/_Util",
-    "workflowmanager/Enum"
-], function(declare, dom, BaseTask, Util, Enum) {
+    "workflowmanager/Enum",
+    "esri/geometry/Multipoint"
+], function(declare, dom, BaseTask, Util, Enum, Multipoint) {
     return declare([BaseTask], {
         
         constructor: function (url) {
@@ -25,7 +26,10 @@ define("workflowmanager/WMJobTask", [
                 response.startDate = util.convertToDate(response.startDate);
                 response.startedDate = util.convertToDate(response.startedDate);
                 response.dueDate = util.convertToDate(response.dueDate);
-                response.aoi = new esri.geometry.Polygon(response.aoi);
+                if (response.aoi)
+                    response.aoi = new esri.geometry.Polygon(response.aoi);
+                if (response.poi)
+                    response.poi = new esri.geometry.Multipoint(response.poi);
                 successCallBack(response);
             }, errorCallBack);
         },
@@ -80,7 +84,20 @@ define("workflowmanager/WMJobTask", [
             if (params.aoi != null) {
                 params.aoi = JSON.stringify(params.aoi.toJson());
             }
-    
+            if (params.loi != null) {
+                var loi = params.loi;
+                params.loi = null;
+                if (loi.type == "polygon") {
+                    params.aoi = JSON.stringify(loi.toJson());
+                } else if (loi.type == "multipoint") {
+                    params.poi = JSON.stringify(loi.toJson());
+                } else if (loi.type == "point") {
+                    var multiPoint = new Multipoint(loi.spatialReference);
+                    multiPoint.addPoint(loi);
+                    params.poi = JSON.stringify(multiPoint.toJson());
+                }
+            }
+            
             this.sendRequest(parameters, "/jobs/create", function (response) {
                 successCallBack(response.jobIds);
             }, errorCallBack);
@@ -139,6 +156,19 @@ define("workflowmanager/WMJobTask", [
             if (parameters.dueDate != null) {
                 parameters.dueDate = Date.parse(parameters.dueDate);
             }
+            if (parameters.loi != null) {
+                var loi = parameters.loi;
+                parameters.loi = null;
+                if (loi.type == "polygon") {
+                    parameters.aoi = loi.toJson();
+                } else if (loi.type == "multipoint") {
+                    parameters.poi = loi.toJson();
+                } else if (loi.type == "point") {
+                    var multiPoint = new Multipoint(loi.spatialReference);
+                    multiPoint.addPoint(loi);
+                    parameters.poi = multiPoint.toJson();
+                }
+            }
     
             // 10.1 style
             var props = {};
@@ -158,6 +188,7 @@ define("workflowmanager/WMJobTask", [
                 successCallBack(response.versionName);
             }, errorCallBack);
         },
+        // Deprecated use updateLOI instead.
         updateAOI: function(jobId, aoi, user, successCallBack, errorCallBack) {
             var params = {};
             params.user = this.formatDomainUsername(user);
@@ -175,6 +206,26 @@ define("workflowmanager/WMJobTask", [
             params["properties"] = JSON.stringify(props);
             this.sendRequest(params, "/jobs/" + jobId + "/update", successCallBack, errorCallBack);
         },
+        updateLOI: function(jobId, loi, user, successCallBack, errorCallBack) {
+            var params = {};
+            params.user = this.formatDomainUsername(user);
+            var props = {};
+            props.user = this.formatDomainUsername(user);
+    
+            if (loi != null) {
+                if (loi.type == "polygon") {
+                    props.aoi = loi.toJson();
+                } else if (loi.type == "multipoint") {
+                    props.poi = loi.toJson();
+                } else if (loi.type == "point") {
+                    var multiPoint = new Multipoint(loi.spatialReference);
+                    multiPoint.addPoint(loi);
+                    props.poi = multiPoint.toJson();
+                }
+            }
+            params["properties"] = JSON.stringify(props);
+            this.sendRequest(params, "/jobs/" + jobId + "/update", successCallBack, errorCallBack);
+        },
         deleteAOI: function(jobId, user, successCallBack, errorCallBack) {
             var params = {};
             params.user = this.formatDomainUsername(user);
@@ -186,6 +237,18 @@ define("workflowmanager/WMJobTask", [
             props.user = this.formatDomainUsername(user);
             props.clearAOI = true;
             props.aoi = null;
+    
+            params["properties"] = JSON.stringify(props);
+            this.sendRequest(params, "/jobs/" + jobId + "/update", successCallBack, errorCallBack);
+        },
+        deleteLOI: function(jobId, user, successCallBack, errorCallBack) {
+            var params = {};
+            params.user = this.formatDomainUsername(user);
+            
+            var props = {};
+            props.user = this.formatDomainUsername(user);
+            props.aoi = null;
+            props.poi = null;
     
             params["properties"] = JSON.stringify(props);
             this.sendRequest(params, "/jobs/" + jobId + "/update", successCallBack, errorCallBack);

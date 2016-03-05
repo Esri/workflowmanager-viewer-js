@@ -27,21 +27,22 @@ define( function() {
             //Default Query - uncomment to use and set via a path, be sure to include all containing folders
             //DefaultQuery: "Public Queries\\Personal Queries\\all jobs",
 
-
-
-            jobAOILayer: {
+            jobLOILayer: {
                 type: "dynamic",
                 url: "http://workflowsample.esri.com/arcgis/rest/services/AOI/MapServer",
-                AOILayerID: 0,
+                // Point layer ID
+                POILayerID: 0,
+                // Polygon layer ID
+                AOILayerID: 1,
                 options: {
-                    id: "jobsAoi",
-                    title: "Jobs AOI",
+                    id: "jobsLoi",
+                    title: "Jobs LOI",
                     opacity: "0.5",
                     visible: true
                 }
             }
         },
-        
+
         // url to your proxy page, must be on same machine hosting your app
         proxy: {
             url: "proxy/proxy.ashx",
@@ -115,7 +116,7 @@ define( function() {
                     wkid: 102100
                 }
             },
-            
+
             // Search widget provides a way to perform search capabilities based on locator service(s). 
             search: {
                 // If the result does not have an associated extent, specify this number to use as the zoom scale for the result.
@@ -169,7 +170,13 @@ define( function() {
             
             drawTool: {
                 isEnabled: true,
-                tools: ["RECTANGLE", "POLYGON", "FREEHAND_POLYGON"]        // "POINT", "POLYLINE", "POLYGON", "FREEHAND_POLYGON", "RECTANGLE" 
+                tools: ["MULTI_POINT", "RECTANGLE", "POLYGON", "FREEHAND_POLYGON"],        // "POINT", "MULTI_POINT", "POLYGON", "FREEHAND_POLYGON", "RECTANGLE"
+                
+                // Selecting a point on the map is a little more difficult than selecting a polygon because 
+                // the mouse click is required to fall directly on the point in order for a result to be returned. 
+                // To makes things easier, a “tolerance” envelope can be built around the clicked point
+                // by specifying a point tolerance (number of pixels).
+                pointTolerance : 0
             }
         }        
     };

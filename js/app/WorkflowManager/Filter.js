@@ -115,6 +115,7 @@ function (
             var self = lang.hitch(this);
             this.queryName = i18n.filter.initialQueryTitle;
             this.reportName = i18n.filter.initialReportTitle;
+            this.jobTypeName = i18n.filter.initialJobTypeTitle;
 
             //Tree store
             this.myStore = new Memory({
@@ -134,6 +135,15 @@ function (
                     return this.query({ parent: object.id });
                 }
             });
+            
+            this.jobTypesStore = new Memory({
+                data: [
+                    { id: 'allJobTypes', name: 'All Job Types', directory: true }
+                ],
+                getChildren: function (object) {
+                    return this.query({ parent: object.id });
+                }
+            });
 
             // Create the model
             this.myModel = new ObjectStoreModel({
@@ -144,6 +154,11 @@ function (
             this.reportModel = new ObjectStoreModel({
                 store: this.reportStore,
                 query: { id: 'allReports' }
+            });
+            
+            this.jobTypesModel = new ObjectStoreModel({
+                store: this.jobTypesStore,
+                query: { id: 'allJobTypes' }
             });
 
             this.tree = new Tree({
@@ -184,6 +199,25 @@ function (
                     }
                 }
             });
+            
+            this.jobTypesTree = new Tree({
+                model: self.jobTypesModel,
+                style: "padding: 10px;",
+                openOnClick: true,
+                autoExpand: true, //all nodes expanded
+                showRoot: false,
+                getIconClass: function (item, opened) {
+                    return item.directory ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+                },
+                onClick: function (item) {
+                    if (item.directory == false) {
+                        self.resetJobType(item.name, item.id);
+                        
+                        //hide drop down
+                        self.jobTypesTreeButton.closeDropDown();
+                    }
+                }
+            });
 
             this.queryTreePanel = new TooltipDialog({                
                 content: self.tree,
@@ -195,6 +229,11 @@ function (
                 className: "tree-tooltipDialog"
             });
 
+            this.jobTypesPanel = new TooltipDialog({
+                content: self.jobTypesTree,
+                className: "tree-tooltipDialog"
+            });
+            
             this.queryTreeButton = new DropDownButton({
                 label: self.queryName,
                 title: self.queryName,
@@ -210,7 +249,16 @@ function (
                 dropDown: self.reportTreePanel
             }).placeAt(this.reportTreeBtn);
             this.reportTreeButton.startup();
-
+            
+            this.jobTypesTreeButton = new DropDownButton({
+                label: self.jobTypeName,
+                title: self.jobTypeName,
+                className: "tree-dropDownButton",
+                dropDown: self.jobTypesPanel,
+                disabled: true,
+            }).placeAt(this.jobTypesBtn);
+            this.jobTypesTreeButton.startup();
+            
             //displayed none for testing query dropdown box with tree
             //should be deleted when tree is fully implemented
             this.jobQueries = new ComboBox({
@@ -249,23 +297,11 @@ function (
                 disabled: true,
                 "class": "dojo-btn-success",
                 onClick: lang.hitch(this, function() {
-                    this.resetForm();
+                    this.resetCreateNewJobForm();
                     this.initializeCreateJob();
                     this.createJobDialog.show();
                 })
             }, this.btnCreateNewJob);
-
-            // job types
-            this.jobTypesSelect = new FilteringSelect({
-                id: "createJobTypesSelect",
-                name: "createJobTypesSelect",
-                style: "width:300px;",
-                disabled: true,
-                onChange: function () {
-                    self.jobTypeChanged();
-                }
-            }, this.cboJobTypes);
-            this.jobTypesSelect.startup();
             
             // start date
             this.jobStartDateControl = new DateTextBox({
@@ -354,15 +390,31 @@ function (
                 self.jobSearchClicked();
             }));
         },
-
-        resetForm: function () {
-            //reset to first job type
-            var store = this.jobTypesSelect.store;
-            if (store && store.data && store.data.length > 0) {
-                this.jobTypesSelect.set("value", store.data[0].id);
-            }
-        },
         
+        initialize: function (args) {
+            this.setUserProperties(args);
+            this.users = args.users;
+            this.groups = args.groups;
+            
+            //Job types
+            var activeJobTypes = dojo.filter(args.jobTypes, function(item){
+                return item.state == Enum.JobTypeState.ACTIVE;
+            });
+            if (activeJobTypes.length > 0) {
+                this.setJobTypesStore(activeJobTypes);
+                this.jobTypesTreeButton.set("disabled", false);
+                this.btnCreateJob.set("disabled", false);
+            }
+            //Data workspaces 
+            this.jobDataWorkspacesSelect.set("store", new Memory({ data: args.dataWorkspaces, idProperty: "id" }));
+            this.jobDataWorkspacesSelect.set("value", "0");  // by default select "No Data Workspace" option
+            //Priorities
+            this.jobPrioritiesSelect.set("store", new Memory({ data: args.jobPriorities, idProperty: "value" }));
+            if (args.jobPriorities && args.jobPriorities.length > 0) {
+                this.jobPrioritiesSelect.set("value", args.jobPriorities[0].value);  // by default select first item
+            }            
+        },
+
         setUserProperties: function (args) {
             this.currentUser = args.user;
             this.currentUserDetails = args.userDetails;
@@ -373,54 +425,78 @@ function (
             else
                 this.createNewJobButton.set("disabled", true);
         },
-        
-        setJobQueries: function (queries) {
-            this.jobQueries.set("store", new Memory({ data: queries }));
-            if (queries.length > 0)
-                this.jobQueries.set("value", queries[0].name);
+
+        resetCreateNewJobForm: function () {
+            var self = lang.hitch(this);
+            //reset to first job type
+            var store = this.jobTypesTree.model.store;
+            if (store && store.data && store.data.length > 0) {
+                arrayUtil.some(store.data, function(item) {
+                    if (item.directory == false) {
+                        self.resetJobType(item.name, item.id);
+                        return true;   // found entry, break from the loop
+                    }
+                });
+            }
         },
         
-        setReportStore: function (reports) {
-            var self = lang.hitch(this);
-            var parents = [];
-           
-            arrayUtil.forEach(reports, function (data, index) {
-                handleParent(data.hierarchy);
-                var obj = {};
-                obj.id = data.id;
-                obj.name = data.name;
-                obj.directory = false;
-                obj.parent = data.hierarchy;
-                self.reportStore.put(obj);
-            });
-            
-            function handleParent(parent) {
-                if (parents.indexOf(parent) >= 0)
-                    return;
-                parents.push(parent);
-                var obj = {};
-                obj.id = parent;
-                obj.name = parent;
-                obj.directory = true;
-                obj.parent = 'allReports';
-                self.reportStore.put(obj);
+        resetJobType: function (jobTypeName, jobTypeId) {
+            this.jobTypesTreeButton.set("label", jobTypeName);
+            this.jobTypesTreeButton.set("title", jobTypeName);
+            this.jobTypeChanged(jobTypeId);
+        },
+        
+        setQueries: function (publicQueries, userQueries) {
+            var sortedPublicQueries = this.formatQueryData(publicQueries);
+            if (sortedPublicQueries.length > 0) {
+                this.publicQueries = sortedPublicQueries;
+                this.queryTypePublic.set("disabled", false);
+            }
+            var sortedUserQueries = this.formatQueryData(userQueries);
+            if (sortedUserQueries.length > 0) {
+                this.userQueries = sortedUserQueries;
+                this.queryTypeUser.set("disabled", false);
             }
 
-            //refresh tree rendering
-            // Completely delete every node from the dijit.Tree     
-            this.reportTree._itemNodesMap = {};
-            this.reportTree.rootNode.state = "UNCHECKED";
-            this.reportTree.model.root.children = null;
+            this.setQueryStore(publicQueries, userQueries);
+        },
 
-            // Destroy the widget
-            this.reportTree.rootNode.destroyRecursive();
+        formatQueryData : function(queryData) {
+            var queries = [];
+            if (queryData) {
+                var self = lang.hitch(this);
+                self.addQueriesFromContainer(queryData, queries);
+            }
+            return queries;
+        },
 
-            // Recreate the model, (with the model again)
-            this.reportTree.model.constructor(this.reportTree.model);
-
-            // Rebuild the tree
-            this.reportTree.postMixInProperties();
-            this.reportTree._load();
+        addQueriesFromContainer : function(container, queries) {
+            if (container) {
+                var self = lang.hitch(this);
+                //add each query
+                var childQueries = container.queries;
+                if (childQueries) {
+                    childQueries.sort(function(query1, query2) {
+                        return query1.name.localeCompare(query2.name);
+                    });           
+                    arrayUtil.forEach(childQueries, function(query) {
+                        queries.push({
+                            "name" : query.name,
+                            "id" : query.id
+                        });
+                    });
+                }
+                //add queries from each container
+                var childContainers = container.containers;
+                if (childContainers) {
+                    childContainers.sort(function(container1, container2) {
+                        return container1.name.localeCompare(container2.name);
+                    });           
+                    arrayUtil.forEach(childContainers, function(item) {
+                        self.addQueriesFromContainer(item, queries);
+                    });
+                }
+            }
         },
 
         setQueryStore: function (publicQueries, userQueries) {
@@ -449,12 +525,12 @@ function (
 
                 self.myStore.put(levelObject);
                 levelCount++;
-                if (currentLevel.queries.length > 0) {
+                if (currentLevel.queries && currentLevel.queries.length > 0) {
                     arrayUtil.forEach(currentLevel.queries, function (value, index) {
                         parseQueries(value, levelObject.id);
                     });
                 }
-                if (currentLevel.containers.length > 0) {
+                if (currentLevel.containers && currentLevel.containers.length > 0) {
                     arrayUtil.forEach(currentLevel.containers, function(value, index) {
                         parseContainers(value, levelObject.id);
                     });
@@ -556,6 +632,152 @@ function (
             topic.publish(appTopics.filter.jobQueriesChanged, this, { selectedId: self.initialQueryId, selectedQuery: self.initialQueryName });
         },
         
+        setQueryNameFromId: function(queryId) {
+            var self = lang.hitch(this);
+            var queryName;
+            arrayUtil.some(this.publicQueries, function(query) {
+                if (query.id == queryId) {
+                    queryName = query.name;
+                    return true;   // found entry, break from the loop
+                }
+            });
+            if (!queryName) 
+            {
+                arrayUtil.some(this.userQueries, function (query) {
+                    if (query.id == queryId) {
+                        queryName = query.name;
+                        return true;   // found entry, break from the loop
+                    }
+                });
+            }
+            if (queryName) {
+                this.queryTreeButton.set("label", queryName);
+                this.queryTreeButton.set("title", queryName);
+            }
+            return queryName;
+        },
+        
+        setReportStore: function (reports) {
+            var self = lang.hitch(this);
+            var parents = [];
+           
+            arrayUtil.forEach(reports, function (data, index) {
+                handleParent(data.hierarchy);
+                var obj = {};
+                obj.id = data.id;
+                obj.name = data.name;
+                obj.directory = false;
+                obj.parent = data.hierarchy;
+                self.reportStore.put(obj);
+            });
+            
+            function handleParent(parent) {
+                if (parents.indexOf(parent) >= 0)
+                    return;
+                parents.push(parent);
+                var obj = {};
+                obj.id = parent;
+                obj.name = parent;
+                obj.directory = true;
+                obj.parent = 'allReports';
+                self.reportStore.put(obj);
+            }
+
+            //refresh tree rendering
+            // Completely delete every node from the dijit.Tree     
+            this.reportTree._itemNodesMap = {};
+            this.reportTree.rootNode.state = "UNCHECKED";
+            this.reportTree.model.root.children = null;
+
+            // Destroy the widget
+            this.reportTree.rootNode.destroyRecursive();
+
+            // Recreate the model, (with the model again)
+            this.reportTree.model.constructor(this.reportTree.model);
+
+            // Rebuild the tree
+            this.reportTree.postMixInProperties();
+            this.reportTree._load();
+        },
+        
+        setJobTypesStore: function (jobTypes) {
+            var self = lang.hitch(this);
+            var parents = [];
+            var uncategorized = i18n.filter.uncategorized;
+            //var to capture the first job type in stack
+            var isFirst = true;
+            
+            var sortedJobTypes = jobTypes.sort(function(jobType1, jobType2) {
+                if (jobType1.category == "")
+                    jobType1.category = uncategorized;
+                if (jobType2.category == "")
+                    jobType2.category = uncategorized;
+                
+                if (jobType1.category.localeCompare(jobType2.category) == 0)
+                    return jobType1.name.localeCompare(jobType2.name);
+                else
+                    return jobType1.category.localeCompare(jobType2.category);
+            });           
+           
+            arrayUtil.forEach(sortedJobTypes, function (data, index) {
+                if (data.category == "")
+                    data.category = uncategorized;
+                
+                handleParent(data.category);
+                var obj = {};
+                obj.id = data.id;
+                obj.name = data.name;
+                obj.directory = false;
+                obj.parent = data.category;
+                self.jobTypesStore.put(obj);
+                
+                if (isFirst) {
+                    isFirst = false;
+                    self.initialJobTypeId = obj.id;
+                    self.initialJobTypeName = obj.name;
+                }
+            });
+            
+            function handleParent(parent) {
+                if (parents.indexOf(parent) >= 0)
+                    return;
+                parents.push(parent);
+                var obj = {};
+                obj.id = parent;
+                obj.name = parent;
+                obj.directory = true;
+                obj.parent = 'allJobTypes';
+                self.jobTypesStore.put(obj);
+            }
+
+            //refresh tree rendering
+            // Completely delete every node from the dijit.Tree     
+            this.jobTypesTree._itemNodesMap = {};
+            this.jobTypesTree.rootNode.state = "UNCHECKED";
+            this.jobTypesTree.model.root.children = null;
+
+            // Destroy the widget
+            this.jobTypesTree.rootNode.destroyRecursive();
+
+            // Recreate the model, (with the model again)
+            this.jobTypesTree.model.constructor(this.jobTypesTree.model);
+
+            // Rebuild the tree
+            this.jobTypesTree.postMixInProperties();
+            this.jobTypesTree._load();
+            
+            // Set job type title
+            var jobTypeName = self.initialJobTypeName != undefined ? self.initialJobTypeName : self.jobTypeName;
+            if (this.initialJobTypeId) {
+                this.resetJobType(jobTypeName, this.initialJobTypeId);                
+            }
+            else {
+                // No intial job type, so just update the label
+                this.jobTypesTreeButton.set("label", jobTypeName);
+                this.jobTypesTreeButton.set("title", jobTypeName);
+            }
+        },
+        
         jobSearchClicked: function() {
             var inputValue = this.jobSearchInput.get("value");
             console.log("Filter::jobSearchClicked: " + inputValue);
@@ -604,7 +826,7 @@ function (
             para.autoExecute = null;
 
             //Job type
-            para.jobTypeId = this.jobTypesSelect.get("value");
+            para.jobTypeId = this.jobTypesTree.selectedItem != null ? this.jobTypesTree.selectedItem.id : this.initialJobTypeId;
 
             //Start date
             var startDate = self.jobStartDateControl.get("value");
@@ -717,37 +939,8 @@ function (
         },
 
         // Calls function in controller to pre populate dropdowns based on the type of job
-        jobTypeChanged: function () {
-            topic.publish(appTopics.filter.jobTypeSelect, this, { jobType: parseInt(this.jobTypesSelect.value) });
-        },
-        
-        populateDropdowns: function (sender, args) {
-            //Job types
-            var activeJobTypes = dojo.filter(args.jobTypes, function(item){
-                return item.state == Enum.JobTypeState.ACTIVE;
-            });
-            this.jobTypesSelect.set("store", new Memory({ data: activeJobTypes, idProperty: "id" }));
-            if (activeJobTypes.length > 0) {
-                this.jobTypesSelect.set("disabled", false);
-                this.jobTypesSelect.set("value", activeJobTypes[0].id);  // by default select first item
-                this.btnCreateJob.set("disabled", false);
-            }
-            //Data workspaces 
-            this.jobDataWorkspacesSelect.set("store", new Memory({ data: args.dataWorkspaces, idProperty: "id" }));
-            this.jobDataWorkspacesSelect.set("value", "0");  // by default select "No Data Workspace" option
-            //Priorities
-            this.jobPrioritiesSelect.set("store", new Memory({ data: args.jobPriorities, idProperty: "value" }));
-            if (args.jobPriorities && args.jobPriorities.length > 0) {
-                this.jobPrioritiesSelect.set("value", args.jobPriorities[0].value);  // by default select first item
-            }            
-        },
-        
-        populateUsers: function(users) {
-            this.users = users;
-        },
-
-        populateGroups: function(groups) {
-            this.groups = groups;
+        jobTypeChanged: function (jobTypeId) {
+            topic.publish(appTopics.filter.jobTypeSelect, this, { jobType: parseInt(jobTypeId) });
         },
         
         populateAssignableUsers: function() {

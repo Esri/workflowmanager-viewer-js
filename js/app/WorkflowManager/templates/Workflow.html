@@ -11,14 +11,24 @@
             <span data-dojo-attach-point="workflowCurrentStepName"></span>
             <span data-dojo-attach-point="currentStepSelectWrapper"><input data-dojo-attach-point="cboCurrentStepSelect"></span>
         </div>
-
+        
         <div class="tab row">
-            <span data-dojo-attach-point="btnExecuteStep"></span>
-            <span data-dojo-attach-point="btnMarkStepComplete"></span>
-            <span data-dojo-attach-point="btnRecreateWorkflow"></span>
+            <div class="workflowButtonRow" data-dojo-attach-point="workflowButtonRowExecute">
+                <span data-dojo-attach-point="btnExecuteStep"></span>
+                <br><label style="text-align: center">Execute Step</label>
+            </div>
+            <div class="workflowButtonRow" data-dojo-attach-point="workflowButtonRowMarkAsDone">
+                <span data-dojo-attach-point="btnMarkStepComplete"></span>
+                <br><label style="text-align: center">Mark as Done</label>
+            </div>
+            <div class="workflowButtonRow" data-dojo-attach-point="workflowButtonRowRecreateWorkflow">
+                <span data-dojo-attach-point="btnRecreateWorkflow"></span>
+                <br><label style="text-align: center">Recreate Workflow</label>
+            </div>
         </div>
     </div>
-    <div data-dojo-attach-point="workflowContainer"/>
+
+    <div data-dojo-attach-point="workflowContainer" class="workflowContainerRow"></div>
     <!-- Recreate workflow confirmation dialog -->
     <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="recreateWorkflowDialog" data-dojo-id="recreateWorkflowDialog" title="${i18n_RecreateWorkflow}">
         <div class="tab row">

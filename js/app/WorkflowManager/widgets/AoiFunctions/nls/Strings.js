@@ -1,9 +1,9 @@
 ﻿define({
     root: ({
-        confirmClear: "Yes, delete AOI",
-        declineClear: "No, don't delete AOI",
-        clearDialogContent: "Are you sure you want to delete the AOI for this job?",
-        clearDialogTitle: "Delete AOI"
+        confirmClear: "Yes, delete LOI",
+        declineClear: "No, don't delete LOI",
+        clearDialogContent: "Are you sure you want to delete the LOI for this job?",
+        clearDialogTitle: "Delete LOI"
     }),
 
     es: true,
