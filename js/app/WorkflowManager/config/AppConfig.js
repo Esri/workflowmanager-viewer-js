@@ -29,7 +29,7 @@ define( function() {
 
             jobLOILayer: {
                 type: "dynamic",
-                url: "http://workflowsample.esri.com/arcgis/rest/services/AOI/MapServer",
+                url: "http://workflowsample.esri.com/arcgis/rest/services/Workflow_LOI/MapServer",
                 // Point layer ID
                 POILayerID: 0,
                 // Polygon layer ID
