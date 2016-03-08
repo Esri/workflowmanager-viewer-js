@@ -13,7 +13,9 @@ Source code for ArcGIS Workflow Manager JavaScrpt viewer - Manage your workflows
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ### ArcGIS Workflow Manager JavaScript API
-* The JavaScript viewer includes the latest [Workflow Manager JavaScript API](js/app/WorkflowManager/libs/workflowmanager).
+* The JavaScript viewer includes the latest [ArcGIS Workflow Manager JavaScript API](js/app/WorkflowManager/libs/workflowmanager).
+* Refer to the [ArcGIS Workflow Manager JavaScript API Reference](http://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
+* Download a zip file of the API and help documentation from the [ArcGIS Workflow Manager API Download site](http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
 
 ## Instructions
 
