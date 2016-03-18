@@ -20,6 +20,12 @@ The current version of the Workflow Manager JavaScrpt viewer is compatible with 
 * Refer to the [ArcGIS Workflow Manager JavaScript API Reference](http://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
 * Download a zip file of the API and help documentation from the [ArcGIS Workflow Manager API Download site](http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
 
+### Supported Browsers
+The Workflow Manager JavaScript viewer supports the following browsers:
+* Chrome
+* Firefox
+* Internet Explorer 10+
+
 ## Instructions
 
 Deployment:
@@ -54,7 +60,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2013 Esri
+Copyright 2016 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
