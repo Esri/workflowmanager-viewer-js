@@ -176,7 +176,7 @@ define( function() {
                 // the mouse click is required to fall directly on the point in order for a result to be returned. 
                 // To makes things easier, a “tolerance” envelope can be built around the clicked point
                 // by specifying a point tolerance (number of pixels).
-                pointTolerance : 0
+                pointTolerance : 2
             }
         }        
     };

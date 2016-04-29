@@ -15,6 +15,7 @@ define([
         
         // WM Tasks
         wmAOILayerTask: null,
+        wmPOILayerTask: null,
         wmConfigurationTask: null,
         
         // WM server configuration info
@@ -23,6 +24,7 @@ define([
         groups: null,
         dataWorkspaceDetails: null,
         aoiJobIdField: null,
+        poiJobIdField: null,
         commentActivityTypeId: null,
         
         loadServiceConfiguration: function (args) {
@@ -30,6 +32,7 @@ define([
             
             this.user = args.user;
             this.wmAOILayerTask = args.wmAOILayerTask;
+            this.wmPOILayerTask = args.wmPOILayerTask; 
             this.wmConfigurationTask = args.wmConfigurationTask;
             
             if (!this.wmAOILayerTask && !this.wmConfigurationTask) {
@@ -74,6 +77,17 @@ define([
                 console.log("Unable to load job Id field from job AOI map service", error);
                 self.errorHandler(i18n.error.errorLoadingJobIdField, error);
             });
+            
+            if (this.wmPOILayerTask != null) {
+                console.log("Retrieving POI job Id field");
+                this.wmPOILayerTask.getJobIdField(function (data) {
+                    console.log("POI Job Id Field: ", data);
+                    self.poiJobIdField = data;
+                }, function (error) {
+                    console.log("Unable to load job Id field from job POI map service", error);
+                    self.errorHandler(i18n.error.errorLoadingJobIdFieldPOI, error);
+                });
+            }
         },
 
         loadUsers: function() {
@@ -127,6 +141,7 @@ define([
                 groups: self.groups,
                 dataWorkspaceDetails: self.dataWorkspaceDetails,
                 aoiJobIdField: self.aoiJobIdField,
+                poiJobIdField: self.poiJobIdField,
                 commentActivityTypeId: self.commentActivityTypeId
             });
         },

@@ -268,7 +268,15 @@ define([
 
             //Execute tasks and call showResults on completion
             var aoiReq = self.aoiQueryTask.execute(query);
-            var poiReq = (self.poiQueryTask) ? self.poiQueryTask.execute(query) : null;
+            var poiReq = null;
+            if (self.poiQueryTask) {
+                var poiQuery = new Query();
+                poiQuery .returnGeometry = true;
+                poiQuery .outSpatialReference = self.map.spatialReference;
+                poiQuery .where = self.poiJobIdField + "=" + jobId;
+                poiReq = self.poiQueryTask.execute(poiQuery);
+            }
+            
             var promises = (poiReq) ? all([aoiReq, poiReq]) : all([aoiReq]);
             promises.then(
                 function (results) {
@@ -472,7 +480,7 @@ define([
                 this.poiQueryTask = new esri.tasks.QueryTask(poiQueryLayerUrl);
                 this.poiQuery = new esri.tasks.Query();
                 this.poiQuery.returnGeometry = true;
-                this.poiQuery.outFields = [this.jobIdField];
+                this.poiQuery.outFields = [this.poiJobIdField];
                 this.poiQuery.outSpatialReference = this.map.spatialReference;  
             }
 
@@ -501,7 +509,7 @@ define([
                 self.poiQuery.geometry = geometry ? geometry : evt.mapPoint;
                 self.poiQuery.outSpatialReference = self.map.spatialReference;
                 //Filter also on jobIds currently selected
-                self.poiQuery.where = self.jobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
+                self.poiQuery.where = self.poiJobIdField + " IN (" + self.selectedJobIds.join(",") + ")";
             }
             
             var aoiReq = self.aoiQueryTask.execute(self.aoiQuery);
@@ -511,9 +519,10 @@ define([
                 function (results) {
                     if (results.length === 1) {
                         // AOI only
-                        if (results[0].features) {
+                        if (results[0].features && results[0].features.length > 0)
                             self.showFeatures(results[0].features, evt);
-                        }
+                        else
+                            self.clearSelection();
                     } else if (results.length === 2) {
                         // AOI and POI
                         var hasAOIs = results[0].features && results[0].features.length > 0;
@@ -571,14 +580,17 @@ define([
             //Loop through features and build a an array of them.
             for (var i = 0; i < numFeatures; i++) {
                 var graphic = features[i];
-                self.returnedFeatures[i] = graphic.attributes[self.jobIdField];
+                if (graphic.geometry.type == "multipoint" || graphic.geometry.type == "point")
+                    self.returnedFeatures[i] = graphic.attributes[self.poiJobIdField];
+                else
+                    self.returnedFeatures[i] = graphic.attributes[self.jobIdField];
             }
 
             // if only one publish to the normal topic
             // otherwise publish the array to the multiple get job topic
             if (numFeatures == 1) {
                 feature.setSymbol(self.symbol);
-                topic.publish(this.mapTopics.layer.click, feature.attributes[self.jobIdField]);
+                topic.publish(this.mapTopics.layer.click, self.returnedFeatures[0]);
             }
             else {
                 feature.setSymbol(self.symbol);
