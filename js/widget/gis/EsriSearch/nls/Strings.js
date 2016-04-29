@@ -7,5 +7,5 @@
     it: true,
     ru: true,
     tr: true,
-    "zh-CN": true
+    "zh-cn": true
 });
