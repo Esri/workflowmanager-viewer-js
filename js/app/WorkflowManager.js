@@ -447,6 +447,8 @@ define([
             this.geometryService = new GeometryService(config.geometryServiceURL);
 
             this.wmAOILayerTask = new WMAOILayerTask(this.aoiMapServiceQueryLayerUrl);
+            if (this.poiMapServiceQueryLayerUrl != null)
+                this.wmPOILayerTask = new WMAOILayerTask(this.poiMapServiceQueryLayerUrl);
             this.wmConfigurationTask = new WMConfigurationTask(this.wmServerUrl);
             this.wmReportTask = new WMReportTask(this.wmServerUrl);
             this.wmJobTask = new WMJobTask(this.wmServerUrl);
@@ -467,6 +469,7 @@ define([
             wmConfig.loadServiceConfiguration({
                 user : this.user,
                 wmAOILayerTask : this.wmAOILayerTask,
+                wmPOILayerTask : this.wmPOILayerTask,
                 wmConfigurationTask : this.wmConfigurationTask
             });
         },
@@ -530,6 +533,8 @@ define([
 
             //console.log("Populating map aoiJobIdField");
             self.myMap.jobIdField = self.aoiJobIdField;
+            if (self.poiJobIdField != null)
+                self.myMap.poiJobIdField = self.poiJobIdField;
 
             aspect.around(this.tabs, "selectChild", function(selectChild) {
                 return function(page) {
@@ -1979,6 +1984,7 @@ define([
                 self.groups = args.groups;
                 self.dataWorkspaceDetails = args.dataWorkspaceDetails;
                 self.aoiJobIdField = args.aoiJobIdField;
+                self.poiJobIdField = args.poiJobIdField;
                 self.commentActivityTypeId = args.commentActivityTypeId;
                 self.onServiceConfigurationLoaded();
 
@@ -2561,6 +2567,8 @@ define([
             this.token = token;
             this.tokenExpiration = expiration;
             this.wmAOILayerTask.token = token;
+            if (this.wmPOILayerTask)
+                this.wmPOILayerTask.token = token;
             this.wmConfigurationTask.token = token;
             this.wmJobTask.token = token;
             this.wmReportTask.token = token;
