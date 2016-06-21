@@ -6,7 +6,7 @@
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
 
-    "dojo/text!./templates/attachmentItem.html",
+    "dojo/text!./templates/AttachmentItem.html",
     "dojo/i18n!./nls/Strings",
     "app/WorkflowManager/config/Topics",
 
