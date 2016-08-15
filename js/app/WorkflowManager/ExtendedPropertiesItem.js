@@ -229,10 +229,9 @@ function (
 
         setRequired: function (index) {
             // toggle the required asterisk
-           
             var field = this.field;
             var data = field.get('value');
-            if (this.required) {
+            if (this.isRequiredField()) {
                 this.fieldRequired.style.display = "";
             } else {
                 this.fieldRequired.style.display = "none";
@@ -244,7 +243,7 @@ function (
            
             var field = this.field;
             var data = field.get('value');
-            if (((data == null || data == "") && this.required) || field.state == "Error") {
+            if (((data == null || data == "") && this.isRequiredField()) || field.state == "Error") {
                 field.set('state', "Error");
             } else {
                 field.set('state', "");
@@ -446,9 +445,9 @@ function (
             }
             var state = field.state;
             //flagging
-            if (((data == null || data == "") && this.required) || state == "Error") {
+            if (((data == null || data == "") && this.isRequiredField()) || state == "Error") {
                 this.setHighlight();
-                if (!(data === undefined) && (data == null || data == "") && this.required) {
+                if (!(data === undefined) && (data == null || data == "") && this.isRequiredField()) {
                     topic.publish(appTopics.extendedProperties.invalidUpdate, this, { missingField: true });
                 } else {
                     topic.publish(appTopics.extendedProperties.invalidUpdate, this, { invalidField: true });
@@ -473,6 +472,14 @@ function (
                 }
             }
         },
+        
+        isRequiredField : function() {
+            // The field is only required if it's not an unsupported type (file, folder, geofile)
+            return this.required && this.displayType != Enum.ExtendedPropertyDisplayType.FILE 
+                && this.displayType != Enum.ExtendedPropertyDisplayType.FOLDER 
+                && this.displayType != Enum.ExtendedPropertyDisplayType.GEO_FILE;
+        },
+        
         generateRandomIndex : function() {
             // generate a random number from 1 to specified max value (1000000000000)
             return Math.floor((Math.random() * 1000000000000) + 1);

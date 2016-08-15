@@ -26,10 +26,14 @@ define("workflowmanager/WMJobTask", [
                 response.startDate = util.convertToDate(response.startDate);
                 response.startedDate = util.convertToDate(response.startedDate);
                 response.dueDate = util.convertToDate(response.dueDate);
-                if (response.aoi)
+                if (response.aoi) {
                     response.aoi = new esri.geometry.Polygon(response.aoi);
-                if (response.poi)
-                    response.poi = new esri.geometry.Multipoint(response.poi);
+                    response.loi = new esri.geometry.Polygon(response.aoi);
+                }
+                if (response.poi) {
+                    response.loi = new esri.geometry.Multipoint(response.poi);
+                    delete response.poi;    // response should not include the poi, just loi
+                }
                 successCallBack(response);
             }, errorCallBack);
         },

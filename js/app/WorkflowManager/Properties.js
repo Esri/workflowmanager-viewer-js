@@ -242,7 +242,7 @@ function (
             this.jobStartDateControl.set("value", job.startDate);
             this.jobDueDateControl.set("value", job.dueDate);
 
-            if (job.aoi || job.poi) {
+            if (job.aoi || job.loi) {
                 this.propertiesFormLOI.innerHTML = this.i18n_LoiDefined;
             } else {
                 this.propertiesFormLOI.innerHTML = this.i18n_LoiUndefined;
@@ -766,7 +766,9 @@ function (
                 para.clearDueDate = true;
             }
 
-            //AOI
+            //AOI / LOI
+            para.aoi = this.currentJob.aoi;
+            para.loi = this.currentJob.loi;
             if ((this.currentJob.aoi != this.propertiesFormLOI.innerHTML) && (this.propertiesFormLOI.innerHTML == "")) {
                 para.clearAOI = true;
             };

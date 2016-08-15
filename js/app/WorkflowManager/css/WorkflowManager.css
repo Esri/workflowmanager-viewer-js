@@ -107,6 +107,10 @@ body .dijitComboBox {
   width: 150px; 
 }
 
+.recreateBtn {
+    border-left:1px solid #000;
+}
+
 /*
 .workflowButtonRow :hover {
    background-color:#149BDF;
@@ -287,6 +291,10 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
     text-align: center;
     vertical-align: middle;
     border: none;
+}
+
+.icon-btnDisabled {
+    opacity: .5;
 }
 
 .executeIcon {
@@ -538,11 +546,11 @@ body .text-button.dijitButton .dijitButtonNode .dijitButtonText i  {
 
 /* Map tools */
 #mapTL {
-    width: 60%;
+    width: 55%;
 }
 
 #mapTR {
-    width: 40%;
+    width: 35%;
 }
 
 #mapTR .wrapper {

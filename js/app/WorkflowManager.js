@@ -643,6 +643,11 @@ define([
             var self = lang.hitch(this);
             this.wmConfigurationTask.getVisibleJobTypes(username, function (response) {
                 self.visibleJobTypes = response.jobTypes;
+                // init framework
+                self.initFrameworkUI();
+            }, function (error) {
+                // init framework
+                self.initFrameworkUI();
             });
         },
 
@@ -727,6 +732,7 @@ define([
                 var queryName = self.filter.content.setQueryNameFromId(self.queryIDInURL);
                 if (queryName) {
                     self.savedQuery = queryName;
+                    queryID = self.queryIDInURL;
                 }
                 self.queryIDInURL = null;
             }
@@ -1135,7 +1141,7 @@ define([
 
                 // set map aoi
                 topic.publish(appTopics.map.clearGraphics, null);
-                var loi = data.aoi ? data.aoi : data.poi;
+                var loi = data.aoi ? data.aoi : data.loi;
                 self.selectJobLOI(args.jobId, loi, args.zoomToFeature);
 
                 //set draw tool buttons
@@ -1849,6 +1855,7 @@ define([
             var self = lang.hitch(this);
             this.myMap = new EsriMap({
                 mapConfig : config.map,
+                poiLayerID : config.app.jobLOILayer.POILayerID,
                 aoiLayerID : config.app.jobLOILayer.AOILayerID,
                 mapTopics : appTopics.map,
                 mapId : self.mapPanel.id,
@@ -2013,7 +2020,7 @@ define([
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
             });
-            })
+            });
             
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
                 if (args.value == "") {
@@ -2602,10 +2609,8 @@ define([
                     self.initUserPrivileges(data.privileges);
                     // user queries
                     self.userQueries = data.userQueries;
-                    //Load Visible Job Types
+                    //Load Visible Job Types and then initialize UI framework afterward
                     self.initVisibleJobTypes(data.userName);
-                    // initialize UI framework
-                    self.initFrameworkUI();
                 }
 
             }, function(error) {

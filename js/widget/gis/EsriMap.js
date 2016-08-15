@@ -271,9 +271,9 @@ define([
             var poiReq = null;
             if (self.poiQueryTask) {
                 var poiQuery = new Query();
-                poiQuery .returnGeometry = true;
-                poiQuery .outSpatialReference = self.map.spatialReference;
-                poiQuery .where = self.poiJobIdField + "=" + jobId;
+                poiQuery.returnGeometry = true;
+                poiQuery.outSpatialReference = self.map.spatialReference;
+                poiQuery.where = self.poiJobIdField + "=" + jobId;
                 poiReq = self.poiQueryTask.execute(poiQuery);
             }
             
@@ -626,6 +626,8 @@ define([
         getUpdatedFeatures: function (jobIds) {
             this.selectedJobIds = jobIds;
             var layerDefinitions = [];
+            if (this.poiLayerID != null)
+                layerDefinitions[this.poiLayerID] = this.poiJobIdField + " in (" + jobIds.join() + ")";
             layerDefinitions[this.aoiLayerID] = this.jobIdField + " in (" + jobIds.join() + ")";
             this.aoiDynamicLayer.setLayerDefinitions(layerDefinitions);   
             this.setMapExtent();
