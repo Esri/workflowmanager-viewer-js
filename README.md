@@ -57,7 +57,7 @@ the proxy will forward to (details in the [README.pdf](README.pdf)).
 
 ## Issues
 
-Find a bug or want to request a new feature?  Please let us know by submitting an issue.
+Find a bug or want to request a new feature?  Please let us know by [submitting an issue](https://github.com/Esri/workflowmanager-viewer-js/issues).
 
 ## Contributing
 
