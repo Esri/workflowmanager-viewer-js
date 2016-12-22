@@ -37,14 +37,12 @@ Deployment:
 1. Fork and then clone the repo.
 2. Install an HTTP server such IIS or Apache.
 3. Modify the deployed js/app/WorkflowManager/config/AppConfig.js file to configure the
-Workflow Manager service, AOI Map service, and ArcGIS Token service if these are secured
+Workflow Manager service, AOI Map service, basemaps and ArcGIS Token service if these are secured
 services (details in the [README.pdf](README.pdf)).
-4. Modify the deployed js/widget/gis/BasemapGallery.js file to configure custom basemaps
-(details in the Readme.pdf).
-5. Modify the deployed proxy/proxy.config file to configure the Workflow Manager service that
+4. Modify the deployed proxy/proxy.config file to configure the Workflow Manager service that
 the proxy will forward to (details in the [README.pdf](README.pdf)).
-6. If using IIS, create a website.
-7. Launch the sample viewer in a web browser.
+5. If using IIS, create a website.
+6. Launch the sample viewer in a web browser.
 
 ## Requirements
 
