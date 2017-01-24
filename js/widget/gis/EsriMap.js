@@ -625,7 +625,7 @@ define([
 
         getUpdatedFeatures: function (jobIds) {
             this.selectedJobIds = jobIds;
-            var layerDefinitions = [];
+            var layerDefinitions = {};
             if (this.poiLayerID != null)
                 layerDefinitions[this.poiLayerID] = this.poiJobIdField + " in (" + jobIds.join() + ")";
             layerDefinitions[this.aoiLayerID] = this.jobIdField + " in (" + jobIds.join() + ")";
