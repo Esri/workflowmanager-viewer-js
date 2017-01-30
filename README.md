@@ -1,7 +1,7 @@
 workflowmanager-viewer-js
 ==========================
 
-Source code for ArcGIS Workflow Manager JavaScrpt viewer - Manage your workflows on the web.
+Source code for ArcGIS Workflow Manager JavaScript viewer - Manage your workflows on the web.
 
 [View it live](http://workflowsample.esri.com/js/)
 
@@ -13,7 +13,7 @@ Source code for ArcGIS Workflow Manager JavaScrpt viewer - Manage your workflows
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ###Versions
-The current version of the Workflow Manager JavaScrpt viewer is compatible with Workflow Manager Server 10.5 and 10.4.  
+The current version of the Workflow Manager JavaScript viewer is compatible with Workflow Manager Server 10.5 and 10.4.  
 
 The 10.4 Language Pack version of this viewer can be found on the [10.4 LP branch](https://github.com/Esri/workflowmanager-viewer-js/tree/10.4_LP) of this repository.
 
