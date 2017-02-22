@@ -10,7 +10,7 @@
 }
 .arcgisSearch .searchClear {
     top: 4px;
-    height: 26px;    
+    height: 26px;
 }
 .arcgisSearch .searchGroup .searchInput {
     margin-top: 2.880px;
@@ -28,14 +28,14 @@
 }
 
 html, body {
-	height: 100%; 
-	width: 100%; 
-	margin: 0; 
-	padding: 0; 
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
 }
 body{
-	background-color: #FFF; 
-	overflow:hidden; 
+	background-color: #FFF;
+	overflow:hidden;
 	font-family: "Trebuchet MS";
     font-size: .9em;
 }
@@ -43,20 +43,20 @@ body{
 h2 {
 	font-size: 1.2em;
 	font-weight: normal;
-	margin: 0.3em 0;	
+	margin: 0.3em 0;
 
 }
 
 h3 {
 	font-size: 1.1em;
 	font-weight: normal;
-	margin: 0.2em 0;	
+	margin: 0.2em 0;
 }
 
 .hint {
 	color: #999;
 	font-style: italic;
-	font-size: 0.9em;	
+	font-size: 0.9em;
 }
 
 .floating-panel {
@@ -72,11 +72,11 @@ h3 {
 /* Bootstrap */
 
 .control-group {
-	margin: 0.5em 0;	
+	margin: 0.5em 0;
 }
 
 .control-label {
-	vertical-align: top;	
+	vertical-align: top;
 	display: block;
 }
 
@@ -111,7 +111,7 @@ h3 {
 }
 #processing-inner h2 {
 	color: #000;
-	font-size: 2.5em;	
+	font-size: 2.5em;
 }
 @-webkit-keyframes progress-bar-stripes {
   from {
@@ -330,7 +330,7 @@ h3 {
 	-webkit-transition: top .5s; /* Safari */
 }
 #loading-inner h1 {
-    color: #F1F1F1; 
+    color: #F1F1F1;
 	font-size: 36px;
 	line-height: 45px;
 	font-weight:700;
@@ -586,7 +586,7 @@ h3 {
 }
 #header .headerLinks {
 	float: right;
-	margin: 10px;	
+	margin: 10px;
 }
 #header .customContainer {
 	position: absolute;
@@ -605,7 +605,7 @@ h3 {
 /****************************************************************************************/
 /* RIGHT CONTAINER */
 #rightContainer {
-	/* custom 
+	/* custom
 	width: 300px;
 	*/
 }
@@ -678,4 +678,67 @@ h3 {
 
 .claro .dijitSplitContainer-child, .claro .dijitBorderContainer-child {
     border: 0;
+}
+
+/****************************************************************************************/
+/* FIX ISSUE ON JS API 3.19*/
+
+
+/* dijit datepicker */
+.dijitCalendarContainer>table{
+  width: 100%;
+}
+
+.dijitCalendarContainer .dijitCalendarArrow{
+  padding: 1px 6px 2px 6px;
+  border: 1px solid white;
+  height: 25px;
+  width: 18px;
+  line-height: 23px!important;
+}
+
+.dijitCalendarContainer .dijitCalendarArrow.dijitCalendarIncrementArrow{
+  float:right;
+}
+
+.dijitCalendarContainer .dijitCalendarArrow.dijitCalendarDecrementArrow{
+  float:left;
+}
+
+
+
+/****************************************************************************************/
+/* FIX REPORT BUTTON STYLE */
+
+.reportTreeBtnContainer{
+  float:right;
+}
+
+.reportTreeBtn .dijitDropDownButton .dijitButtonNode{
+  width: 120px!important;
+  background-color: #2f96b4!important;
+  background-image: linear-gradient(to bottom, #5bc0de, #2f96b4)!important;
+  background-repeat: repeat-x!important;
+  border: 1px solid #3b9ebb!important;
+  color: #fff!important;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25)!important;
+}
+
+.reportTreeBtn .dijitDropDownButton .dijitButtonNode .dijitButtonText{
+  width: 100px!important;
+}
+
+.reportTreeBtn .dijitDropDownButton .dijitButtonNode .dijitArrowButtonInner{
+  border-top: 4px solid #fff;
+}
+
+/****************************************************************************************/
+/* FIX QUERY BUTTON STYLE */
+
+.queryTreeBtn .dijitDropDownButton .dijitButtonNode{
+  width: 300px!important;
+}
+
+.queryTreeBtn .dijitDropDownButton .dijitButtonNode .dijitButtonText{
+  width: 280px!important;
 }

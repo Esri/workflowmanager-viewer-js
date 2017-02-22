@@ -18,7 +18,9 @@ define( function() {
             TokenService: "https://your-server/arcgis/tokens",
             // Portal URL and AppId only apply if using portal authentication
             PortalURL: "https://your-server/arcgis",
-            AppId: "your-application-id",
+            // The default appId for the Workflow Manager web application in Portal 10.5 and later versions is "wmxweb".
+            // Update the appId to the appropriate value as needed.
+            AppId: "wmxweb",
             // When specifying a domain with the default user, use "\\" to separate domain and username
             // e.g.  DefaultUser: "myDomain\\username"
             DefaultUser: "demo",
@@ -128,6 +130,7 @@ define( function() {
                 
                 // An array of locator sources used to find search results. Only applicable if using custom locator sources.
                 // Refer to the esri/dijit/Search widget documentation for customizing locator sources.
+                // https://developers.arcgis.com/javascript/3/jsapi/search-amd.html#sources
                 locatorSources: []
             },
 

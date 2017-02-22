@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>ArcGIS Workflow Manager</title>
-    <link rel="stylesheet" href="//js.arcgis.com/3.15/esri/css/esri.css">
+    <link rel="stylesheet" href="//js.arcgis.com/3.19/esri/css/esri.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
 
 </head>
-  
+
 <body class="bootstrap">
 
     <div id="processing-outer">
@@ -40,7 +40,7 @@
                 <li></li>
                 <li></li>
                 <li></li>
-            </ul>                    
+            </ul>
             <div id="loginContainer"></div>
             <!--
             <div class="progress progress-striped active">
@@ -63,7 +63,7 @@
         //locale: "tr",
         //locale: "zh-cn",
         //isDebug: true,
-        packages: [ 
+        packages: [
             {
                 name: "widget",
                 location: path + "js/widget"
@@ -83,12 +83,12 @@
         ]
     };
 </script>
-<script type="text/javascript" src="//js.arcgis.com/3.15/"></script>
+<script type="text/javascript" src="//js.arcgis.com/3.19/"></script>
 <script type="text/javascript">
     if (window.attachEvent && !window.addEventListener) {
         // unsupported browsers (IE8 or older)
         var loadingMsgElem = document.getElementById("loadingMessage");
-        loadingMsgElem.innerHTML = "Unsupported Browser" + "<br>" + 
+        loadingMsgElem.innerHTML = "Unsupported Browser" + "<br>" +
             "The browser you are using is not supported by ArcGIS Workflow Manager. Please download the latest version of Internet Explorer.";
         loadingMsgElem.className = "loading-error";
     }
@@ -97,25 +97,25 @@
     require([
         "app/WorkflowManager",
         "dojo/parser"
-    ], 
+    ],
     function(Controller, parser) {
         parser.parse();
-        
+
         // Use Windows authenticated user to log into the application.  Select the user with or without
         // domain authentication depending on how your Workflow Manager repository is set up.
         // (Use only when windows authentication is enabled through IIS)
         //var user = "<%= User.Identity.Name.Replace("MyDomain\","") %>";  // user without domain authentication
         //var user = "<%= User.Identity.Name.Replace("\","*") %>";     // user with domain authentication
         //Controller.startup( {user: user} );
-        
+
         // Windows authetication not used
         Controller.startup();
-        
-        //Uncomment out the following lines for testing purposes only.  
+
+        //Uncomment out the following lines for testing purposes only.
         //Use this to determine the organization's domain when using windows authentication.
         //var windowsUser = "<%= User.Identity.Name %>";     // get the username from Windows
         //var loadingMsgElem = document.getElementById("loadingMessage");
-        //loadingMsgElem.innerHTML = "windowsUser = " + windowsUser;        
+        //loadingMsgElem.innerHTML = "windowsUser = " + windowsUser;
     });
 </script>
 

@@ -6,13 +6,13 @@
         <input type="radio" data-dojo-type="dijit/form/RadioButton" name="queryType" value="userQuery" disabled="true" data-dojo-attach-point="queryTypeUser" data-dojo-attach-event="onClick: toggleQueryType" />
         <label for="userQuery" style="width: 100px; font-weight: normal;">${i18n_QueryTypeUser}</label>
     </span>
-    
+
     <span style="display: none;">
         <input data-dojo-attach-point="cboJobQueries">
     </span>
-    
+
     <span class="header-text">${i18n_Queries}</span>:
-    <div class="query-dropDown-container" data-dojo-attach-point="queryTreeBtn"></div>
+    <div class="query-dropDown-container queryTreeBtn" data-dojo-attach-point="queryTreeBtn"></div>
     <span class="header-text">${i18n_OrFindJob}</span>:
 
     <!--
@@ -26,12 +26,14 @@
         <button type="submit" data-dojo-attach-point="btnJobSearch"></button>
         <!--<button type="button" data-dojo-attach-point="btnClearSearch" class="text-button neg-button"></button>-->
     </form>
-    <span class="filter-bar-item">
-        <span class="header-text report-label">${i18n_Reports}</span>:
-        <div class="query-dropDown-container" data-dojo-attach-point="reportTreeBtn"></div>
-    </span>
+
     <!-- Create job dialog -->
     <button type="button" data-dojo-attach-point="btnCreateNewJob"></button>
+    <!-- Create Report Dropdown -->
+    <span class="filter-bar-item reportTreeBtnContainer">
+        <!-- <span class="header-text report-label">${i18n_Reports}</span>: -->
+        <div class="query-dropDown-container reportTreeBtn" data-dojo-attach-point="reportTreeBtn"></div>
+    </span>
     <!--<button type="button" data-dojo-type="dijit.form.Button" onclick="createJobDialog.show();" data-dojo-attach-point="btnCreateNewJob" style="float: right;">Create New Job</button>-->
     <div data-dojo-type="dijit.Dialog" data-dojo-attach-point="createJobDialog" data-dojo-id="createJobDialog" title="${i18n_CreateNewJob}" style="width: 800px">
         <div class="dijitDialogPaneContentArea">
@@ -96,5 +98,5 @@
             <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="class: 'dojo-btn-danger', onClick:function(){createJobDialog.hide();}">${i18n_Cancel}</button>
         </div>
     </div>
-    
+
 </div>
