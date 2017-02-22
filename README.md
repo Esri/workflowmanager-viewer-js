@@ -13,7 +13,7 @@ Source code for ArcGIS Workflow Manager JavaScript viewer - Manage your workflow
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ###Versions
-The current version of the Workflow Manager JavaScript viewer is compatible with Workflow Manager Server 10.5 and 10.4.  
+The current version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 3.19 API](https://developers.arcgis.com/javascript/3/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.5 and 10.4.  
 
 The 10.4 Language Pack version of this viewer can be found on the [10.4 LP branch](https://github.com/Esri/workflowmanager-viewer-js/tree/10.4_LP) of this repository.
 
