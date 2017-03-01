@@ -288,7 +288,7 @@ define([
 
             topic.subscribe(this.mapTopics.zoom.extent, function(sender, args) {
                 var extent = new Extent(parseFloat(args.xmin), parseFloat(args.ymin), parseFloat(args.xmax), parseFloat(args.ymax), new SpatialReference({ wkid: parseInt(args.wkid) }));
-                self.map.setExtent(extent);
+                self.mapView.extent = extent;
             });
 
             //clear graphics when grid row is deselected
@@ -381,11 +381,11 @@ define([
         
         zoomToFeature: function (geometry) {
             if (geometry.type == "point") {
-                this.map.centerAt(geometry);
+                this.mapView.center = geometry;
             } else if (geometry.type == "multipoint") {
-                this.map.setExtent(geometry.getExtent().expand(1.5));
+                this.mapView.extent = geometry.extent.expand(1.5);
             } else if (geometry.type == "polygon" && geometry.rings.length > 0) {
-                this.map.setExtent(geometry.getExtent().expand(1.5));
+                this.mapView.extent = geometry.extent.expand(1.5);
             }
         },
     
@@ -433,7 +433,7 @@ define([
                 return;
             
             //calculate map coords represented per pixel
-            var pixelWidth = this.map.extent.getWidth() / this.map.width;
+            var pixelWidth = this.mapView.extent.width / this.map.width;
             
             //calculate map coords for tolerance in pixel
             var toleraceInMapCoords = this.toleranceInPixels * pixelWidth;
@@ -444,7 +444,7 @@ define([
                 point.y - toleraceInMapCoords,
                 point.x + toleraceInMapCoords,
                 point.y + toleraceInMapCoords,
-                this.map.spatialReference ); 
+                this.mapView.spatialReference ); 
         },
         
         getLayerObject: function(layer) {
@@ -696,16 +696,16 @@ define([
             var extent = args;
             if (!args) {
                 extent = {
-                    xmin: self.map.extent.xmin,
-                    ymin: self.map.extent.ymin,
-                    xmax: self.map.extent.xmax,
-                    ymax: self.map.extent.ymax,
+                    xmin: self.mapView.extent.xmin,
+                    ymin: self.mapView.extent.ymin,
+                    xmax: self.mapView.extent.xmax,
+                    ymax: self.mapView.extent.ymax,
                     spatialReference: {
-                        wkid: self.map.extent.spatialReference.wkid
+                        wkid: self.mapView.extent.spatialReference.wkid
                     }
                 };
             }
-            this.mapView.extent(new Extent(extent.xmin, extent.ymin, extent.xmax, extent.ymax, new SpatialReference(extent.spatialReference.wkid)));
+            this.mapView.extent = new Extent(extent.xmin, extent.ymin, extent.xmax, extent.ymax, new SpatialReference(extent.spatialReference.wkid));
         },
 
         refreshLayers: function () {

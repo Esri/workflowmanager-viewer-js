@@ -2067,7 +2067,7 @@ define([
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
                 });
-            })
+            });
 
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
                 if (args.value == "") {
