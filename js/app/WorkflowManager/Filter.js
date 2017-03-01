@@ -22,9 +22,8 @@ define([
     "dojo/store/Memory",
     "dijit/tree/ObjectStoreModel",
 
-    "workflowmanager/supportclasses/JobCreationParameters",
-    "workflowmanager/Enum",
-    
+    "./Constants",
+
     "dijit/form/Button",
     "dijit/form/ComboBox",
     "dijit/form/DateTextBox",
@@ -42,7 +41,7 @@ function (
     template, i18n, appTopics, config,
     arrayUtil, lang, connect, parser, query, on, domStyle, topic, registry,
     Memory, ObjectStoreModel,
-    JobCreationParameters, Enum,
+    Constants,
     Button, ComboBox, DateTextBox, DropDownButton, TooltipDialog, FilteringSelect, NumberSpinner, Textarea, TextBox, Tree) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -93,7 +92,7 @@ function (
         currentUserDetails: null,
         currentUserPrivileges: null,
         currentJobTypeDetails: null,
-        currentAssignedType: Enum.JobAssignmentType.NONE,
+        currentAssignedType: Constants.JobAssignmentType.NONE,
         
         constructor: function () {
             parser.parse();
@@ -193,7 +192,7 @@ function (
                 onClick: function (item) {
                     if (item.directory == false) {
                         
-                        topic.publish(appTopics.filter.generateReport, this, { reportID: item.id, title: item.name });
+                        topic.publish(appTopics.filter.generateReport, this, { reportId: item.id, title: item.name });
                         //hide drop down
                         self.reportTreeButton.closeDropDown();
                     }
@@ -398,7 +397,7 @@ function (
             
             //Job types
             var activeJobTypes = dojo.filter(args.jobTypes, function(item){
-                return item.state == Enum.JobTypeState.ACTIVE;
+                return (item.state == Constants.JobTypeState.ACTIVE);
             });
             if (activeJobTypes.length > 0) {
                 this.setJobTypesStore(activeJobTypes);
@@ -816,14 +815,7 @@ function (
         createNewJob: function() {
             console.log("Create new job clicked");
             var self = lang.hitch(this);
-            var para = new JobCreationParameters();
-
-            //Properties that don't have editable fields
-            para.id = null,
-            para.name = null,
-            para.aoi = null;
-            para.autoCommitWorkflow = null;
-            para.autoExecute = null;
+            var para = {};
 
             //Job type
             para.jobTypeId = this.jobTypesTree.selectedItem != null ? this.jobTypesTree.selectedItem.id : this.initialJobTypeId;
@@ -834,7 +826,7 @@ function (
                 var startDateFix = Date.parse(startDate) + 43200000;
                 para.startDate = new Date(startDateFix);
             } else {
-                para.clearStartDate = true;
+                para.startDate = null;
             }
 
             //Due date
@@ -843,7 +835,7 @@ function (
                 var dueDateFix = Date.parse(dueDate) + 43200000;
                 para.dueDate = new Date(dueDateFix);
             } else {
-                para.clearDueDate = true;
+                para.dueDate = null;
             }
 
             //Priority
@@ -869,13 +861,13 @@ function (
             
             //Assigned type / assigned to
             if (this.assignmentTypeUser.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.ASSIGNED_TO_USER;
+                para.assignedType = Constants.JobAssignmentType.ASSIGNED_TO_USER;
                 para.assignedTo = self.assignmentUsersSelect.get("value");
             } else if (this.assignmentTypeGroup.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.ASSIGNED_TO_GROUP;
+                para.assignedType = Constants.JobAssignmentType.ASSIGNED_TO_GROUP;
                 para.assignedTo = self.assignmentGroupsSelect.get("value");
             } else if (this.assignmentTypeUnassigned.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.UNASSIGNED;
+                para.assignedType = Constants.JobAssignmentType.UNASSIGNED;
                 para.assignedTo = "";
             } else {
                 // unknown option
@@ -901,19 +893,19 @@ function (
             var checkedButtons = dojo.query('[name=assignmentType]').filter(function (radio) {
                 return radio.checked;
             });
-            if (checkedButtons[0].value == "user") {
+            if (checkedButtons[0].value == Constants.JobAssignmentType.ASSIGNED_TO_USER) {
                 this.assignmentTypeWrapper.style.visibility = "visible";
                 this.assignmentTypeUserWrapper.style.display = "inline";
                 this.assignmentTypeGroupWrapper.style.display = "none";
-                this.currentAssignedType = Enum.JobAssignmentType.ASSIGNED_TO_USER;
-            } else if (checkedButtons[0].value == "group") {
+                this.currentAssignedType = Constants.JobAssignmentType.ASSIGNED_TO_USER;
+            } else if (checkedButtons[0].value == Constants.JobAssignmentType.ASSIGNED_TO_GROUP) {
                 this.assignmentTypeWrapper.style.visibility = "visible";
                 this.assignmentTypeUserWrapper.style.display = "none";
                 this.assignmentTypeGroupWrapper.style.display = "inline";
-                this.currentAssignedType = Enum.JobAssignmentType.ASSIGNED_TO_GROUP;
+                this.currentAssignedType = Constants.JobAssignmentType.ASSIGNED_TO_GROUP;
             } else {
                 this.assignmentTypeWrapper.style.visibility = "hidden";
-                this.currentAssignedType = Enum.JobAssignmentType.UNASSIGNED;
+                this.currentAssignedType = Constants.JobAssignmentType.UNASSIGNED;
             }
         },
 
@@ -951,7 +943,7 @@ function (
                         return true;
                     }
                     if (this.currentJobTypeDetails) {
-                        if (this.currentJobTypeDetails.defaultAssignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER
+                        if (this.currentJobTypeDetails.defaultAssignedType == Constants.JobAssignmentType.ASSIGNED_TO_USER
                         && this.currentJobTypeDetails.defaultAssignedTo == item.userName) {
                             return true;
                         }
@@ -1002,7 +994,7 @@ function (
                         return true;
                     }
                     if (this.currentJobTypeDetails) {
-                        if (this.currentJobTypeDetails.defaultAssignedType == Enum.JobAssignmentType.ASSIGNED_TO_GROUP
+                        if (this.currentJobTypeDetails.defaultAssignedType == Constants.JobAssignmentType.ASSIGNED_TO_GROUP
                             && this.currentJobTypeDetails.defaultAssignedTo == item.name) {
                             return true;
                         }
@@ -1032,7 +1024,7 @@ function (
             //Job assignment
             var assignedTo = jobTypeDetails.defaultAssignedTo;
             switch (jobTypeDetails.defaultAssignedType) {
-                case Enum.JobAssignmentType.ASSIGNED_TO_USER:
+                case Constants.JobAssignmentType.ASSIGNED_TO_USER:
                     this.assignmentTypeUser.set("checked", true);
                     if (assignedTo && assignedTo != ""){
                         if (assignedTo == "[SYS:CUR_LOGIN]") {
@@ -1041,7 +1033,7 @@ function (
                         this.assignmentUsersSelect.set("value", assignedTo);
                     }
                     break;
-                case Enum.JobAssignmentType.ASSIGNED_TO_GROUP:
+                case Constants.JobAssignmentType.ASSIGNED_TO_GROUP:
                     this.assignmentTypeGroup.set("checked", true);
                     if (assignedTo && assignedTo != "") {
                         this.assignmentGroupsSelect.set("value", assignedTo);

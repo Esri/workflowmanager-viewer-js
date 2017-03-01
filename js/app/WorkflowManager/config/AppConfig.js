@@ -55,19 +55,13 @@ define( function() {
         geometryServiceURL : "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",       
 
         map: {
-            // select default basemap (ArcGIS basemap or custom basemap Id)
+            // Configuration for basemap toggle
+            // select default and next basemap (ArcGIS basemap or custom basemap Id)
             defaultBasemap: "topo",
-            
-            basemapGallery: {
-                isEnabled: true,
-                
-                // false - use custom basemaps
-                //      (Define custom basemaps below)
-                // true  - use ArcGIS basemaps
-                //      (ArcGIS basemaps: "streets", "satellite", "hybrid", "topo", "gray", "oceans", "national-geographic", "osm")
-                showArcGISBasemaps: true
-            },
-            
+            nextBasemap: "hybrid",
+
+            showArcGISBasemaps: true,
+
             // Custom basemaps
             // This section is required only if 'showArcGISBasemaps' is set to false
             customBasemaps : [
@@ -122,65 +116,14 @@ define( function() {
             // Search widget provides a way to perform search capabilities based on locator service(s). 
             search: {
                 // If the result does not have an associated extent, specify this number to use as the zoom scale for the result.
-                zoomLevel: 1000,
-                
-                // false - use default locator service
-                // true  - use custom locator service(s)
-                customSources: false,
-                
-                // An array of locator sources used to find search results. Only applicable if using custom locator sources.
-                // Refer to the esri/dijit/Search widget documentation for customizing locator sources.
-                // https://developers.arcgis.com/javascript/3/jsapi/search-amd.html#sources
-                locatorSources: []
-            },
+                //zoomLevel: 1000,
 
-            showAttribution: false,
-            showLogo: false,
-            
-            navigation: {
-                slider: {
-                    isEnabled: true,
-                    style: "small",  // "small" or "large"
-                    position: "top-left", // "top-left", "top-right", "bottom-left", "bottom-right"
-                    orientation: "vertical", // "vertical" or "horizontal"
-                    labels: ["Street","County","State","Nation","World"] // Only valid when the "large" slider style option is true. 
-                },
-                hasPanControls: false    
-            },
-            
-            overview: {
-                isEnabled: false,
-                position: "bottom-left", // "top-right","bottom-right","bottom-left" and "top-left"
-                isVisibleOnStartup: true,
-                hasMaximizeButton: false
-            },
-            
-            scalebar: {
-                isEnabled: false,
-                position: "bottom-left",  // "top-right","bottom-right","top-center","bottom-center","bottom-left","top-left"
-                style: "line", // ruler" or "line" --- When unit is set to dual the scalebar style will be set to line. As of version 3.4
-                unit: "dual"  // "english" or "metric" and starting at version 3.4 "dual"
-            },
-            
-            coordinates: {
-                isEnabled: false
-            },
-            
-            legend: {
-                isEnabled: false,
-                hasDropDownButton: true
-            },
-            
-            drawTool: {
-                isEnabled: true,
-                tools: ["MULTI_POINT", "RECTANGLE", "POLYGON", "FREEHAND_POLYGON"],        // "POINT", "MULTI_POINT", "POLYGON", "FREEHAND_POLYGON", "RECTANGLE"
-                
-                // Selecting a point on the map is a little more difficult than selecting a polygon because 
-                // the mouse click is required to fall directly on the point in order for a result to be returned. 
-                // To makes things easier, a “tolerance” envelope can be built around the clicked point
-                // by specifying a point tolerance (number of pixels).
-                pointTolerance : 2
+                // (Optional) An array of custom locator sources used to find search results.
+                // If no custome sources are specified, the default settings in the Search widget will be used
+                // Refer to the esri/widgets/Search documentation for customizing sources 
+                // https://developers.arcgis.com/javascript/latest/api-reference/esri-widgets-Search.html#sources
+                customSources: []
             }
-        }        
+        }
     };
 });

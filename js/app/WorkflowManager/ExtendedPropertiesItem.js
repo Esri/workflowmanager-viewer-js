@@ -31,8 +31,7 @@ define([
     "dijit/Tooltip",
 
     "app/WorkflowManager/config/Topics",
-    "workflowmanager/Enum",
-
+    "./Constants"
 ],
 
 function (
@@ -40,13 +39,12 @@ function (
     template, i18n,
     lang, connect, arrayUtil, parser, query, on, domConstruct, dom, domStyle, Memory, registry,
     FilteringSelect, TextBox, Button, DropDownButton, DateTextBox, ComboBox, ValidationTextBox, Tooltip,
-    appTopics, Enum) {
+    appTopics, Constants) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
         templateString: template,
         widgetsInTemplate: false,
-
 
         i18n_InvalidMessage: i18n.extendedProperties.invalid,
 
@@ -73,24 +71,24 @@ function (
 
             switch (this.displayType) {
                 //TODO: Add display to warn of unsupported display types all good otherwise
-                case Enum.ExtendedPropertyDisplayType.DATE:
+                case Constants.ExtendedPropertyDisplayType.DATE:
                     //date display
                     self.populateDateField();
                     break;
-                case Enum.ExtendedPropertyDisplayType.DOMAIN:
-                case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
+                case Constants.ExtendedPropertyDisplayType.DOMAIN:
+                case Constants.ExtendedPropertyDisplayType.TABLE_LIST:
                     //combo display
                     topic.publish(appTopics.extendedProperties.getFieldValues, self, { tableName: self.tableName, field: self.name, callback: self.fieldValuesResponse });
                     break;
-                case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
+                case Constants.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
                     //multi combo display
                     this.fieldError.style.height = "auto";
                     self.fieldTitle.innerHTML += " (" + self.tableField.tableListStoreField + ")";
                     topic.publish(appTopics.extendedProperties.getMultiListValues, self, { field: self.tableField, callback: self.multiFieldValuesResponse });
                     break;
-                case Enum.ExtendedPropertyDisplayType.FILE:
-                case Enum.ExtendedPropertyDisplayType.FOLDER:
-                case Enum.ExtendedPropertyDisplayType.GEO_FILE:
+                case Constants.ExtendedPropertyDisplayType.FILE:
+                case Constants.ExtendedPropertyDisplayType.FOLDER:
+                case Constants.ExtendedPropertyDisplayType.GEO_FILE:
                     //text display
                     self.populateTextField();
                     self.field.set('readOnly', true);
@@ -98,15 +96,15 @@ function (
                 default:
                     //text display
                     switch (this.dataType) {
-                        case Enum.FieldType.SMALL_INTEGER:
-                        case Enum.FieldType.INTEGER:
+                        case Constants.FieldType.SMALL_INTEGER:
+                        case Constants.FieldType.INTEGER:
                             self.populateValidationTextBox(self.integerRegex);
                             break;
-                        case Enum.FieldType.SINGLE:
-                        case Enum.FieldType.DOUBLE:
+                        case Constants.FieldType.SINGLE:
+                        case Constants.FieldType.DOUBLE:
                             self.populateValidationTextBox(self.decimalNumberRegex);
                             break;
-                        case Enum.FieldType.GUID:
+                        case Constants.FieldType.GUID:
                             self.populateValidationTextBox(self.GUIDRegex);
                             break;
                         default:
@@ -118,8 +116,6 @@ function (
             if (self.field) {
                 self.setRequired();
             }
-
-           
         },
 
         // first multi level response
@@ -150,11 +146,11 @@ function (
             var ListStore = new Memory({ data: store });
             var ListItem;
             if (storeLevel < self.levelHeight - 1)
-                var itemID = self.curSelectedValues[storeLevel];
+                var itemId = self.curSelectedValues[storeLevel];
             else
-                var itemID = self.data;
+                var itemId = self.data;
             if (self.curSelectedValues[storeLevel] != undefined && self.curSelectedValues[storeLevel] != null) {
-                ListItem = ListStore.get(itemID);
+                ListItem = ListStore.get(itemId);
             } else {
                 ListItem = null;
             }
@@ -433,11 +429,11 @@ function (
             var field = this.field;
             var data;
             switch (this.displayType) {
-                case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
-                case Enum.ExtendedPropertyDisplayType.DOMAIN:
+                case Constants.ExtendedPropertyDisplayType.TABLE_LIST:
+                case Constants.ExtendedPropertyDisplayType.DOMAIN:
                     data = field.get('item');
                     break;
-                case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
+                case Constants.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
                     data = field.get('item');
                     break;
                 default:
@@ -458,11 +454,11 @@ function (
                 //naive check, only matters if its been changed at all, not if its the same value as before
                 if (this.changed) {
                     switch (this.displayType) {
-                        case Enum.ExtendedPropertyDisplayType.DATE:
+                        case Constants.ExtendedPropertyDisplayType.DATE:
                             return (data !== null) ? data.getTime() : null;
-                        case Enum.ExtendedPropertyDisplayType.TABLE_LIST:
-                        case Enum.ExtendedPropertyDisplayType.DOMAIN:
-                        case Enum.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
+                        case Constants.ExtendedPropertyDisplayType.TABLE_LIST:
+                        case Constants.ExtendedPropertyDisplayType.DOMAIN:
+                        case Constants.ExtendedPropertyDisplayType.MULTI_LEVEL_TABLE_LIST:
                             return (data !== null) ? data.id : "";
                         default:
                             return data;

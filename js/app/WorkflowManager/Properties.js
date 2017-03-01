@@ -20,9 +20,6 @@ define([
     "dojo/store/Memory",
     "./config/Topics",
     
-    "workflowmanager/supportclasses/JobUpdateParameters",
-    "workflowmanager/Enum",
-
     "./widgets/SaveProps",
 
     "dijit/form/FilteringSelect",
@@ -38,16 +35,16 @@ define([
 
     "./Attachments",
     "./AttachmentItem",
+    "./Constants"
     ],
 
 function (
     declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, 
     template, i18n,
     topic, lang, connect, arrayUtil, parser, query, on, domStyle, domConstruct, registry, Memory, appTopics,
-    JobUpdateParameters, Enum,
     SaveProps,
     FilteringSelect, Select, TextBox, Textarea, Button, DropDownButton, ComboBox, RadioButton, DateTextBox, Dialog,
-    Attachments, AttachmentItem) {
+    Attachments, AttachmentItem, Constants) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         
@@ -242,7 +239,7 @@ function (
             this.jobStartDateControl.set("value", job.startDate);
             this.jobDueDateControl.set("value", job.dueDate);
 
-            if (job.aoi || job.loi) {
+            if (job.loi) {
                 this.propertiesFormLOI.innerHTML = this.i18n_LoiDefined;
             } else {
                 this.propertiesFormLOI.innerHTML = this.i18n_LoiUndefined;
@@ -266,7 +263,7 @@ function (
             this.populateAssignmentUsers();
             this.populateAssignmentGroups();
             switch (job.assignedType) {
-                case 1:
+                case "user":
                     this.jobAssignmentTypeUser.set("checked", true);
                     var user = this.findUser(job.assignedTo, this.assignmentUsersSelect.get("store").data);
                     if (user)
@@ -275,7 +272,7 @@ function (
                     if (this.assignmentUsersSelect.item == null)
                         this.assignmentUsersSelect.set("displayedValue", this.i18n_JobAssignmentUnknownUser);
                             break;
-                case 2:
+                case "group":
                     this.jobAssignmentTypeGroup.set("checked", true);
                     this.assignmentGroupsSelect.set("value", job.assignedTo);
                     break;
@@ -345,7 +342,7 @@ function (
             // Job owner is editable if:
             //  - job is not closed
             //  - user has privilege to change job owner 
-            if (this.currentJob.stage != Enum.JobStage.CLOSED && this.currentUserPrivileges.canChangeJobOwner) {
+            if (this.currentJob.stage != Constants.JobStage.CLOSED && this.currentUserPrivileges.canChangeJobOwner) {
                 this.canChangeOwner = true;
             }
 
@@ -353,11 +350,11 @@ function (
             //  - job is not closed
             //  - user has privilege to manage data workspaces
             //  - job is unassigned, job is owned by current user, or job is assigned to the current user    
-            if (this.currentJob.stage != Enum.JobStage.CLOSED
+            if (this.currentJob.stage != Constants.JobStage.CLOSED
                 && this.currentUserPrivileges.canManageDataWorkspace
-                && (this.currentJob.assignedType == Enum.JobAssignmentType.UNASSIGNED
+                && (this.currentJob.assignedType == Constants.JobAssignmentType.UNASSIGNED
                     || this.currentJob.ownedBy == this.currentUser 
-                    || (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER && this.currentJob.assignedTo == this.currentUser))) {
+                    || (this.currentJob.assignedType == Constants.JobAssignmentType.ASSIGNED_TO_USER && this.currentJob.assignedTo == this.currentUser))) {
                 this.canChangeDataWorkspace = true;
             } 
 
@@ -366,12 +363,12 @@ function (
             //  - user has privilege to update job properties
             //  - job has no active holds, or user has privilege to update properties of held jobs
             //  - job is unassigned, job is owned by current user, or job is assigned to the current user    
-            if (this.currentJob.stage != Enum.JobStage.CLOSED
+            if (this.currentJob.stage != Constants.JobStage.CLOSED
                 && this.currentUserPrivileges.canUpdateProperties
                 && (!this.jobHasActiveHolds || this.currentUserPrivileges.canUpdatePropsForHeldJobs)
-                && (this.currentJob.assignedType == Enum.JobAssignmentType.UNASSIGNED
+                && (this.currentJob.assignedType == Constants.JobAssignmentType.UNASSIGNED
                     || this.currentJob.ownedBy == this.currentUser 
-                    || (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER && this.currentJob.assignedTo == this.currentUser))) {
+                    || (this.currentJob.assignedType == Constants.JobAssignmentType.ASSIGNED_TO_USER && this.currentJob.assignedTo == this.currentUser))) {
                 this.canChangeProperties = true;
             } 
             
@@ -501,32 +498,32 @@ function (
                 return radio.checked;
             });
             
-            if (checkedButtons[0].value == "user") {
+            if (checkedButtons[0].value == Constants.JobAssignmentType.ASSIGNED_TO_USER) {
                 this.jobAssignmentTypeWrapper.style.visibility = "visible";
                 this.jobAssignmentTypeUserWrapper.style.display = "inline";
                 this.jobAssignmentTypeGroupWrapper.style.display = "none";
-                this.initAssignmentType = Enum.JobAssignmentType.ASSIGNED_TO_USER;
+                this.initAssignmentType = Constants.JobAssignmentType.ASSIGNED_TO_USER;
                 //set a type var for detecting change
-                this.userAssignedType = 1;
-            } else if (checkedButtons[0].value == "group") {
+                this.userAssignedType = "user";
+            } else if (checkedButtons[0].value == Constants.JobAssignmentType.ASSIGNED_TO_GROUP) {
                 this.jobAssignmentTypeWrapper.style.visibility = "visible";
                 this.jobAssignmentTypeUserWrapper.style.display = "none";
                 this.jobAssignmentTypeGroupWrapper.style.display = "inline";
-                this.initAssignmentType = Enum.JobAssignmentType.ASSIGNED_TO_GROUP;
+                this.initAssignmentType = Constants.JobAssignmentType.ASSIGNED_TO_GROUP;
                 //set a type var for detecting change
-                this.userAssignedType = 2;
+                this.userAssignedType = "group";
             } else {
                 this.jobAssignmentTypeWrapper.style.visibility = "hidden";
-                this.initAssignmentType = Enum.JobAssignmentType.UNASSIGNED;
+                this.initAssignmentType = Constants.JobAssignmentType.UNASSIGNED;
                 //set a type var for detecting change
-                this.userAssignedType = 0;
+                this.userAssignedType = "unassigned";
             }
 
             this.activateUpdateBtn();
         },
         
         canAssignJob: function() {
-            if (this.currentJob.stage == Enum.JobStage.CLOSED) {
+            if (this.currentJob.stage == Constants.JobStage.CLOSED) {
                 return false;
             }
             if (this.currentUserPrivileges.canAssignAnyJob) {
@@ -543,7 +540,7 @@ function (
                 //   - assigned to the current user
                 //   - assigned to any group of the current user
                 //   - assigned to any user within any group of the current user (only if canGroupJobAssign)
-                if (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER) {
+                if (this.currentJob.assignedType == Constants.JobAssignmentType.ASSIGNED_TO_USER) {
                     if (this.currentJob.assignedTo == this.currentUserDetails.userName) {
                         return true;
                     }
@@ -558,7 +555,7 @@ function (
                         }
                     }
                 }
-                if (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_GROUP) {
+                if (this.currentJob.assignedType == Constants.JobAssignmentType.ASSIGNED_TO_GROUP) {
                     // Check if assigned to any group of the current user
                     var assignableGroups = this.assignableGroups;
                     for (var i = 0; i < assignableGroups.length; i++) {
@@ -620,13 +617,13 @@ function (
 
             //set assigned to
             switch (this.userAssignedType) {
-                case 0:
+                case "unassigned":
                     this.userAssignedTo = null;
                     break;
-                case 1:
+                case "user":
                     this.userAssignedTo = this.assignmentUsersSelect.get("value");
                     break;
-                case 2:
+                case "group":
                     this.userAssignedTo = this.assignmentGroupsSelect.get("value");
                     break;
             }
@@ -712,14 +709,10 @@ function (
         updateProperties: function () {
             console.log("update properties button clicked");
             var self = lang.hitch(this);
-            var para = new JobUpdateParameters;
+            var para = {
+                jobId: this.currentJob.id
+            };
             
-            //Properties that don't have editable fields
-            para.jobId = this.currentJob.id;
-            para.name = this.currentJob.name;
-            para.status = this.currentJob.status;
-            para.percent = this.currentJob.percentageComplete;
-
             //Data workspace
             para.dataWorkspaceId = this.currentJob.dataWorkspaceId;
             
@@ -731,13 +724,13 @@ function (
 
             //Assigned type / assigned to
             if (this.jobAssignmentTypeUser.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.ASSIGNED_TO_USER;
+                para.assignedType = Constants.JobAssignmentType.ASSIGNED_TO_USER;
                 para.assignedTo = self.assignmentUsersSelect.get("value");
             } else if (this.jobAssignmentTypeGroup.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.ASSIGNED_TO_GROUP;
+                para.assignedType = Constants.JobAssignmentType.ASSIGNED_TO_GROUP;
                 para.assignedTo = self.assignmentGroupsSelect.get("value");
             } else if (this.jobAssignmentTypeUnassigned.checked == true) {
-                para.assignedType = Enum.JobAssignmentType.UNASSIGNED;
+                para.assignedType = Constants.JobAssignmentType.UNASSIGNED;
                 para.assignedTo = "";
             } else {
                 // unknown option
@@ -754,7 +747,7 @@ function (
                 var startDateFix = Date.parse(startDate) + 43200000;
                 para.startDate = new Date(startDateFix);
             } else {
-                para.clearStartDate = true;
+                para.startDate = null;
             }
 
             //Due Date
@@ -763,14 +756,12 @@ function (
                 var dueDateFix = Date.parse(dueDate) + 43200000;
                 para.dueDate = new Date(dueDateFix);
             } else {
-                para.clearDueDate = true;
+                para.dueDate = null;
             }
 
-            //AOI / LOI
-            para.aoi = this.currentJob.aoi;
-            para.loi = this.currentJob.loi;
-            if ((this.currentJob.aoi != this.propertiesFormLOI.innerHTML) && (this.propertiesFormLOI.innerHTML == "")) {
-                para.clearAOI = true;
+            //AOI
+            if ((this.currentJob.loi != this.propertiesFormLOI.innerHTML) && (this.propertiesFormLOI.innerHTML == "")) {
+                para.loi = null;
             };
 
             //Priority

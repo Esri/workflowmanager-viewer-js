@@ -14,9 +14,9 @@ define([
     return declare(null, {
         
         // WM Tasks
-        wmAOILayerTask: null,
-        wmPOILayerTask: null,
-        wmConfigurationTask: null,
+        aoiLayerTask: null,
+        poiLayerTask: null,
+        configurationTask: null,
         
         // WM server configuration info
         serviceInfo: null,
@@ -31,18 +31,18 @@ define([
             var self = lang.hitch(this);
             
             this.user = args.user;
-            this.wmAOILayerTask = args.wmAOILayerTask;
-            this.wmPOILayerTask = args.wmPOILayerTask; 
-            this.wmConfigurationTask = args.wmConfigurationTask;
+            this.aoiLayerTask = args.aoiLayerTask;
+            this.poiLayerTask = args.poiLayerTask; 
+            this.configurationTask = args.configurationTask;
             
-            if (!this.wmAOILayerTask && !this.wmConfigurationTask) {
+            if (!this.aoiLayerTask && !this.configurationTask) {
                 console.log("Unable to load Workflow Manager configuration: AOI layer task or configuration task is null");
                 self.errorHandler(i18n.error.errorLoadingWorkflowConfiguration, error);
             }
             
             //load service information
             console.log("Loading WM service info");
-            this.wmConfigurationTask.getServiceInfo(function (data) {
+            this.configurationTask.getServiceInfo().then(function (data) {
                 console.log("WM Service info: ", data);
 
                 // service info
@@ -57,7 +57,7 @@ define([
                 self.commentActivityTypeId = self.getActivityType("Comment");
                 
                 // load other service configurations
-                self.intializeJobID();
+                self.intializeJobId();
                 self.loadUsers();
 
             }, function(error) {
@@ -67,10 +67,10 @@ define([
 
         },
         
-        intializeJobID: function() {
+        intializeJobId: function() {
             var self = lang.hitch(this);
             console.log("Retrieving AOI job Id field");
-            this.wmAOILayerTask.getJobIdField(function (data) {
+            this.aoiLayerTask._getJobIdField().then(function (data) {
                 console.log("AOI Job Id Field: ", data);
                 self.aoiJobIdField = data;
             }, function (error) {
@@ -78,9 +78,9 @@ define([
                 self.errorHandler(i18n.error.errorLoadingJobIdField, error);
             });
             
-            if (this.wmPOILayerTask != null) {
+            if (this.poiLayerTask != null) {
                 console.log("Retrieving POI job Id field");
-                this.wmPOILayerTask.getJobIdField(function (data) {
+                this.poiLayerTask._getJobIdField().then(function (data) {
                     console.log("POI Job Id Field: ", data);
                     self.poiJobIdField = data;
                 }, function (error) {
@@ -93,7 +93,7 @@ define([
         loadUsers: function() {
             var self = lang.hitch(this);
             console.log("Loading users");
-            this.wmConfigurationTask.getAllUsers(function (data) {
+            this.configurationTask.getAllUsers().then(function (data) {
                 console.log("Users: ", data);
                 self.users = data;
                 self.loadGroups();
@@ -107,7 +107,7 @@ define([
         loadGroups: function() {
             var self = lang.hitch(this);
             console.log("Loading groups");
-            this.wmConfigurationTask.getAllGroups(function (data) {
+            this.configurationTask.getAllGroups().then(function (data) {
                 console.log("Groups: ", data);
                 self.groups = data;
                 self.loadDataWorkspaces();
@@ -125,8 +125,12 @@ define([
             
             var dataWorkspaces = this.serviceInfo.dataWorkspaces;
             var length = dataWorkspaces.length;
-            for (var i = 0; i < length; i++) {                            
-                this.wmConfigurationTask.getDataWorkspaceDetails(dataWorkspaces[i].id, this.user, function(data) {
+            var params = {
+                user: this.user
+            };
+            for (var i = 0; i < length; i++) {
+                params.dataWorkspaceId = dataWorkspaces[i].id;
+                this.configurationTask.getDataWorkspaceDetails(params).then(function(data) {
                     self.dataWorkspaceDetails.push(data);
                 }, function(error) {
                     console.log("Unable to load data workspace details", error);

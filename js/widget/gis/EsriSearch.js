@@ -15,7 +15,7 @@ define([
 
     "dojo/i18n!./EsriSearch/nls/Strings",
     
-    "esri/dijit/Search",
+    "esri/widgets/Search",
     "dojo/text!./EsriSearch/templates/EsriSearch.html",
     "app/WorkflowManager/config/Topics"
 ], 
@@ -37,8 +37,7 @@ function(
             var self = lang.hitch(this);
 
             this.search = new Search({
-                map: this.map,
-                zoomScale: this.zoomLevel,
+                view: this.map.mapView,
             }, this.EsriSearchContainer);
             if (this.customSources)
                 this.search.set('sources', this.sources);
@@ -54,11 +53,13 @@ function(
         },
 
         focusOnButton: function () {
+            /*
+            // TODO Fix this
             var self = lang.hitch(this);
             setTimeout(function () {
                 self.search.submitNode.focus();
             }, 5);
-            
+            */
         }
     });
 });

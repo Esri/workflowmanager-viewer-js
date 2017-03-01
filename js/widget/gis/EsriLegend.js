@@ -12,7 +12,7 @@ define([
     "dojo/_base/lang",
     "dojo/string",
     
-    "esri/dijit/Legend",
+    "esri/widgets/Legend",
     
     "dijit/form/DropDownButton",
     "dijit/TooltipDialog",

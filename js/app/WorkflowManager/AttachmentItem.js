@@ -96,7 +96,7 @@ function (
             };
 
             switch (self.storageType) {
-                case 1:
+                case "file":
                     self.attachmentTypeVar = self.i18n_TypeFile;
                     self.attachmentURLName.innerHTML = self.attachmentTitleVar;
                     self.attachmentURLLink.target = "_blank";
@@ -109,7 +109,7 @@ function (
                         label: self.attachmentTitleVar
                     });
                     break;
-                case 2:
+                case "embedded":
                     self.attachmentTypeVar = self.i18n_TypeEmbedded;
                     self.attachmentURLName.innerHTML = self.attachmentFilenameVar;
                     self.attachmentURLLink.onclick = function () {

@@ -26,6 +26,8 @@ define([
     "app/WorkflowManager/Alert",
     "app/WorkflowManager/ExtendedPropertiesRecord",
     "app/WorkflowManager/config/Topics",
+    
+    "./Constants"
 ],
 
 function (
@@ -33,7 +35,8 @@ function (
     template, i18n,
     lang, connect, arrayUtil, parser, query, on, domStyle, dom, registry,
     FilteringSelect, TextBox, Button, DropDownButton,
-    Alert, ExtendedProperitesRecord, appTopics) {
+    Alert, ExtendedProperitesRecord, appTopics,
+    Constants) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
@@ -83,7 +86,7 @@ function (
             var self = lang.hitch(this);
             self.recordList = [];
             arrayUtil.forEach(containers, function (data, index) {
-                if (data && data.relationshipType == 1) {
+                if (data && data.relationshipType == Constants.TableRelationshipType.ONE_TO_ONE) {
                     self.addExtendedPropertiesRecord({ alias: data.tableAlias, record: data.records[0], tableName: data.tableName, editable: editable });
                 }
             });

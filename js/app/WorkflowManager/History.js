@@ -20,13 +20,11 @@ define([
     "dojo/date/locale",
     "dijit/registry",
 
-    "dojo/store/Memory",
+    "dstore/Memory",
 
     "dgrid/OnDemandGrid",
     "dgrid/extensions/DijitRegistry",
     "dgrid/Selection",
-    "dgrid/tree",
-    "dgrid/editor",
     "dgrid/extensions/Pagination",
     "dgrid/extensions/ColumnHider",
     "dgrid/extensions/ColumnResizer",
@@ -43,7 +41,7 @@ function (
     template, i18n, appTopics,
     lang, connect, parser, query, on, string, domStyle, locale, registry,
     Memory,
-    OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
+    OnDemandGrid, DijitRegistry, Selection, Pagination, ColumnHider, ColumnResizer,
     FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -136,8 +134,8 @@ function (
 
         setGridData: function (rows) {
             var self = lang.hitch(this);
-            this.historyGrid.set("store", new Memory({ data: rows, idProperty: "date" }));
-            this.historyGrid.set("sort", [{ attribute: "date", descending: true }]);
+            this.historyGrid.set("collection", new Memory({ data: rows, idProperty: "date" }));
+            this.historyGrid.set("sort", [{ property: "date", descending: true }]);
 
             // Clear content
             self.createHistoryTextarea.set("value", "");

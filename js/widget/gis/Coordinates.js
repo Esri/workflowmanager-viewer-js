@@ -12,7 +12,7 @@ define([
     "dojo/_base/lang",
     "dojo/string",
     
-    "esri/geometry/webMercatorUtils",
+    "esri/geometry/support/webMercatorUtils",
     
     "dojo/text!./Coordinates/templates/Coordinates.html",
     "dojo/i18n!./Coordinates/nls/Strings"

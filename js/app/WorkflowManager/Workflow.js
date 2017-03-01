@@ -30,7 +30,7 @@ define([
     
     "app/WorkflowManager/WorkflowImage",
 
-    "workflowmanager/Enum",    
+    "./Constants",
     "./utils/URLUtil",
     "./Alert"
     ],
@@ -41,7 +41,7 @@ function (
     arrayUtil, lang, connect, parser, query, on, Memory, domStyle, registry, dom,
     ContentPane, Dialog, FilteringSelect, TextBox, Textarea, Button, DropDownButton,
     WorkflowImage,
-    Enum, URLUtil, Alert) {
+    Constants, URLUtil, Alert) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         
@@ -57,9 +57,9 @@ function (
         i18n_RecreateWorkflow: i18n.workflow.recreateWorkflow,
         i18n_PromptRecreateWorkflow: i18n.workflow.promptRecreateWorkflow,
         
-        wmWorkflowTask: null,
-        wmJobTask: null,
-        wmTokenTask: null,
+        workflowTask: null,
+        jobTask: null,
+        tokenTask: null,
         commentActivityType: null,
         
         currentUser: null,
@@ -68,7 +68,7 @@ function (
         currentJob: null,
         currentStep: null,
         currentSteps: null,        
-        optionSteps: null,  // a comma-separated list of the step IDs of all the possible next steps (for Resolve Conflict use)
+        optionSteps: null,  // a comma-separated list of the step Ids of all the possible next steps (for Resolve Conflict use)
         
         // Question step input types
         questionStepInputType: {
@@ -170,16 +170,16 @@ function (
         },
         
         initializeProperties: function (args) {
-            this.wmWorkflowTask = args.workflowTask;
-            this.wmjobTask = args.jobTask;
-            this.wmTokenTask = args.tokenTask;
+            this.workflowTask = args.workflowTask;
+            this.jobTask = args.jobTask;
+            this.tokenTask = args.tokenTask;
             this.commentActivityType = args.commentActivityType;
             this.currentUser = args.currentUser;
             this.currentJob = args.currentJob;
             this.canRecreateWorkflow = args.canRecreateWorkflow;
         },
         
-        resize: function(){
+        resize: function() {
             var contentPane = dom.byId("tabWorkflow");
             var workflowContainerPane = dom.byId("workflowImageContainer");
             workflowContainerPane.style.maxHeight = contentPane.style.height.split("px")[0] - 100 + "px";
@@ -213,16 +213,16 @@ function (
         },
         
         loadWorkflowControl: function () {
-            if ((this.currentJob.stage != Enum.JobStage.CLOSED)
-                && (this.currentJob.assignedType == Enum.JobAssignmentType.ASSIGNED_TO_USER)
+            if ((this.currentJob.stage != Constants.JobStage.CLOSED)
+                && (this.currentJob.assignedType == Constants.JobAssignmentType.ASSIGNED_TO_USER)
                 && (this.currentJob.assignedTo == this.currentUser)) {
                     
-                if (this.wmWorkflowTask == null) {                   
+                if (this.workflowTask == null) {
                     console.log("Unable to load workflow.  Workflow properties not initialized.");
                     return;        
                 }
                 var self = lang.hitch(this);
-                this.wmWorkflowTask.getCurrentSteps(this.currentJob.id, 
+                this.workflowTask.getCurrentSteps(this.currentJob.id).then(
                     function(data) {
                         self.getCurrentStepsHandler(data);
                     }, 
@@ -233,7 +233,7 @@ function (
         },
         
         loadWorkflowImage: function () {
-            var urlString = this.wmWorkflowTask.getWorkflowImageURL(this.currentJob.id);
+            var urlString = this.workflowTask.getWorkflowImageUrl(this.currentJob.id);
             this.workflowImageContainer.content.setImage(urlString);
         },
         
@@ -256,16 +256,19 @@ function (
                 this.workflowExecuteStepButton.set("disabled", true);
                 this.workflowMarkStepCompleteButton.set("disabled", true);
                 // recreate button should only be disabled if the job is closed
-                if (this.currentJob.stage == Enum.JobStage.CLOSED)
+                if (this.currentJob.stage == Constants.JobStage.CLOSED)
                     this.workflowRecreateWorkflowButton.set("disabled", true);
             }
         },
         
         checkCurrentStep: function () {
             var self = lang.hitch(this);
-            var stepData = this.currentStep;
-            var stepId = stepData.id;
-            this.wmWorkflowTask.canRunStep(this.currentJob.id, stepId, this.currentUser, lang.hitch(this, 
+            var params = {
+                jobId: this.currentJob.id,
+                stepId: this.currentStep.id,
+                user: this.currentUser
+            };
+            this.workflowTask.canRunStep(params).then(lang.hitch(this,
                 function (data) {
                     self.canRunStepHandler(data);
                 }),
@@ -275,16 +278,14 @@ function (
         },
         
         canRunStepHandler: function (canRun) {
-            
-            this.currentStepStatus.style.display = "none";
-            
-            if (canRun == Enum.StepRunnableStatus.CAN_RUN) {
+            this.currentStepStatus.style.display = "none";           
+            if (canRun == Constants.StepRunnableStatus.CAN_RUN) {
                 var stepData = this.currentStep;
             
                 var canExecuteStep = false;
                 var canMarkStepComplete = false;
             
-                if (stepData.stepType.executionType == Enum.StepExecutionType.PROCEDURAL) {// when execution type is procedual
+                if (stepData.stepType.executionType == Constants.StepExecutionType.PROCEDURAL) {// when execution type is procedual
                     canMarkStepComplete = true;
                     if (stepData.autoRun) {
                         canExecuteStep = true;
@@ -296,18 +297,17 @@ function (
                         canMarkStepComplete = true;
                     }
                     canExecuteStep = true;
-                }
-                
+                }               
                 this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
-            }
-            else
-            {
+
+            } else {
                 console.log("Unable to run step: " + this.currentStep.name + ", runnableStatus = " +  canRun);
 
                 // Check for job dependencies                
-                if (canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STEP || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STAGE 
-                    || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STATUS || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_JOB)
-                {
+                if (canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STEP ||
+                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STAGE ||
+                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STATUS ||
+                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_JOB) {
                     this.currentStepStatus.style.display = "block";
                     this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
                 }
@@ -315,25 +315,19 @@ function (
         },
         
         updateWorkflowToolsStatus: function(step, canExecuteStep, canMarkStepComplete) {
-            
             var currentSteps = this.currentSteps;
-            if (step == null || currentSteps == null || currentSteps.length == 0)
-            {
+            if (step == null || currentSteps == null || currentSteps.length == 0) {
                 // Clear out everything
                 this.workflowExecuteStepButton.set("disabled", true);
                 this.workflowMarkStepCompleteButton.set("disabled", true);
-            }
-            else if (currentSteps.length == 1)
-            {
+            } else if (currentSteps.length == 1) {
                 // Single step
                 this.workflowCurrentStepName.innerHTML = step.name;
                 this.workflowCurrentStepName.style.display = "block";
                 this.currentStepSelectWrapper.style.display = "none";
                 this.workflowExecuteStepButton.set("disabled", !canExecuteStep);
                 this.workflowMarkStepCompleteButton.set("disabled", !canMarkStepComplete);
-            }
-            else
-            {
+            } else {
                 // Multiple steps
                 // If multiple steps, step selection has already been made in the drop down
                 this.workflowCurrentStepName.innerHTML = "";
@@ -355,8 +349,8 @@ function (
             var firstOption = {id: -1, name: i18n.workflow.selectPrompt};
             newStore.put(firstOption);
             
-            dojo.forEach(this.currentSteps, function(step){
-                if(step !== null){
+            dojo.forEach(this.currentSteps, function(step) {
+                if(step !== null) {
                     var stepItem = {id: step.id, name: step.name};
                     newStore.put(stepItem); // add to memory store
                 }
@@ -367,10 +361,10 @@ function (
         
         setCurrentStep: function () {
             var self = lang.hitch(this);
-            var selectID = self.currentStepSelect.value;
-            if (selectID != -1) {
+            var selectId = self.currentStepSelect.value;
+            if (selectId != -1) {
                dojo.forEach(self.currentSteps, function(step){
-                    if (selectID == step.id) {
+                   if (selectId == step.id) {
                         self.currentStep = step;
                         self.checkCurrentStep();
                     }
@@ -384,7 +378,7 @@ function (
         executeStepsHandler: function(executeInfo) {
             var response = executeInfo[0].executionResult;
                                       
-            if (response == 1) {
+            if (response == Constants.StepExecutionResultType.EXECUTED) {
                 // execution successful
                 if (executeInfo[0].threwError) {
                     // show error if it occurs when executing current step
@@ -403,7 +397,7 @@ function (
             topic.publish(appTopics.manager.showProgress, this);           
             console.log("Executing step: " + self.currentStep.name);
             var platform = self.currentStep.stepType.supportedPlatform;
-            if (platform == Enum.StepPlatformType.DESKTOP) {
+            if (platform == Constants.StepPlatformType.DESKTOP) {
                 console.log(i18n.workflow.executionWarning + ": " + i18n.error.errorStepNotWebEnabled);
                 self.showError(i18n.workflow.executionWarning, i18n.error.errorStepNotWebEnabled, null);              
             } else {
@@ -412,30 +406,33 @@ function (
                 // Execute certain step types on the server (essentially anything but questions).
                 // This is necessary in order to record that a step has been executed.
                 switch (exeType) {
-                    case Enum.StepExecutionType.PROCEDURAL:  //procedual step will never have run button enabled
+                    case Constants.StepExecutionType.PROCEDURAL:  //procedual step will never have run button enabled
                         if (!self.currentStep.autoRun)          
                             break;
-                    case Enum.StepExecutionType.EXECUTABLE:
-                    case Enum.StepExecutionType.FUNCTION:
-                    case Enum.StepExecutionType.FILE:
-                    case Enum.StepExecutionType.URL:  
+                    case Constants.StepExecutionType.EXECUTABLE:
+                    case Constants.StepExecutionType.FUNCTION:
+                    case Constants.StepExecutionType.FILE:
+                    case Constants.StepExecutionType.URL:
                         var stepIds = new Array();
                         stepIds[0] = self.currentStep.id;
-                        self.wmWorkflowTask.executeSteps(self.currentJob.id, stepIds, self.currentUser, true,
-                            function (data) {
+                        var params = {
+                            jobId: self.currentJob.id,
+                            stepIds: stepIds,
+                            auto: true,
+                            user: self.currentUser
+                        };
+                        self.workflowTask.executeSteps(params).then(
+                                function (data) {
                                 self.executeStepsHandler(data);                                
                             },
                             function (error) {
                                 // In the case of an autoexecute sequence, reload the workflow so
                                 // that the user can view the current step.  Execution could have
                                 // stopped at any step.
-                                if (self.currentStep.autoRun)
-                                {
+                                if (self.currentStep.autoRun) {
                                     console.log("Got an error during an auto execution sequence, reloading the workflow");
                                     self.loadWorkflow();
-                                }
-                                else
-                                {
+                                } else {
                                     self.showError(i18n.error.title, i18n.error.errorExecuteStep, error);
                                 }
                             });
@@ -444,18 +441,23 @@ function (
                      
                 // Handle client-side execution of certain step types
                 switch (exeType) {
-                    case Enum.StepExecutionType.QUESTION:
+                    case Constants.StepExecutionType.QUESTION:
                         this.popupQuestion();
                         break;
-                    case Enum.StepExecutionType.FILE:   // open file in a new window
-                        var fileURL = this.wmWorkflowTask.getStepFileURL(this.currentJob.id, this.currentStep.id);
+                    case Constants.StepExecutionType.FILE:   // open file in a new window
+                        // open file in a new window
+                        var params = {
+                            jobId: this.currentJob.id,
+                            stepId: this.currentStep.id
+                        };
+                        var fileURL = this.workflowTask.getStepFileURL(params);
                         window.open(fileURL, "_blank");
                         topic.publish(appTopics.manager.hideProgress, this);  
                         break;
-                    case Enum.StepExecutionType.URL:  // open URL in a new window  
+                    case Constants.StepExecutionType.URL:  // open URL in a new window  
                         var url = this.currentStep.stepType.program;
                         this.parseURLToken(url);
-                        topic.publish(appTopics.manager.hideProgress, this);  
+                        topic.publish(appTopics.manager.hideProgress, this);
                         break;
                 }
             }
@@ -463,10 +465,12 @@ function (
         
         parseURLToken: function (urlToParse) {
             var self = lang.hitch(this);
-            self.wmTokenTask.parseTokens(
-                self.currentJob.id,
-                urlToParse,
-                self.currentUser,
+            var params = {
+                jobId: self.currentJob.id,
+                stringToParse: urlToParse,
+                user: self.currentUser
+            };
+            self.tokenTask.parseTokens(params).then(
                 function(result) {
                     self.openURL(result);
                 },
@@ -490,8 +494,12 @@ function (
 
             var stepIds = new Array();
             stepIds[0] = this.currentStep.id;
-         
-            this.wmWorkflowTask.markStepsAsDone(this.currentJob.id, stepIds, this.currentUser,
+            var params = {
+                jobId: this.currentJob.id,
+                stepIds: stepIds,
+                user: this.currentUser
+            };
+            this.workflowTask.markStepsAsDone(params).then(
                 function (executeInfo) {
                     if (executeInfo[0].hasConflicts) {
                         self.showConflictDialog(executeInfo[0].conflicts);
@@ -510,8 +518,11 @@ function (
             var self = lang.hitch(this);
             recreateWorkflowDialog.hide();
             topic.publish(appTopics.manager.showProgress, this);
-         
-            this.wmWorkflowTask.recreateWorkflow(this.currentJob.id, this.currentUser,
+            var params = {
+                jobId: this.currentJob.id,
+                user: this.currentUser
+            };
+            this.workflowTask.recreateWorkflow(params).then(
                 function (data) {
                     self.loadWorkflow();
                 },
@@ -652,7 +663,13 @@ function (
                 } else {                   
                     comment = i18n.workflow.questionResponse.replace("{0}", answerLabel);
                 }
-                this.wmjobTask.logAction(this.currentJob.id, this.commentActivityType, comment, this.currentUser,
+                var params = {
+                    jobId: this.currentJob.id,
+                    activityTypeId: this.commentActivityType,
+                    comments: comment,
+                    user: this.currentUser
+                };
+                this.jobTask.logAction(params).then(
                     function(data) {
                         self.moveNext(returnCode);
                     },
@@ -669,7 +686,13 @@ function (
             var self = lang.hitch(this);
             // if selfCheck is false, cannot proceed to next step
             if (this.currentStep.selfCheck == true) {
-                this.wmWorkflowTask.moveToNextStep(this.currentJob.id, this.currentStep.id, returnCode, this.currentUser,
+                var params = {
+                    jobId: this.currentJob.id,
+                    stepId: this.currentStep.id,
+                    returnCode: returnCode,
+                    user: this.currentUser
+                };
+                this.workflowTask.moveToNextStep(params).then(
                     function (data) {
                         self.loadWorkflow();
                     },
@@ -750,7 +773,14 @@ function (
             }
             
             topic.publish(appTopics.manager.showProgress, this);  
-            this.wmWorkflowTask.resolveConflict(this.currentJob.id, this.currentStep.id, returnCode, optionSteps, this.currentUser,
+            var params = {
+                jobId: this.currentJob.id,
+                stepId: this.currentStep.id,
+                optionReturnCode: returnCode,
+                optionStepIds: optionSteps,
+                user: this.currentUser
+            };
+            this.workflowTask.resolveConflict(params).then(
                 function (data) {
                     self.loadWorkflow();
                 },

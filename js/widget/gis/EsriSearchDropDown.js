@@ -15,10 +15,6 @@ define([
     "dojo/string",
     "dojox/lang/functional",
     
-    "esri/dijit/Basemap",
-    "esri/dijit/BasemapLayer",
-    "esri/dijit/BasemapGallery",
-    
     "widget/gis/EsriSearch",
 
     "dijit/form/DropDownButton",
@@ -31,8 +27,7 @@ define([
     function(
         declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
         topic, query, on, dom, domStyle, domConstruct, domClass, lang, string, functional,
-        Basemap, BasemapLayer, BasemapGallery,
-        Search,
+        EsriSearch,
         DropDownButton, TooltipDialog,
         template, i18n
     ) {
@@ -48,9 +43,8 @@ define([
             var self = lang.hitch(this);
 
             this.SearchDropDown = new TooltipDialog({
-                "content": new Search({
+                "content": new EsriSearch({
                     map: this.map,
-                    zoomLevel: this.zoomLevel,
                     customSources: this.customSources,
                     sources: this.sources
                 })
@@ -63,7 +57,7 @@ define([
 
             this.SearchDropDown.content.cleanup = function () {
                 self.SearchDropDownButton.closeDropDown();
-            }
+            };
             
             on(this.SearchDropDownButton, 'click', function (e) {
                 self.SearchDropDown.content.focusOnButton();

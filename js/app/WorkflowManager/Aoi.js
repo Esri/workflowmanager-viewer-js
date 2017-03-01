@@ -24,8 +24,10 @@
 
     // GIS widgets
     "widget/gis/EsriMap",
-    "widget/gis/BasemapGallery",
-    "widget/gis/DrawTool",
+    
+    // TODO No support in 4.x currently
+    //"widget/gis/BasemapGallery",
+    //"widget/gis/DrawTool",
 
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -41,7 +43,7 @@ function (
     template, mapTemplate, i18n, appTopics, config,
     lang, connect, parser, query, on, string, domStyle, registry,
     Memory,
-    EsriMap, BasemapGallery, DrawTool,
+    EsriMap, 
     BorderContainer, ContentPane, FilteringSelect, TextBox, Textarea, Button, DropDownButton) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -99,16 +101,20 @@ function (
             });
             this.aoiMap.startup();
 
-            if (config.map.basemapGallery.isEnabled) {
-                this.aoiBasemapGallery = new BasemapGallery({ map: this.aoiMap.map, basemapConfig: config.map.basemapGallery, galleryId: "aoiMapBasemapGallery" }, "aoiBasemapGalleryContainer");
-                this.aoiBasemapGallery.startup();
-                this.aoiBasemapGallery.selectBasemap(config.map.defaultBasemap);
-            }
+            // TODO No support in 4.x currently
+            // BasemapGallery
+            // if (config.map.basemapGallery.isEnabled) {
+            //     this.aoiBasemapGallery = new BasemapGallery({ map: this.aoiMap.map, basemapConfig: config.map.basemapGallery, galleryId: "aoiMapBasemapGallery" }, "aoiBasemapGalleryContainer");
+            //     this.aoiBasemapGallery.startup();
+            //     this.aoiBasemapGallery.selectBasemap(config.map.defaultBasemap);
+            // }
 
-            if (config.map.drawTool.isEnabled) {
-                this.aoiDrawTool = new DrawTool({ map: this.aoiMap.map, drawConfig: config.map.drawTool }, "aoiDrawContainer");
-                this.aoiDrawTool.startup();    
-            }
+            // TODO No support in 4.x currently
+            // DrawTool
+            // if (config.map.drawTool.isEnabled) {
+            //     this.aoiDrawTool = new DrawTool({ map: this.aoiMap.map, drawConfig: config.map.drawTool }, "aoiDrawContainer");
+            //     this.aoiDrawTool.startup();    
+            // }
         }
 
     });

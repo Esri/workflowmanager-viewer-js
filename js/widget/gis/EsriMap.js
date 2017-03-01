@@ -4,26 +4,38 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/_base/array",
+    "dojo/ready",
 
-    "esri/map",
-    "esri/dijit/Popup",
-    "esri/dijit/Attribution",
-    "esri/dijit/Basemap",
-    "esri/dijit/BasemapLayer",
-    "esri/dijit/OverviewMap",
-    "esri/dijit/Scalebar",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/Graphic",
+    "esri/widgets/Home",
+    "esri/widgets/BasemapToggle",
+    "esri/widgets/Locate",
+    "esri/widgets/Popup",
+    "esri/widgets/Attribution",
+    "esri/widgets/Search",
+
+    // TODO No support in 4.x currently
+    //"esri/dijit/Basemap",
+    //"esri/dijit/BasemapLayer",
+    //"esri/dijit/OverviewMap",
+    //"esri/dijit/Scalebar",
+
+    "esri/layers/MapImageLayer",    // previously ArcGISDynamicMapServiceLayer
+    "esri/layers/TileLayer",        // previously ArcGISTiledMapServiceLayer
+
     "esri/layers/FeatureLayer",
-    "esri/geometry/screenUtils",
-    "esri/geometry/webMercatorUtils",
+    "esri/geometry/support/webMercatorUtils",
     "esri/geometry/Polygon",
     "esri/geometry/Extent",
-    "esri/SpatialReference",
+    "esri/geometry/SpatialReference",
     "esri/layers/GraphicsLayer",
     "esri/symbols/SimpleMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/tasks/QueryTask",
-    "esri/tasks/query",
+    "esri/tasks/support/Query",
     
     "dojo/topic",
     "dojo/on",
@@ -40,15 +52,19 @@ define([
     "dojo/i18n!./EsriMap/nls/Strings",
 
     "dojo/text!./EsriMap/templates/EsriMap.html",
+
+    "app/WorkflowManager/Constants",
     "app/WorkflowManager/config/Topics"
     ], 
     function(
-        declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, arrayUtil,
-        Map, Popup, Attribution, Basemap, BasemapLayer, OverviewMap, Scalebar, FeatureLayer, screenUtils, webMercatorUtils, Polygon, Extent, SpatialReference, GraphicsLayer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol, QueryTask, Query,
+        declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, arrayUtil, ready,
+        Map, MapView, Graphic, Home, BasemapToggle, Locate, Popup, Attribution, Search,
+        MapImageLayer, TileLayer,
+        FeatureLayer, webMercatorUtils, Polygon, Extent, SpatialReference, GraphicsLayer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol, QueryTask, Query,
         topic, on, dom, domStyle, domConstruct, domClass,
         Promise, all,
         lang, string, i18n,
-        mapTemplate, appTopics
+        mapTemplate, Constants, appTopics
     ) {
         
     //anonymous function to load CSS files required for this module
@@ -70,6 +86,7 @@ define([
         templateString: mapTemplate,
         widgetsInTemplate: true,
         map: null,
+        mapView: null,
         graphicsLayer: null,
         returnedFeatures: [],
         isDrawToolEnabled: false,
@@ -77,12 +94,12 @@ define([
         postCreate: function() {
             this.inherited(arguments);
 
-            //var popup = new Popup(null, domConstruct.create("div"));
             var popup = new Popup({}, domConstruct.create("div"));
             popup.startup();
             
             var startingBasemap;
-            if (this.mapConfig.basemapGallery.showArcGISBasemaps == false)
+            //if (this.mapConfig.basemapGallery.showArcGISBasemaps == false)
+            if (this.mapConfig.showArcGISBasemaps == false)
             {
                 var defaultBasemapName = this.mapConfig.defaultBasemap;
                 var customBasemaps = this.mapConfig.customBasemaps; 
@@ -109,15 +126,19 @@ define([
                                 break;
                             }
                             
-                            layers[j] = new BasemapLayer(layerConfig);
+                            // TODO No support in 4.x currently
+                            // BasemapLayer
+                            //layers[j] = new BasemapLayer(layerConfig);
                         }
 
-                        startingBasemap = new Basemap({
-                            id: basemap.id,
-                            title: basemap.title,
-                            layers: layers,
-                            thumbnailUrl: basemap.thumbnailUrl,
-                        });
+                        // TODO No support in 4.x currently
+                        // BasemapLayer
+                        // startingBasemap = new Basemap({
+                        //     id: basemap.id,
+                        //     title: basemap.title,
+                        //     layers: layers,
+                        //     thumbnailUrl: basemap.thumbnailUrl,
+                        // });
                     }
                 }
             }
@@ -126,90 +147,140 @@ define([
                 startingBasemap = this.mapConfig.defaultBasemap;
             }
 
-            this.map = new esri.Map(this.mapId, {
-                basemap: startingBasemap,
-                extent: new esri.geometry.Extent(this.mapConfig.initialExtent),
-                infoWindow: popup,
-                slider: this.mapConfig.navigation.slider.isEnabled,
-                sliderPosition: this.mapConfig.navigation.slider.position,
-                sliderOrientation: this.mapConfig.navigation.slider.orientation,
-                sliderStyle: this.mapConfig.navigation.slider.style,
-                sliderLabels: this.mapConfig.navigation.slider.labels,
-                nav: this.mapConfig.navigation.hasPanControls,
-                fadeOnZoom: true,
-                showAttribution: this.mapConfig.showAttribution,
-                logo: this.mapConfig.showLogo,
-                wrapAround180: false
+            this.map = new Map({
+                basemap: startingBasemap
             });
+
             this.map.on("load", lang.hitch(this, "initMapWidgets"));
             
             // add a graphics layer to the map
             this.graphicsLayer = new GraphicsLayer();
-            this.map.addLayer(this.graphicsLayer);
+            this.map.add(this.graphicsLayer);
             
+            // TODO No support in 4.x currently 
             // point tolerance
-            if (this.mapConfig.drawTool.pointTolerance && this.mapConfig.drawTool.pointTolerance > 0)
-                this.toleranceInPixels = this.mapConfig.drawTool.pointTolerance;
+            //if (this.mapConfig.drawTool.pointTolerance && this.mapConfig.drawTool.pointTolerance > 0)
+            //    this.toleranceInPixels = this.mapConfig.drawTool.pointTolerance;
+
+            ready(lang.hitch(this, function(){
+                // create the map view only after DOM is ready
+                var initialExtent = this.mapConfig.initialExtent;
+                this.mapView = new MapView({
+                    container: this.mapId,
+                    map: this.map,
+                    extent: { // autocasts as new Extent()
+                        xmin: initialExtent.xmin,
+                        ymin: initialExtent.ymin,
+                        xmax: initialExtent.xmax,
+                        ymax: initialExtent.ymax,
+                        spatialReference: initialExtent.spatialReference.wkid
+                    },
+                    popup: popup
+                });
+                
+                // Enable Basemap Toggle for now, since BasemapGallery is not yet supported
+                var basemapToggleWidget = new BasemapToggle({ 
+                    view: this.mapView, 
+                    nextBasemap: this.mapConfig.nextBasemap
+                });                
+                this.mapView.ui.add(basemapToggleWidget, "bottom-right");
+                
+                // Add the home widget to the top left corner of the view
+                var homeBtn = new Home({
+                    view: this.mapView
+                }, "homediv");
+                homeBtn.startup();
+                this.mapView.ui.add(homeBtn, "top-left");
+                
+                // Adds the search widget below other elements in the top left corner of the view
+                var searchWidget = new Search({
+                    view: this.mapView
+                });
+                this.mapView.ui.add(searchWidget, {
+                    position: "top-right"
+                });                
+                
+                // Add the locate widget to the top left corner of the view
+                /*
+                var locatorGraphicsLayer = new GraphicsLayer();
+                this.map.add(locatorGraphicsLayer);         
+                var locateBtn = new Locate({
+                    view: this.mapView,
+                    graphicsLayer: locatorGraphicsLayer
+                });
+                locateBtn.startup();
+            
+                this.mapView.ui.add(locateBtn, {
+                    position: "bottom-left",
+                    index: 0
+                });
+                */
+            }));         
         },
 
         startup: function () {
             var self = lang.hitch(this);
             this.initTopics();
             
-            //catch click events on links inside popup
-            on(this.map.infoWindow.domNode, "a:click", function (event) {
-                var featureId = event.target.attributes["data-feature-id"].value;
+            //catch click events on links inside popup (if it exists)
+            if (this.map.infoWindow) {
+                on(this.map.infoWindow.domNode, "a:click", function (event) {
+                    var featureId = event.target.attributes["data-feature-id"].value;
 
-                if (event.target.attributes["data-feature-single"]) {
-                    //open job dialog with selected id
-                    
-                    topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event, gridArr: self.returnedFeatures, gridArrPos: self.featurePos +1 });
-                } else if (event.target.attributes["data-feature-next"].value == "true") {
-                    //move to next
-                    self.featurePos++;
-                    if (self.featurePos == self.jobList.length)
-                        self.featurePos = 0;
-                    self.features[self.featurePos].setSymbol(self.symbol);
-                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
-                    self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
-                } else if (event.target.attributes["data-feature-next"].value == "false") {
-                    //move back
-                    self.featurePos--;
-                    if (self.featurePos < 0)
-                        self.featurePos = self.jobList.length -1;
-                    self.features[self.featurePos].setSymbol(self.symbol);
-                    topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
-                    self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
-                }
-            });
+                    if (event.target.attributes["data-feature-single"]) {
+                        //open job dialog with selected id
+
+                        topic.publish(appTopics.grid.jobDialog, this, { selectedId: featureId, event: event, gridArr: self.returnedFeatures, gridArrPos: self.featurePos + 1 });
+                    } else if (event.target.attributes["data-feature-next"].value == "true") {
+                        //move to next
+                        self.featurePos++;
+                        if (self.featurePos == self.jobList.length)
+                            self.featurePos = 0;
+                        self.features[self.featurePos].setSymbol(self.symbol);
+                        topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
+                        self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
+                    } else if (event.target.attributes["data-feature-next"].value == "false") {
+                        //move back
+                        self.featurePos--;
+                        if (self.featurePos < 0)
+                            self.featurePos = self.jobList.length - 1;
+                        self.features[self.featurePos].setSymbol(self.symbol);
+                        topic.publish(appTopics.map.layer.select, self.returnedFeatures[self.featurePos], self.features[self.featurePos].geometry);
+                        self.populateInfoWindow(self.jobList[self.featurePos], self.mapJobStatuses, self.mapJobPriorities);
+                    }
+                });
+            }
             
             console.log("Map started");
         },
 
+        // TODO: Is this still needed?
         initMapWidgets: function() {
 
             topic.publish(this.mapTopics.loaded);
-
+            
+            // TODO No support in 4.x currently
             // Overview Map
-            if (this.mapConfig.overview.isEnabled) {
-                this.overviewMap = new esri.dijit.OverviewMap({
-                    map: this.map,
-                    attachTo: this.mapConfig.overview.position,
-                    visible: this.mapConfig.overview.isVisibleOnStartup,
-                    maximizeButton: this.mapConfig.overview.hasMaximizeButton
-                });
-                this.overviewMap.startup();
-            }
+            // if (this.mapConfig.overview.isEnabled) {
+            //     this.overviewMap = new esri.dijit.OverviewMap({
+            //         map: this.map,
+            //         attachTo: this.mapConfig.overview.position,
+            //         visible: this.mapConfig.overview.isVisibleOnStartup,
+            //         maximizeButton: this.mapConfig.overview.hasMaximizeButton
+            //     });
+            //     this.overviewMap.startup();
+            // }
 
+            // TODO No support in 4.x currently
             // Scalebar
-            if (this.mapConfig.scalebar.isEnabled) {
-                this.scalebar = new esri.dijit.Scalebar({
-                    map: this.map,
-                    scalebarStyle: this.mapConfig.scalebar.style,
-                    scalebarUnit: this.mapConfig.scalebar.unit,
-                    attachTo: this.mapConfig.scalebar.position
-                });
-            }
+            // if (this.mapConfig.scalebar.isEnabled) {
+            //     this.scalebar = new esri.dijit.Scalebar({
+            //         map: this.map,
+            //         scalebarStyle: this.mapConfig.scalebar.style,
+            //         scalebarUnit: this.mapConfig.scalebar.unit,
+            //         attachTo: this.mapConfig.scalebar.position
+            //     });
+            // }
         },
 
         initTopics: function() {
@@ -222,7 +293,7 @@ define([
 
             //clear graphics when grid row is deselected
             topic.subscribe(appTopics.map.clearGraphics, function () {
-                self.graphicsLayer.clear();
+                self.graphicsLayer.removeAll();
             });
             topic.subscribe(appTopics.map.draw.start, function () {
                 self.isDrawToolEnabled = true;
@@ -238,8 +309,8 @@ define([
         },
         
         drawLoi: function(jobId, loi, zoomToFeature) {
-            if (loi && (loi.type == "point" || loi.type == "multipoint" ||
-                (loi.type == "polygon" && (loi.rings && loi.rings.length > 0)))) {
+            if (loi && (loi.type == Constants.GeometryType.POINT || loi.type == Constants.GeometryType.MULTIPOINT ||
+                (loi.type == Constants.GeometryType.POLYGON && (loi.rings && loi.rings.length > 0)))) {
                 if (this.map.spatialReference == loi.spatialReference) {
                     this._drawLoi(loi, zoomToFeature);
                 } else {
@@ -247,7 +318,7 @@ define([
                     this._getAndDrawLoi(jobId, zoomToFeature);
                 }
             } else {
-                this.graphicsLayer.clear();
+                this.graphicsLayer.removeAll();
             }
         },
         
@@ -295,11 +366,11 @@ define([
                         } else if (hasPOIs) {
                             self._drawLoi(results[1].features[0].geometry, zoomToFeature);
                         } else {
-                            self.graphicsLayer.clear();
+                            self.graphicsLayer.removeAll();
                         }
                     } else {
                         // No results
-                        self.graphicsLayer.clear();
+                        self.graphicsLayer.removeAll();
                     }
                 },
                 function(error) {
@@ -321,11 +392,11 @@ define([
         //add a boundary graphic of a selected state 
         addBoundaryGraphic: function (geometry, clearGraphics) {
             if (clearGraphics) {
-                this.graphicsLayer.clear();
+                this.graphicsLayer.removeAll();
             }
             
             var symbol = (geometry.type == "point" || geometry.type == "multipoint") ? this.getMarkerSymbol(): this.getBoundarySymbol();
-            var graphic = new esri.Graphic(geometry, symbol);
+            var graphic = new Graphic(geometry, symbol);
             this.graphicsLayer.add(graphic);
         },
         
@@ -341,7 +412,7 @@ define([
             var self = lang.hitch(this);
             
             self.aoiDynamicLayer = self.getLayerObject(args.layerConfig);
-            self.map.addLayer(self.aoiDynamicLayer);
+            self.map.add(self.aoiDynamicLayer);
             self.initializeQueryTasks(args.aoiQueryLayerUrl, args.poiQueryLayerUrl);
 
             self.map.on("click", function(event) {
@@ -368,7 +439,7 @@ define([
             var toleraceInMapCoords = this.toleranceInPixels * pixelWidth;
             
             //calculate & return computed extent
-            return new esri.geometry.Extent(
+            return new Extent(
                 point.x - toleraceInMapCoords,
                 point.y - toleraceInMapCoords,
                 point.x + toleraceInMapCoords,
@@ -383,12 +454,14 @@ define([
             this.featurePos = 0;
 
             //console.log("running getLayerObject with: ", layer);
+            var layerProps = layer.options;
+            layerProps.url = layer.url;
             if (layer.type == 'dynamic') {
-                l = new esri.layers.ArcGISDynamicMapServiceLayer(layer.url, layer.options);
+                l = new MapImageLayer(layerProps);
             } else if (layer.type == 'tiled') {
-                l = new esri.layers.ArcGISTiledMapServiceLayer(layer.url, layer.options);
+                l = new TileLayer(layerProps);
             } else if (layer.type == 'feature') {
-                l = new esri.layers.FeatureLayer(layer.url, layer.options);
+                l = new FeatureLayer(layerProps);
             } else {
                 console.log('Layer type not supported: ', layer.type);
                 l = null;
@@ -469,30 +542,45 @@ define([
 
         initializeQueryTasks: function(aoiQueryLayerUrl, poiQueryLayerUrl) {
             //build AOI query task and filter
-            this.aoiQueryTask = new esri.tasks.QueryTask(aoiQueryLayerUrl);
-            this.aoiQuery = new esri.tasks.Query();
+            this.aoiQueryTask = new QueryTask(aoiQueryLayerUrl);
+            this.aoiQuery = new Query();
             this.aoiQuery.returnGeometry = true;
             this.aoiQuery.outFields = [this.jobIdField];
             this.aoiQuery.outSpatialReference = this.map.spatialReference;  
 
             if (poiQueryLayerUrl) {
                 //build POI query task and filter
-                this.poiQueryTask = new esri.tasks.QueryTask(poiQueryLayerUrl);
-                this.poiQuery = new esri.tasks.Query();
+                this.poiQueryTask = new QueryTask(poiQueryLayerUrl);
+                this.poiQuery = new Query();
                 this.poiQuery.returnGeometry = true;
                 this.poiQuery.outFields = [this.poiJobIdField];
                 this.poiQuery.outSpatialReference = this.map.spatialReference;  
             }
 
-            this.markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 1.0]));
-            this.symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1), new dojo.Color([255, 0, 0, 0.5]));
+            this.markerSymbol = new SimpleMarkerSymbol({
+                color: [255, 0, 0, 1.0],
+                style: "circle",
+                size: 10,
+                outline: {  // autocasts as esri/symbols/SimpleLineSymbol
+                    color: [255, 0, 0],
+                    width: 1
+                }
+            });
+            this.symbol = new SimpleFillSymbol({
+                color: [255, 0, 0, 0.5],
+                style: "solid",
+                outline: {  // autocasts as esri/symbols/SimpleLineSymbol
+                    color: [255, 0, 0],
+                    width: 1
+                }
+            });
             this.singleFeature = this.showFeature;
         },
         
         //map click feature
         executeQueryTask: function (evt, geometry) {
             var self = lang.hitch(this);
-            self.graphicsLayer.clear();
+            self.graphicsLayer.removeAll();
 
             self.map.infoWindow.hide();
             self.map.infoWindow.setContent(i18n.loadingJobInfo);
@@ -555,7 +643,7 @@ define([
         clearSelection: function() {
             var self = lang.hitch(this);
             //remove all graphics on the maps graphics layer
-            self.graphicsLayer.clear();
+            self.graphicsLayer.removeAll();
             topic.publish(this.mapTopics.layer.clearSelection);
         },
         
@@ -569,7 +657,7 @@ define([
         showFeatures: function(features, evt) {
             var self = lang.hitch(this);
             //remove all graphics on the maps graphics layer
-            self.graphicsLayer.clear();
+            self.graphicsLayer.removeAll();
 
             self.features = features;
             var numFeatures = self.features.length;
@@ -604,6 +692,7 @@ define([
 
         setMapExtent: function (args) {
             var self = this;
+
             var extent = args;
             if (!args) {
                 extent = {
@@ -616,7 +705,7 @@ define([
                     }
                 };
             }
-            this.map.setExtent(new Extent(extent.xmin, extent.ymin, extent.xmax, extent.ymax, new SpatialReference(extent.spatialReference.wkid)));
+            this.mapView.extent(new Extent(extent.xmin, extent.ymin, extent.xmax, extent.ymax, new SpatialReference(extent.spatialReference.wkid)));
         },
 
         refreshLayers: function () {
@@ -625,11 +714,20 @@ define([
 
         getUpdatedFeatures: function (jobIds) {
             this.selectedJobIds = jobIds;
-            var layerDefinitions = {};
-            if (this.poiLayerID != null)
-                layerDefinitions[this.poiLayerID] = this.poiJobIdField + " in (" + jobIds.join() + ")";
-            layerDefinitions[this.aoiLayerID] = this.jobIdField + " in (" + jobIds.join() + ")";
-            this.aoiDynamicLayer.setLayerDefinitions(layerDefinitions);   
+            var sublayers = [];
+            sublayers.push({
+                id: this.aoiLayerID,
+                visible: true,
+                definitionExpression: this.jobIdField + " in (" + jobIds.join() + ")"
+            });
+            if (this.poiLayerID != null) {
+                sublayers.push({
+                    id: this.poiLayerID,
+                    visible: true,
+                    definitionExpression: this.poiJobIdField + " in (" + jobIds.join() + ")"
+                });
+            }
+            this.aoiDynamicLayer.sublayers = sublayers;
             this.setMapExtent();
             this.refreshLayers();
         },

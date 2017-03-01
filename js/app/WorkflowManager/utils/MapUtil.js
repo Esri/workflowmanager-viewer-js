@@ -2,7 +2,7 @@ define(function() {
     return {
         
         /*
-         * Converts a comma-separated list of layer IDs into an Array that can 
+         * Converts a comma-separated list of layer Ids into an Array that can 
          * be applied to the visibleLayers property of ArcGISDynamicMapServiceLayer and 
          * ArcIMSMapServiceLayer.
          */

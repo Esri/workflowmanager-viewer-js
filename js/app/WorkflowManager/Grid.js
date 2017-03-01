@@ -18,13 +18,11 @@ define([
     "dojo/_base/lang",
     "dojo/string",
     
-    "dojo/store/Memory",
+    "dstore/Memory",
     
     "dgrid/OnDemandGrid",
     "dgrid/extensions/DijitRegistry",
     "dgrid/Selection",
-    "dgrid/tree",
-    "dgrid/editor",
     "dgrid/extensions/Pagination",
     "dgrid/extensions/ColumnHider",
     "dgrid/extensions/ColumnResizer",
@@ -42,7 +40,7 @@ define([
         topic, dom, domStyle, domConstruct, domClass, locale, localeNumber, on, tap,
         lang, string, 
         Memory,
-        OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
+        OnDemandGrid, DijitRegistry, Selection, Pagination, ColumnHider, ColumnResizer,
         Button, Dialog, FilteringSelect,
         template, i18n, appTopics
     ) {
@@ -106,7 +104,7 @@ define([
                 minRowsPerPage: 100,    //default (25)
                 loadingMessage: i18n.common.loading,
                 noDataMessage: i18n.filter.noJobsForThisQuery,
-                store: new Memory()
+                collection: new Memory()
             }, this.gridContainer);
 
             this.grid = dom.byId("grid");
@@ -182,11 +180,11 @@ define([
             this.dataGrid.startup();
         },
 
-        findGridArrPos: function(gridArr, selID){
+        findGridArrPos: function(gridArr, selectId) {
             var pos = 1;
             for(pos = 1; pos < (gridArr.length -1); pos++)
             {
-                if(gridArr[pos].firstChild.firstChild.firstChild.innerText == selID)
+                if(gridArr[pos].firstChild.firstChild.firstChild.innerText == selectId)
                     break;
             }
             
@@ -306,7 +304,7 @@ define([
             });
 
             this.dataGrid.set("columns", columns);
-            this.dataGrid.set("store", new Memory({ data: rows, idProperty: idProperty }));
+            this.dataGrid.set("collection", new Memory({ data: rows, idProperty: idProperty }));
             this.resizeGrid();
         },
 
@@ -316,7 +314,7 @@ define([
         },
 
         resetGridData: function (rows) {
-            this.dataGrid.set("store", new Memory({ data: rows }));
+            this.dataGrid.set("collection", new Memory({ data: rows }));
         },
 
         filterGrid: function (data, idProperty) {

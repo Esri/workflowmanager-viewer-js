@@ -29,7 +29,7 @@ define([
     "dijit/Tooltip",
     "dojox/form/Uploader",
 
-    "workflowmanager/Enum"
+    "./Constants"
     ],
 
 function (
@@ -37,7 +37,7 @@ function (
     template, i18n, AttachmentItem, appTopics,
     lang, connect, parser, query, on, domStyle, registry, domClass,
     FilteringSelect, TextBox, Button, DropDownButton, Tooltip, Uploader,
-    Enum) {
+    Constants) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         
@@ -138,14 +138,14 @@ function (
         toggleEmbedAttachmentType: function(){
             this.linkURLAttachmentContainer.style.display = "none";
             this.embedAttachmentContainer.style.display = "";
-            this.attachType = Enum.JobAttachmentType.EMBEDDED;
+            this.attachType = Constants.JobAttachmentType.EMBEDDED;
         },
 
         toggleLinkAttachmentType: function(){
             this.attachDojoTextBox.set('placeHolder', this.i18n_LinkPrompt);
             this.embedAttachmentContainer.style.display = "none";
             this.linkURLAttachmentContainer.style.display = "";
-            this.attachType = Enum.JobAttachmentType.LINKED_FILE;
+            this.attachType = Constants.JobAttachmentType.FILE;
             this.attachDojoTextBox.set('value', "");
         },
 
@@ -153,19 +153,21 @@ function (
             this.attachDojoTextBox.set('placeHolder', this.i18n_URLPrompt);
             this.embedAttachmentContainer.style.display = "none";
             this.linkURLAttachmentContainer.style.display = "";
-            this.attachType = Enum.JobAttachmentType.LINKED_URL;
+            this.attachType = Constants.JobAttachmentType.URL;
             this.attachDojoTextBox.set('value', "");
         },
 
         disableAttachments: function(){
-            this.embedAttach.set('disabled', true);
+            // Disable embedded attachments.  Form data not supported in esri/request
+            //this.embedAttach.set('disabled', true);
             this.linkAttach.set('disabled', true);
             this.urlAttach.set('disabled', true);
             this.embedAttachmentContainer.style.display = "none";
         },
 
         enableAttachments: function(){
-            this.embedAttach.set('disabled', false);
+            // Disable embedded attachments.  Form data not supported in esri/request
+            //this.embedAttach.set('disabled', false);
             this.linkAttach.set('disabled', false);
             this.urlAttach.set('disabled', false);
             this.embedAttachmentContainer.style.display = "";
@@ -173,12 +175,13 @@ function (
 
         //hide the attachment ui
         resetAttachmentPanes: function () {
-            this.attachType = Enum.JobAttachmentType.EMBEDDED;
+            this.attachType = Constants.JobAttachmentType.EMBEDDED;
             this.linkURLAttachmentContainer.style.display = "none";
             if (this.canAddAttachments) {
                 this.embedAttachmentContainer.style.display = "";
             }
-            this.embedAttach.set('checked', true);
+            // Disable embedded attachments.  Form data not supported in esri/request
+            //this.embedAttach.set('checked', true);
             this.linkAttach.set('checked', false);
             this.urlAttach.set('checked', false);
             this.attachDojoTextBox.set('value', "");
@@ -208,13 +211,13 @@ function (
 
         uploadAttachment: function (type, value) {
             switch (type) {
-                case Enum.JobAttachmentType.LINKED_URL:
+                case Constants.JobAttachmentType.URL:
                     topic.publish(appTopics.attachment.uploadAttachment, this, { url: value });
                     break;
-                case Enum.JobAttachmentType.LINKED_FILE:
+                case Constants.JobAttachmentType.FILE:
                     topic.publish(appTopics.attachment.uploadAttachment, this, { link: value });
                     break;
-                case Enum.JobAttachmentType.EMBEDDED:
+                case Constants.JobAttachmentType.EMBEDDED:
                     var form = dom.byId('sendForm');
                     topic.publish(appTopics.attachment.uploadAttachment, this, { form: form });
                     break;

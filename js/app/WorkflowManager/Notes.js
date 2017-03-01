@@ -28,9 +28,7 @@ define([
     "dojox/form/Uploader",
 
     "./Attachments",
-    "./AttachmentItem",
-
-    "workflowmanager/Enum"
+    "./AttachmentItem"
     ],
 
 function (
@@ -38,8 +36,7 @@ function (
     template, i18n, appTopics,
     lang, topic, connect, parser, query, on, domStyle, registry, domClass, dom,
     FilteringSelect, TextBox, Textarea, Button, DropDownButton, Tooltip, Uploader,
-    Attachments, AttachmentItem,
-    Enum) {
+    Attachments, AttachmentItem) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         

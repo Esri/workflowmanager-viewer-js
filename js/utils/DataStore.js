@@ -5,8 +5,10 @@ define([
     "dojo/_base/xhr",
     "dojo/store/Memory",
     "dojo/store/util/QueryResults",
-    "dojo/store/util/SimpleQueryEngine"
-], function(declare, arrayUtil, xhr, Memory, QueryResults, SimpleQueryEngine) {
+    "dojo/store/util/SimpleQueryEngine",
+    
+    "esri/request"
+], function(declare, arrayUtil, xhr, Memory, QueryResults, SimpleQueryEngine, esriRequest) {
 
     var commonMethods = ["get", "add", "put", "remove"];
     
@@ -21,7 +23,7 @@ define([
             
             // Fire the request and store the returned promise for use by wrapped methods
 
-            promise = this._promise = esri.request({
+            promise = this._promise = new esriRequest({
                 url: this.url,
                 content: this.params,
                 handleAs:"json"

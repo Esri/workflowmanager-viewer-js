@@ -84,8 +84,6 @@ define({
             aoiUndefined: "AOI not defined",
             loiDefined: "LOI defined",
             loiUndefined: "LOI not defined",
-            poiDefined: "POI defined",
-            poiUndefined: "POI not defined",
             invalidAssignmentType: "Invalid assignment type",
             jobId: "Job ID",
             jobName: "Job Name",

@@ -681,8 +681,22 @@ h3 {
 }
 
 /****************************************************************************************/
-/* FIX ISSUE ON JS API 3.19*/
+/* FIX ISSUE ON JS API 4.1*/
 
+
+/* dgrid */
+.bootstrap .dgrid-cell{
+  padding:4px;
+}
+
+.dgrid .dgrid-scroller{
+  overflow-y: scroll!important;
+}
+
+/* map control */
+.esri-search>div{
+  width: 100%;
+}
 
 /* dijit datepicker */
 .dijitCalendarContainer>table{
@@ -704,7 +718,6 @@ h3 {
 .dijitCalendarContainer .dijitCalendarArrow.dijitCalendarDecrementArrow{
   float:left;
 }
-
 
 
 /****************************************************************************************/

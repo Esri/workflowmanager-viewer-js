@@ -22,12 +22,12 @@
     "dijit/registry",
 
     "dojo/store/Memory",
+    // dstore memory needed by dgrid
+    "dstore/Memory",
 
     "dgrid/OnDemandGrid",
     "dgrid/extensions/DijitRegistry",
     "dgrid/Selection",
-    "dgrid/tree",
-    "dgrid/editor",
     "dgrid/extensions/Pagination",
     "dgrid/extensions/ColumnHider",
     "dgrid/extensions/ColumnResizer",
@@ -44,8 +44,8 @@ function (
     topic, dom, declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, domClass,
     template, i18n, appTopics,
     lang, connect, parser, query, on, string, domStyle, locale, registry,
-    Memory,
-    OnDemandGrid, DijitRegistry, Selection, treeGrid, editor, Pagination, ColumnHider, ColumnResizer,
+    Memory, dstoreMemory,
+    OnDemandGrid, DijitRegistry, Selection, Pagination, ColumnHider, ColumnResizer,
     FilteringSelect, TextBox, Textarea, Button, DropDownButton, Form) {
 
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -215,8 +215,8 @@ function (
 
         setGridData: function (rows) {
             var self = lang.hitch(this);
-            this.holdsGrid.set("store", new Memory({ data: rows, idProperty: "id" }));
-            this.holdsGrid.set("sort", [{ attribute: "holdDate", descending: true }]);
+            this.holdsGrid.set("collection", new dstoreMemory({ data: rows, idProperty: "id" }));
+            this.holdsGrid.set("sort", [{ property: "holdDate", descending: true }]);
         },
 
         populateDropdowns: function (args) {
@@ -285,7 +285,7 @@ function (
             else
             {
                 console.log("Hold release button clicked: " + this.rows[0].id);
-                topic.publish(appTopics.holds.releaseHold, this, { holdID: this.rows[0].id, comment: this.createHoldTextarea.value });
+                topic.publish(appTopics.holds.releaseHold, this, { holdId: this.rows[0].id, comment: this.createHoldTextarea.value });
             }
             this.resetView();
         },

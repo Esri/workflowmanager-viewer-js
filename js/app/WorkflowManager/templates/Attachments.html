@@ -1,8 +1,11 @@
 <div>
     <div data-dojo-attach-point="attachmentTypeContainer">
         <div class="attachment-row">
+            <!-- Disable embedded attachments.  Form data not supported in esri/request -->
+            <!--
             <input type="radio" data-dojo-attach-point="embedAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="embed" checked="true" data-dojo-attach-event="onClick: toggleEmbedAttachmentType" />
             <label for="embed">${i18n_Embed}</label>
+            -->
             <input type="radio" data-dojo-attach-point="linkAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="link" data-dojo-attach-event="onClick: toggleLinkAttachmentType" />
             <label for="link">${i18n_Link}</label>
             <input type="radio" data-dojo-attach-point="urlAttach" data-dojo-type="dijit/form/RadioButton" name="AttachmentType" value="url" data-dojo-attach-event="onClick: toggleURLAttachmentType" />
