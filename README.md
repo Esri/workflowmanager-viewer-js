@@ -12,7 +12,7 @@ Source code for ArcGIS Workflow Manager JavaScript viewer - Manage your workflow
 * A complete workflow management application, that allows for ease and efficiency toward managing and tracking business workflows.
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
-###Versions
+### Versions
 This version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.5 and 10.4.  
 
 The ArcGIS JavaScript 3.19 API version of this viewer can be found on the [master branch](https://github.com/esri/workflowmanager-viewer-js) of this repository.
@@ -20,6 +20,11 @@ The ArcGIS JavaScript 3.19 API version of this viewer can be found on the [maste
 The 10.4 Language Pack version of this viewer can be found on the [10.4 LP branch](https://github.com/Esri/workflowmanager-viewer-js/tree/10.4_LP) of this repository.
 
 The 10.3.1 version of this viewer can be found on the [10.3.1 branch](https://github.com/Esri/workflowmanager-viewer-js/tree/10.3.1) of this repository.
+
+### Limitations
+Due to several features not yet available in ArcGIS JavaScript API 4.3, the following features have been disabled in the 4.3 version of JavaScript Viewer.
+* Ability to create/update/delete a job's area of interest
+* Adding embedded attachments
 
 ### ArcGIS Workflow Manager JavaScript API
 The ArcGIS Workflow Manager JavaScript API is now integrated with [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/).
