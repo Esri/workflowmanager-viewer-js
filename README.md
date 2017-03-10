@@ -47,7 +47,8 @@ the proxy will forward to (details in the Readme.pdf).
 
 ## Resources
 
-* [ArcGIS Workflow Manager Resource Center](http://resources.arcgis.com/en/communities/workflow-manager/)
+* [ArcGIS Workflow Manager for Server](https://server.arcgis.com/en/workflow-manager)
+* [ArcGIS Workflow Manager Discussion on GeoNet](https://geonet.esri.com/community/gis/solutions/workflow-manager)
 
 ## Issues
 
