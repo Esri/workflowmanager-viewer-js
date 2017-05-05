@@ -727,7 +727,7 @@ function (
             para.parentVersion = this.currentJob.parentVersion;
             
             //Version
-            para.version = this.currentJob.version;
+            para.versionName = this.currentJob.versionName;
 
             //Assigned type / assigned to
             if (this.jobAssignmentTypeUser.checked == true) {
