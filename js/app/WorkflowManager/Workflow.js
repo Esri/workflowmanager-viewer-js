@@ -279,9 +279,9 @@ function (
         
         canRunStepHandler: function (canRun) {
             this.currentStepStatus.style.display = "none";           
+
+            var stepData = this.currentStep;
             if (canRun == Constants.StepRunnableStatus.CAN_RUN) {
-                var stepData = this.currentStep;
-            
                 var canExecuteStep = false;
                 var canMarkStepComplete = false;
             
@@ -301,16 +301,30 @@ function (
                 this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
 
             } else {
-                console.log("Unable to run step: " + this.currentStep.name + ", runnableStatus = " +  canRun);
+                this.handleStepRunnableStatus(canRun);
+            }
+            this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
+        },
 
-                // Check for job dependencies                
-                if (canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STEP ||
-                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STAGE ||
-                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STATUS ||
-                    canRun == Constants.StepRunnableStatus.DEPENDENT_ON_JOB) {
-                    this.currentStepStatus.style.display = "block";
-                    this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
+        handleStepRunnableStatus: function(canRun) {
+            console.log("Unable to run step: " + this.currentStep.name + ", runnableStatus = " +  canRun);
+
+            // Check for job dependencies
+            if (canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STEP || canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STAGE
+                || canRun == Constants.StepRunnableStatus.DEPENDENT_ON_STATUS || canRun == Constants.StepRunnableStatus.DEPENDENT_ON_JOB
+                || canRun == Constants.StepRunnableStatus.STEP_DEPENDS_ON_STEP)
+            {
+                this.currentStepStatus.style.display = "block";
+                this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
+            }
+            // Update job status if the job has a hold or is closed
+            else if (canRun == Constants.StepRunnableStatus.JOB_ON_HOLD || canRun == Constants.StepRunnableStatus.JOB_CLOSED)
+            {
+                var args = {
+                    jobHold: canRun == Constants.StepRunnableStatus.JOB_ON_HOLD,
+                    jobClosed: canRun == Constants.StepRunnableStatus.JOB_CLOSED
                 }
+                topic.publish(appTopics.workflow.errorExecutingJobStatusChanged, args);
             }
         },
         

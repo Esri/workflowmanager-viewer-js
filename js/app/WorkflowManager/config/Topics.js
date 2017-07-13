@@ -97,6 +97,10 @@ define(function () {
             getMultiListStores: "/extendedProperties/getMultiListStores",
             invalidUpdate: "/extendedProperties/invalidUpdate",
             errorUpdating: "/extendedProperties/errorUpdating"
+        },
+
+        workflow: {
+            errorExecutingJobStatusChanged: "/workflow/errorExecutingJobStatusChanged"
         }
-	};
+    };
 });

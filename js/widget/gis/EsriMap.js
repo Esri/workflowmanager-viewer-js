@@ -6,6 +6,7 @@ define([
     "dojo/_base/array",
     "dojo/ready",
 
+    "esri/Basemap",
     "esri/Map",
     "esri/views/MapView",
     "esri/Graphic",
@@ -17,7 +18,6 @@ define([
     "esri/widgets/Search",
 
     // TODO No support in 4.x currently
-    //"esri/dijit/Basemap",
     //"esri/dijit/BasemapLayer",
     //"esri/dijit/OverviewMap",
     //"esri/dijit/Scalebar",
@@ -58,7 +58,7 @@ define([
     ], 
     function(
         declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, arrayUtil, ready,
-        Map, MapView, Graphic, Home, BasemapToggle, Locate, Popup, Attribution, Search,
+        Basemap, Map, MapView, Graphic, Home, BasemapToggle, Locate, Popup, Attribution, Search,
         MapImageLayer, TileLayer,
         FeatureLayer, webMercatorUtils, Polygon, Extent, SpatialReference, GraphicsLayer, SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol, QueryTask, Query,
         topic, on, dom, domStyle, domConstruct, domClass,
@@ -98,61 +98,35 @@ define([
             popup.startup();
             
             var startingBasemap;
-            //if (this.mapConfig.basemapGallery.showArcGISBasemaps == false)
-            if (this.mapConfig.showArcGISBasemaps == false)
-            {
-                var defaultBasemapName = this.mapConfig.defaultBasemap;
-                var customBasemaps = this.mapConfig.customBasemaps; 
-                
-                for (var i=0; i < customBasemaps.length; i++)
-                {
-                    var basemap = customBasemaps[i];
-                    if (basemap.id == defaultBasemapName)
-                    {
-                        var layers = [];
-                        
-                        if (basemap.layers == null || basemap.layers.length < 1)
-                        {
-                            console.log("Unable to create basemap " + basemap.id + ", no layer information found");
-                            break;
-                        }
-                        
-                        for (var j=0; j < basemap.layers.length; j++)
-                        {
-                            var layerConfig = basemap.layers[j];
-                            if (layerConfig.url == null)
-                            {
-                                console.log("Unable to create basemap " + basemap.id + ", no url specified for a layer in the basemap");
-                                break;
-                            }
-                            
-                            // TODO No support in 4.x currently
-                            // BasemapLayer
-                            //layers[j] = new BasemapLayer(layerConfig);
-                        }
-
-                        // TODO No support in 4.x currently
-                        // BasemapLayer
-                        // startingBasemap = new Basemap({
-                        //     id: basemap.id,
-                        //     title: basemap.title,
-                        //     layers: layers,
-                        //     thumbnailUrl: basemap.thumbnailUrl,
-                        // });
-                    }
+            if (this.mapConfig.basemapToggle.isEnabled) {
+                if (this.mapConfig.basemapToggle.showArcGISBasemaps == false) {
+                    var defaultBasemapName = this.mapConfig.basemapToggle.defaultBasemap;
+                    var customBasemaps = this.mapConfig.basemapToggle.customBasemaps;
+                    startingBasemap = this.createBasemap(defaultBasemapName, customBasemaps);
+                } else {
+                    startingBasemap = this.mapConfig.basemapToggle.defaultBasemap;
                 }
-            }
-            else
-            {
-                startingBasemap = this.mapConfig.defaultBasemap;
             }
 
             this.map = new Map({
                 basemap: startingBasemap
             });
-
             this.map.on("load", lang.hitch(this, "initMapWidgets"));
-            
+
+            // add custom non-cached basemap layers to the map
+            if (!this.mapConfig.basemapToggle.isEnabled && this.mapConfig.customBasemap) {
+                var customMapConfig = this.mapConfig.customBasemap;
+                var basemap;
+                if (customMapConfig.type == "map-image") {
+                    basemap = new MapImageLayer( customMapConfig.properties );
+                } else if (customMapConfig.type == "imagery") {
+                    basemap = new TileLayer( customMapConfig.properties );
+                }
+                if (basemap) {
+                    this.map.add(basemap);
+                }
+            }
+
             // add a graphics layer to the map
             this.graphicsLayer = new GraphicsLayer();
             this.map.add(this.graphicsLayer);
@@ -179,12 +153,23 @@ define([
                 });
                 
                 // Enable Basemap Toggle for now, since BasemapGallery is not yet supported
-                var basemapToggleWidget = new BasemapToggle({ 
-                    view: this.mapView, 
-                    nextBasemap: this.mapConfig.nextBasemap
-                });                
-                this.mapView.ui.add(basemapToggleWidget, "bottom-right");
-                
+                if(this.mapConfig.basemapToggle.isEnabled) {
+                    var nextBasemap;
+                    if (this.mapConfig.basemapToggle.showArcGISBasemaps) {
+                        nextBasemap = this.mapConfig.basemapToggle.nextBasemap
+                    } else {
+                        var basemapName = this.mapConfig.basemapToggle.nextBasemap;
+                        var customBasemaps = this.mapConfig.basemapToggle.customBasemaps;
+                        nextBasemap = this.createBasemap(basemapName, customBasemaps);
+                    }
+
+                    var basemapToggleWidget = new BasemapToggle({
+                        view: this.mapView,
+                        nextBasemap: nextBasemap
+                    });
+                    this.mapView.ui.add(basemapToggleWidget, "bottom-right");
+                }
+
                 // Add the home widget to the top left corner of the view
                 var homeBtn = new Home({
                     view: this.mapView
@@ -281,6 +266,38 @@ define([
             //         attachTo: this.mapConfig.scalebar.position
             //     });
             // }
+        },
+
+        createBasemap: function(basemapName, customBasemaps) {
+            for (var i=0; i < customBasemaps.length; i++) {
+                var basemap = customBasemaps[i];
+                if (basemap.id == basemapName) {
+                    var layers = [];
+                    if (basemap.layers == null || basemap.layers.length < 1) {
+                        console.log("Unable to create basemap " + basemap.id + ", no layer information found");
+                        break;
+                    }
+
+                    for (var j=0; j < basemap.layers.length; j++) {
+                        var layerConfig = basemap.layers[j];
+                        if (layerConfig.url == null) {
+                            console.log("Unable to create basemap " + basemap.id + ", no url specified for a layer in the basemap");
+                            break;
+                        }
+                        layers[j] = new TileLayer(layerConfig);
+                    }
+
+                    return new Basemap({
+                        id: basemap.id,
+                        title: basemap.title,
+                        baseLayers: layers,
+                        thumbnailUrl: basemap.thumbnailUrl,
+                    });
+                }
+            }
+            // Could not find matching basemap configuration
+            console.log("Unable to create basemap " + basemapName + ", no configuration specified");
+            return null;
         },
 
         initTopics: function() {

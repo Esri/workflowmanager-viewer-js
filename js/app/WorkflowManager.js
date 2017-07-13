@@ -2471,6 +2471,18 @@ define([
                     });
             });
 
+            // topic for job status change during workflow execution
+            topic.subscribe(appTopics.workflow.errorExecutingJobStatusChanged, lang.hitch(this, function(args) {
+                // Only update the job status if it hasn't already been updated
+                if (this.jobWarning.innerHTML == '') {
+                    if (args.jobHold) {
+                        this.jobWarning.innerHTML = i18n.header.onHold;
+                    } else if (args.jobClosed) {
+                        this.jobWarning.innerHTML = i18n.header.closed;
+                    }
+                }
+            }));
+
             // Log action for job
             // requires:
             // activity type (if no activity type is specified, comment activity type is used)

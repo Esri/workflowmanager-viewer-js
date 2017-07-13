@@ -96,7 +96,7 @@ function (
             };
 
             switch (self.storageType) {
-                case "file":
+                case "linked-file":
                     self.attachmentTypeVar = self.i18n_TypeFile;
                     self.attachmentURLName.innerHTML = self.attachmentTitleVar;
                     self.attachmentURLLink.target = "_blank";
