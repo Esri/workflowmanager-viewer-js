@@ -102,7 +102,7 @@ function (
             if (config.map.basemapGallery.isEnabled) {
                 this.aoiBasemapGallery = new BasemapGallery({ map: this.aoiMap.map, basemapConfig: config.map.basemapGallery, galleryId: "aoiMapBasemapGallery" }, "aoiBasemapGalleryContainer");
                 this.aoiBasemapGallery.startup();
-                this.aoiBasemapGallery.selectBasemap(config.map.defaultBasemap);
+                this.aoiBasemapGallery.selectBasemap(config.map.basemapGallery.defaultBasemap);
             }
 
             if (config.map.drawTool.isEnabled) {
