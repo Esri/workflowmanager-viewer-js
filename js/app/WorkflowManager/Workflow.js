@@ -277,10 +277,10 @@ function (
         canRunStepHandler: function (canRun) {
             
             this.currentStepStatus.style.display = "none";
-            
+
+            var stepData = this.currentStep;
             if (canRun == Enum.StepRunnableStatus.CAN_RUN) {
-                var stepData = this.currentStep;
-            
+
                 var canExecuteStep = false;
                 var canMarkStepComplete = false;
             
@@ -297,23 +297,36 @@ function (
                     }
                     canExecuteStep = true;
                 }
-                
-                this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
             }
             else
             {
-                console.log("Unable to run step: " + this.currentStep.name + ", runnableStatus = " +  canRun);
+                this.handleStepRunnableStatus(canRun);
+            }
+            this.updateWorkflowToolsStatus(stepData, canExecuteStep, canMarkStepComplete);
+        },
 
-                // Check for job dependencies                
-                if (canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STEP || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STAGE 
-                    || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STATUS || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_JOB)
-                {
-                    this.currentStepStatus.style.display = "block";
-                    this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
+        handleStepRunnableStatus: function(canRun) {
+            console.log("Unable to run step: " + this.currentStep.name + ", runnableStatus = " +  canRun);
+
+            // Check for job dependencies
+            if (canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STEP || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STAGE
+                || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_STATUS || canRun == Enum.StepRunnableStatus.DEPENDENT_ON_JOB
+                || canRun == Enum.StepRunnableStatus.STEP_DEPENDS_ON_STEP)
+            {
+                this.currentStepStatus.style.display = "block";
+                this.currentStepStatusMessage.innerHTML = i18n.workflow.stepHasJobDependency.replace("{0}", this.currentStep.name);
+            }
+            // Update job status if the job has a hold or is closed
+            else if (canRun == Enum.StepRunnableStatus.JOB_ON_HOLD || canRun == Enum.StepRunnableStatus.JOB_CLOSED)
+            {
+                var args = {
+                    jobHold: canRun == Enum.StepRunnableStatus.JOB_ON_HOLD,
+                    jobClosed: canRun == Enum.StepRunnableStatus.JOB_CLOSED
                 }
+                topic.publish(appTopics.workflow.errorExecutingJobStatusChanged, args);
             }
         },
-        
+
         updateWorkflowToolsStatus: function(step, canExecuteStep, canMarkStepComplete) {
             
             var currentSteps = this.currentSteps;

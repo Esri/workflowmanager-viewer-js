@@ -45,69 +45,106 @@ define( function() {
             }
         },
 
-        // url to your proxy page, must be on same machine hosting your app
+        // Url to your proxy page, must be on same machine hosting your app
         proxy: {
             url: "proxy/proxy.ashx",
             alwaysUseProxy: false
         },
         
-        //geometry Service
+        // Geometry Service
         geometryServiceURL : "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",       
 
         map: {
-            // select default basemap (ArcGIS basemap or custom basemap Id)
-            defaultBasemap: "topo",
-            
+            // Confiugre maps to be included in the basemap gallery
+            // Note: Only cached/tiled basemaps can be included in the gallery
+            //       For other basemaps types, specify your map under 'customBasemap'
             basemapGallery: {
+                // Enable / disable the basemap gallery.
+                // Disable the map gallery to use your non-cached basemap configuration under 'customBasemap'
                 isEnabled: true,
-                
+
                 // false - use custom basemaps
                 //      (Define custom basemaps below)
                 // true  - use ArcGIS basemaps
                 //      (ArcGIS basemaps: "streets", "satellite", "hybrid", "topo", "gray", "oceans", "national-geographic", "osm")
-                showArcGISBasemaps: true
-            },
-            
-            // Custom basemaps
-            // This section is required only if 'showArcGISBasemaps' is set to false
-            customBasemaps : [
-                {
-                    id: "streets",
-                    title: "streets",
-                    layers: [{
-                        url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
-                    }],
-                    thumbnailUrl: "js/widget/gis/BasemapGallery/images/streets.jpg"
-                },
-                {
-                    id: "hybrid",
-                    title: "hybrid",
-                    layers: [{
-                        url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
-                    },
-                    {
-                        url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer",
-                        isReference: true,
-                        displayLevels: [0, 1, 2, 3, 4, 5, 6, 7]
-                    },
-                    {
-                        url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer",
-                        isReference: true,
-                        displayLevels: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-                    }],
-                    thumbnailUrl: "js/widget/gis/BasemapGallery/images/hybrid.jpg"
-                },
-                {
-                    id: "topo",
-                    title: "topo",
-                    layers: [{
-                        url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
-                    }],
-                    thumbnailUrl: "js/widget/gis/BasemapGallery/images/topo.jpg"
-                }
-            ],
+                showArcGISBasemaps: true,
 
-            // initialExtent: extent the the map starts at. 
+                // Select default basemap for the basemap gallery (ArcGIS basemap or custom basemap Id)
+                defaultBasemap: "topo",
+
+                // Custom basemaps for the basemap gallery
+                // This section is required only if 'showArcGISBasemaps' is set to false
+                customBasemaps : [
+                    {
+                        id: "streets",
+                        title: "streets",
+                        layers: [{
+                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
+                        }],
+                        thumbnailUrl: "js/widget/gis/BasemapGallery/images/streets.jpg"
+                    },
+                    {
+                        id: "hybrid",
+                        title: "hybrid",
+                        layers: [{
+                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+                        },
+                            {
+                                url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer",
+                                isReference: true,
+                                displayLevels: [0, 1, 2, 3, 4, 5, 6, 7]
+                            },
+                            {
+                                url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer",
+                                isReference: true,
+                                displayLevels: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+                            }],
+                        thumbnailUrl: "js/widget/gis/BasemapGallery/images/hybrid.jpg"
+                    },
+                    {
+                        id: "topo",
+                        title: "topo",
+                        layers: [{
+                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
+                        }],
+                        thumbnailUrl: "js/widget/gis/BasemapGallery/images/topo.jpg"
+                    }
+                ]
+            },
+
+            // Custom basemap support of other map types: dynamic, image
+            // Specify a map to be used as the single basemap for the application
+            customBasemap: {
+                // Example of a dynamic basemap
+                // Refer to the ArcGISDynamicMapServiceLayer documentation for options
+                //      https://developers.arcgis.com/javascript/3/jsapi/arcgisdynamicmapservicelayer-amd.html
+                type: "dynamic",
+                url: "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer",
+                options: {
+                    id: "usaMap",
+                    // imageParameters: {
+                    //     layerIds: [1, 2],
+                    //     layerOption: "show"
+                    // },
+                    opacity: 0.8,
+                    showAttribution: false
+                }
+
+                // Example of an image service basemap
+                // Refer to the ArcGISImageServiceLayer documentation for options
+                //      https://developers.arcgis.com/javascript/3/jsapi/arcgisimageservicelayer-amd.html
+                // type: "image",
+                // url: "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Toronto/ImageServer",
+                // options: {
+                //     id: "torontoCanadaImagery",
+                //     imageServiceParameters: {
+                //         noData: 0,
+                //     },
+                //     opacity: 0.75
+                // }
+            },
+
+            // InitialExtent: extent the the map starts at. 
             // helper tool: http://www.arcgis.com/home/item.html?id=dd1091f33a3e4ecb8cd77adf3e585c8a
             initialExtent: {
                 xmin: -15489130.48708616,

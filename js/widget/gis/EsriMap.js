@@ -82,48 +82,41 @@ define([
             popup.startup();
             
             var startingBasemap;
-            if (this.mapConfig.basemapGallery.showArcGISBasemaps == false)
-            {
-                var defaultBasemapName = this.mapConfig.defaultBasemap;
-                var customBasemaps = this.mapConfig.customBasemaps; 
-                
-                for (var i=0; i < customBasemaps.length; i++)
-                {
-                    var basemap = customBasemaps[i];
-                    if (basemap.id == defaultBasemapName)
-                    {
-                        var layers = [];
-                        
-                        if (basemap.layers == null || basemap.layers.length < 1)
-                        {
-                            console.log("Unable to create basemap " + basemap.id + ", no layer information found");
-                            break;
-                        }
-                        
-                        for (var j=0; j < basemap.layers.length; j++)
-                        {
-                            var layerConfig = basemap.layers[j];
-                            if (layerConfig.url == null)
-                            {
-                                console.log("Unable to create basemap " + basemap.id + ", no url specified for a layer in the basemap");
+            if (this.mapConfig.basemapGallery.isEnabled) {
+                if (this.mapConfig.basemapGallery.showArcGISBasemaps == false) {
+                    var defaultBasemapName = this.mapConfig.basemapGallery.defaultBasemap;
+                    var customBasemaps = this.mapConfig.basemapGallery.customBasemaps;
+
+                    for (var i=0; i < customBasemaps.length; i++) {
+                        var basemap = customBasemaps[i];
+                        if (basemap.id == defaultBasemapName) {
+                            var layers = [];
+
+                            if (basemap.layers == null || basemap.layers.length < 1) {
+                                console.log("Unable to create basemap " + basemap.id + ", no layer information found");
                                 break;
                             }
-                            
-                            layers[j] = new BasemapLayer(layerConfig);
-                        }
 
-                        startingBasemap = new Basemap({
-                            id: basemap.id,
-                            title: basemap.title,
-                            layers: layers,
-                            thumbnailUrl: basemap.thumbnailUrl,
-                        });
+                            for (var j=0; j < basemap.layers.length; j++) {
+                                var layerConfig = basemap.layers[j];
+                                if (layerConfig.url == null) {
+                                    console.log("Unable to create basemap " + basemap.id + ", no url specified for a layer in the basemap");
+                                    break;
+                                }
+                                layers[j] = new BasemapLayer(layerConfig);
+                            }
+
+                            startingBasemap = new Basemap({
+                                id: basemap.id,
+                                title: basemap.title,
+                                layers: layers,
+                                thumbnailUrl: basemap.thumbnailUrl,
+                            });
+                        }
                     }
+                } else {
+                    startingBasemap = this.mapConfig.basemapGallery.defaultBasemap;
                 }
-            }
-            else
-            {
-                startingBasemap = this.mapConfig.defaultBasemap;
             }
 
             this.map = new esri.Map(this.mapId, {
@@ -142,7 +135,37 @@ define([
                 wrapAround180: false
             });
             this.map.on("load", lang.hitch(this, "initMapWidgets"));
-            
+
+            // add custom non-cached basemap layers to the map
+            if (!this.mapConfig.basemapGallery.isEnabled && this.mapConfig.customBasemap) {
+                var customMapConfig = this.mapConfig.customBasemap;
+                var basemap;
+                if (customMapConfig.type == "dynamic") {
+                    if (customMapConfig.options && customMapConfig.options.imageParameters) {
+                        var params = new esri.layers.ImageParameters();
+                        var keys = Object.keys(customMapConfig.options.imageParameters);
+                        arrayUtil.forEach(keys, function(key) {
+                            params[key] = customMapConfig.options.imageParameters[key];
+                        });
+                        customMapConfig.options.imageParameters = params;
+                    }
+                    basemap = new esri.layers.ArcGISDynamicMapServiceLayer (customMapConfig.url, customMapConfig.options);
+                } else if (customMapConfig.type == "image") {
+                    if (customMapConfig.options && customMapConfig.options.imageServiceParameters) {
+                        var params = new esri.layers.ImageServiceParameters();
+                        var keys = Object.keys(customMapConfig.options.imageServiceParameters);
+                        arrayUtil.forEach(keys, function(key) {
+                            params[key] = customMapConfig.options.imageServiceParameters[key];
+                        });
+                        customMapConfig.options.imageServiceParameters = params;
+                    }
+                    basemap = new esri.layers.ArcGISImageServiceLayer (customMapConfig.url, customMapConfig.options);
+                }
+                if (basemap) {
+                    this.map.addLayer(basemap);
+                }
+            }
+
             // add a graphics layer to the map
             this.graphicsLayer = new GraphicsLayer();
             this.map.addLayer(this.graphicsLayer);

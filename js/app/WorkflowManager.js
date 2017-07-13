@@ -732,7 +732,6 @@ define([
                 var queryName = self.filter.content.setQueryNameFromId(self.queryIDInURL);
                 if (queryName) {
                     self.savedQuery = queryName;
-                    queryID = self.queryIDInURL;
                 }
                 self.queryIDInURL = null;
             }
@@ -1873,11 +1872,11 @@ define([
                 this.basemapGallery = new BasemapGallery({
                     map : this.myMap.map,
                     basemapConfig : config.map.basemapGallery,
-                    customBasemapConfig : config.map.customBasemaps,
+                    customBasemapConfig : config.map.basemapGallery.customBasemaps,
                     galleryId : "myMapBasemapGallery"
                 }, "basemapGalleryContainer");
                 this.basemapGallery.startup();
-                this.basemapGallery.selectBasemap(config.map.defaultBasemap);
+                this.basemapGallery.selectBasemap(config.map.basemapGallery.defaultBasemap);
             }
 
             if (config.map.legend.isEnabled) {
@@ -1939,7 +1938,7 @@ define([
             topic.subscribe(appTopics.manager.logoutUser, function(sender, args) {
 				self.logoutUser(true);
 			});
-			
+
             //topic for updating Extended Properties
             topic.subscribe(appTopics.extendedProperties.updateExtendedProperties, function(sender, args) {
                 self.wmJobTask.updateRecord(self.currentJob.id, args.record, self.user, function(success) {
@@ -2346,6 +2345,18 @@ define([
                         console.log("Error deleting attachment with id: " + args.attachmentId + " " + error);
                     });
             });
+
+            // topic for job status change during workflow execution
+            topic.subscribe(appTopics.workflow.errorExecutingJobStatusChanged, lang.hitch(this, function(args) {
+                // Only update the job status if it hasn't already been updated
+                if (this.jobWarning.innerHTML == '') {
+                    if (args.jobHold) {
+                        this.jobWarning.innerHTML = i18n.header.onHold;
+                    } else if (args.jobClosed) {
+                        this.jobWarning.innerHTML = i18n.header.closed;
+                    }
+                }
+            }));
 
             // Log action for job
             // requires:

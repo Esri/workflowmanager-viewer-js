@@ -102,7 +102,6 @@ function (
                 label: i18n.holds.saveHold,
                 id: "holdSaveButton",
                 name: "holdSaveButton",
-                style: "width:100px;",
                 "class": "dojo-btn-info",
                 disabled: true,
                 onClick: lang.hitch(this, function () {
@@ -116,7 +115,6 @@ function (
                 label: i18n.holds.releaseHold,
                 id: "holdReleaseButton",
                 name: "holdReleaseButton",
-                style: "width:160px;",
                 "class": "dojo-btn-info",
                 disabled: true,
                 onClick: lang.hitch(this, function () {

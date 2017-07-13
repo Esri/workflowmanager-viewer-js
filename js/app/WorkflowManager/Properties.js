@@ -718,7 +718,10 @@ function (
             para.jobId = this.currentJob.id;
             para.name = this.currentJob.name;
             para.status = this.currentJob.status;
-            para.percent = this.currentJob.percentageComplete;
+
+            // Do NOT update percent, since this is really updating the percentage of work completed on the job's 
+            // current step, not the percent complete on the job.
+            // para.percent = this.currentJob.percentageComplete;
 
             //Data workspace
             para.dataWorkspaceId = this.currentJob.dataWorkspaceId;
