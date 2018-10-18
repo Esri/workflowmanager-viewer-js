@@ -13,7 +13,7 @@ Source code for ArcGIS Workflow Manager JavaScript viewer - Manage your workflow
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ### Versions
-The current version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 3.19 API](https://developers.arcgis.com/javascript/3/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.5 and 10.4.
+The current version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 3.19 API](https://developers.arcgis.com/javascript/3/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.4 and later versions.
 
 The [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/) version of this viewer can be found on the [4master branch](https://github.com/Esri/workflowmanager-viewer-js/tree/4master) of this repository. In version 4.3, the [Workflow Manager JavaScript API](https://developers.arcgis.com/javascript/latest/guide/get-started-workflows/index.html) has been integrated with the ArcGIS JavaScript API.
 
@@ -24,7 +24,7 @@ The 10.3.1 version of this viewer can be found on the [10.3.1 branch](https://gi
 ### ArcGIS Workflow Manager JavaScript API
 * The JavaScript viewer includes the latest [ArcGIS Workflow Manager JavaScript API](js/app/WorkflowManager/libs/workflowmanager).
 * Refer to the [ArcGIS Workflow Manager JavaScript API Reference](http://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
-* Download a zip file of the API and help documentation from the [ArcGIS Workflow Manager API Download site](http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
+* Download older versions of the API and help documentation from the [ArcGIS Workflow Manager API Download site](http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
 
 ### Supported Browsers
 The Workflow Manager JavaScript viewer supports the following browsers:
@@ -53,8 +53,8 @@ the proxy will forward to (details in the [README.pdf](README.pdf)).
 
 ## Resources
 
-* [ArcGIS Workflow Manager for Server](https://server.arcgis.com/en/workflow-manager)
-* [ArcGIS Workflow Manager Discussion on GeoNet](https://geonet.esri.com/community/gis/solutions/workflow-manager)
+* [ArcGIS Workflow Manager for Server](https://enterprise.arcgis.com/en/workflow-manager/)
+* [ArcGIS Workflow Manager Discussions on GeoNet](https://community.esri.com/community/gis/solutions/workflow-manager)
 
 ## Issues
 

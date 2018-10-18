@@ -84,10 +84,16 @@ function (
             self.recordList = [];
             arrayUtil.forEach(containers, function (data, index) {
                 if (data && data.relationshipType == 1) {
-                    self.addExtendedPropertiesRecord({ alias: data.tableAlias, record: data.records[0], tableName: data.tableName, editable: editable });
+                    var records = data.records[0];
+                    if (records && records.recordValues && records.recordValues.length > 0) {
+                        // order records based on displayOrder field
+                        records.recordValues = records.recordValues.sort(function(r1, r2) {
+                            return r1.displayOrder - r2.displayOrder;
+                        });
+                    }
+                    self.addExtendedPropertiesRecord({ alias: data.tableAlias, record: records, tableName: data.tableName, editable: editable });
                 }
             });
-
         },
 
         addExtendedPropertiesRecord: function (recordData) {

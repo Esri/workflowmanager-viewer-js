@@ -168,6 +168,13 @@ define( function() {
                 // An array of locator sources used to find search results. Only applicable if using custom locator sources.
                 // Refer to the esri/dijit/Search widget documentation for customizing locator sources.
                 // https://developers.arcgis.com/javascript/3/jsapi/search-amd.html#sources
+                // For example:
+                // locatorSources: [
+                //     {
+                //         locator: new Locator("//geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"),
+                //         <additional options>
+                //     }
+                // ]
                 locatorSources: []
             },
 
