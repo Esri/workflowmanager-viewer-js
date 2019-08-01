@@ -284,13 +284,13 @@ define([
             }
             
             this.tokenServerUrl = config.app.TokenService;
+            this.authenticationMode = config.app.AuthenticationMode != null ? config.app.AuthenticationMode.toLowerCase() : "none";
             this.initTasks();
 
             // Theme
             this.initTheme(config.theme);
 
-            // Authenticate user
-            this.authenticationMode = config.app.AuthenticationMode != null ? config.app.AuthenticationMode.toLowerCase() : "none";
+            // Authenticate user            
             switch (this.authenticationMode) {
                 case "windows" :
                     if (args && args.user) {
@@ -453,6 +453,7 @@ define([
             this.wmReportTask = new WMReportTask(this.wmServerUrl);
             this.wmJobTask = new WMJobTask(this.wmServerUrl);
             this.wmWorkflowTask = new WMWorkflowTask(this.wmServerUrl);
+            this.wmWorkflowTask.authenticationMode = this.authenticationMode;
             this.wmTokenTask = new WMTokenTask(this.wmServerUrl);
         },
         
@@ -732,7 +733,6 @@ define([
                 var queryName = self.filter.content.setQueryNameFromId(self.queryIDInURL);
                 if (queryName) {
                     self.savedQuery = queryName;
-                    queryID = self.queryIDInURL;
                 }
                 self.queryIDInURL = null;
             }
@@ -1873,11 +1873,11 @@ define([
                 this.basemapGallery = new BasemapGallery({
                     map : this.myMap.map,
                     basemapConfig : config.map.basemapGallery,
-                    customBasemapConfig : config.map.customBasemaps,
+                    customBasemapConfig : config.map.basemapGallery.customBasemaps,
                     galleryId : "myMapBasemapGallery"
                 }, "basemapGalleryContainer");
                 this.basemapGallery.startup();
-                this.basemapGallery.selectBasemap(config.map.defaultBasemap);
+                this.basemapGallery.selectBasemap(config.map.basemapGallery.defaultBasemap);
             }
 
             if (config.map.legend.isEnabled) {
@@ -1939,7 +1939,7 @@ define([
             topic.subscribe(appTopics.manager.logoutUser, function(sender, args) {
 				self.logoutUser(true);
 			});
-			
+
             //topic for updating Extended Properties
             topic.subscribe(appTopics.extendedProperties.updateExtendedProperties, function(sender, args) {
                 self.wmJobTask.updateRecord(self.currentJob.id, args.record, self.user, function(success) {
@@ -2019,7 +2019,7 @@ define([
                     var errMsg = i18n.error.errorGeneratingReport;
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
-            });
+                });
             });
             
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
@@ -2346,6 +2346,18 @@ define([
                         console.log("Error deleting attachment with id: " + args.attachmentId + " " + error);
                     });
             });
+
+            // topic for job status change during workflow execution
+            topic.subscribe(appTopics.workflow.errorExecutingJobStatusChanged, lang.hitch(this, function(args) {
+                // Only update the job status if it hasn't already been updated
+                if (this.jobWarning.innerHTML == '') {
+                    if (args.jobHold) {
+                        this.jobWarning.innerHTML = i18n.header.onHold;
+                    } else if (args.jobClosed) {
+                        this.jobWarning.innerHTML = i18n.header.closed;
+                    }
+                }
+            }));
 
             // Log action for job
             // requires:

@@ -1,9 +1,13 @@
 define("workflowmanager/WMWorkflowTask", [
     "dojo/_base/declare",
     "workflowmanager/_BaseTask",
-    "workflowmanager/_Util"
-], function(declare, BaseTask, Util) {
+    "workflowmanager/_Util",
+    "esri/IdentityManager"
+], function(declare, BaseTask, Util, IdentityManager) {
     return declare([BaseTask], {
+
+        authenticationMode: null,
+
         constructor: function (url) {
             this.url = url;
             this.disableClientCaching = true;
@@ -16,7 +20,15 @@ define("workflowmanager/WMWorkflowTask", [
             }
             if (this.proxyURL) {
                 imageUrl = this.proxyURL + "?" + imageUrl;
-            }        
+            }
+            if (this.authenticationMode === "windows" && !this.token) {
+                // For windows authentication, attempt to get the token from Identity Manager.
+                // This is not needed for token and portal authentication, since we already have the token.
+                var credential = IdentityManager.findCredential(this.url);
+                if (credential && credential.token) {
+                    imageUrl += "&token=" + credential.token;
+                }
+            }     
             return imageUrl;
         },
         getWorkflowDisplayDetails: function (jobId, successCallBack, errorCallBack) {
@@ -69,7 +81,7 @@ define("workflowmanager/WMWorkflowTask", [
             }
             if (this.proxyURL) {
                 fileUrl = this.proxyURL + "?" + fileUrl;
-            }        
+            }
             return fileUrl;
         },
         assignSteps: function (jobId, stepIds, assignedType, assignedTo, user, successCallBack, errorCallBack) {
