@@ -284,13 +284,13 @@ define([
             }
             
             this.tokenServerUrl = config.app.TokenService;
+            this.authenticationMode = config.app.AuthenticationMode != null ? config.app.AuthenticationMode.toLowerCase() : "none";
             this.initTasks();
 
             // Theme
             this.initTheme(config.theme);
 
             // Authenticate user
-            this.authenticationMode = config.app.AuthenticationMode != null ? config.app.AuthenticationMode.toLowerCase() : "none";
             switch (this.authenticationMode) {
                 case "windows" :
                     if (args && args.user) {
@@ -453,6 +453,7 @@ define([
             this.wmReportTask = new WMReportTask(this.wmServerUrl);
             this.wmJobTask = new WMJobTask(this.wmServerUrl);
             this.wmWorkflowTask = new WMWorkflowTask(this.wmServerUrl);
+            this.wmWorkflowTask.authenticationMode = this.authenticationMode;
             this.wmTokenTask = new WMTokenTask(this.wmServerUrl);
         },
         
@@ -2018,7 +2019,7 @@ define([
                     var errMsg = i18n.error.errorGeneratingReport;
                     console.log(errMsg, error);
                     self.errorHandler(errMsg, error);
-            });
+                });
             });
             
             topic.subscribe(appTopics.filter.jobSearch, function(sender, args) {
