@@ -13,7 +13,7 @@ Source code for ArcGIS Workflow Manager JavaScript viewer - Manage your workflow
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ### Versions
-This version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.5 and 10.4.  
+This version of the Workflow Manager JavaScript viewer is compatible with [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/) and [Workflow Manager Server](https://server.arcgis.com/en/workflow-manager/) 10.4 and later versions.
 
 The ArcGIS JavaScript 3.19 API version of this viewer can be found on the [master branch](https://github.com/esri/workflowmanager-viewer-js) of this repository.
 
@@ -27,10 +27,10 @@ Due to several features not yet available in ArcGIS JavaScript API 4.3, the foll
 * Adding embedded attachments
 
 ### ArcGIS Workflow Manager JavaScript API
-The ArcGIS Workflow Manager JavaScript API is now integrated with [ArcGIS JavaScript 4.3 API](https://developers.arcgis.com/javascript/).
-* Guide > Working with the API > [Get started with workflows](https://developers.arcgis.com/javascript/latest/guide/get-started-workflows/index.html)
-* API Reference > esri/tasks/workflow
- * [ConfigurationTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-ConfigurationTask.html), [JobTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-JobTask.html), [NotificationTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-NotificationTask.html), [ReportTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-ReportTask.html), [TokenTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-TokenTask.html), [WorkflowTask](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-workflow-WorkflowTask.html)
+The ArcGIS Workflow Manager JavaScript API is integrated with [ArcGIS API for JavaScript](https://developers.arcgis.com/downloads/apis-and-sdks?product=javascript) versions 4.3 through 4.12. 
+* Download the API and install the documentation
+* The documentation has information on using the Workflow Manager 4.x API
+  * Open documentation > Guide > Working with the API > Get started with workflows
 
 ### Supported Browsers
 The Workflow Manager JavaScript viewer supports the following browsers:
