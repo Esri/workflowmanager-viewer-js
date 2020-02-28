@@ -7,7 +7,7 @@ define( function() {
         // Note: If using https, replace http with https and include port numbers
         //       6080 or 6443 as needed.
         app: {
-            ServiceRoot: "http://workflowsample.esri.com/arcgis/rest/services/Workflow/WMServer",
+            ServiceRoot: "https://workflowsample.esri.com/arcgis/rest/services/Workflow/WMServer",
             // Determines authentication mode to use for the application
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
@@ -31,7 +31,7 @@ define( function() {
 
             jobLOILayer: {
                 type: "dynamic",
-                url: "http://workflowsample.esri.com/arcgis/rest/services/Workflow_LOI/MapServer",
+                url: "https://workflowsample.esri.com/arcgis/rest/services/Workflow_LOI/MapServer",
                 // Point layer ID
                 POILayerID: 0,
                 // Polygon layer ID
@@ -52,7 +52,7 @@ define( function() {
         },
         
         // Geometry Service
-        geometryServiceURL : "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",       
+        geometryServiceURL : "https://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",       
 
         map: {
             // Confiugre maps to be included in the basemap gallery
@@ -79,7 +79,7 @@ define( function() {
                         id: "streets",
                         title: "streets",
                         layers: [{
-                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
+                            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
                         }],
                         thumbnailUrl: "js/widget/gis/BasemapGallery/images/streets.jpg"
                     },
@@ -87,15 +87,15 @@ define( function() {
                         id: "hybrid",
                         title: "hybrid",
                         layers: [{
-                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+                            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
                         },
                             {
-                                url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer",
+                                url: "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer",
                                 isReference: true,
                                 displayLevels: [0, 1, 2, 3, 4, 5, 6, 7]
                             },
                             {
-                                url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer",
+                                url: "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer",
                                 isReference: true,
                                 displayLevels: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
                             }],
@@ -105,7 +105,7 @@ define( function() {
                         id: "topo",
                         title: "topo",
                         layers: [{
-                            url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
+                            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
                         }],
                         thumbnailUrl: "js/widget/gis/BasemapGallery/images/topo.jpg"
                     }
@@ -119,7 +119,7 @@ define( function() {
                 // Refer to the ArcGISDynamicMapServiceLayer documentation for options
                 //      https://developers.arcgis.com/javascript/3/jsapi/arcgisdynamicmapservicelayer-amd.html
                 type: "dynamic",
-                url: "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer",
+                url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer",
                 options: {
                     id: "usaMap",
                     // imageParameters: {
@@ -134,7 +134,7 @@ define( function() {
                 // Refer to the ArcGISImageServiceLayer documentation for options
                 //      https://developers.arcgis.com/javascript/3/jsapi/arcgisimageservicelayer-amd.html
                 // type: "image",
-                // url: "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Toronto/ImageServer",
+                // url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Toronto/ImageServer",
                 // options: {
                 //     id: "torontoCanadaImagery",
                 //     imageServiceParameters: {
@@ -145,7 +145,7 @@ define( function() {
             },
 
             // InitialExtent: extent the the map starts at. 
-            // helper tool: http://www.arcgis.com/home/item.html?id=dd1091f33a3e4ecb8cd77adf3e585c8a
+            // helper tool: https://www.arcgis.com/home/item.html?id=dd1091f33a3e4ecb8cd77adf3e585c8a
             initialExtent: {
                 xmin: -15489130.48708616,
                 ymin: 398794.4860580916,
