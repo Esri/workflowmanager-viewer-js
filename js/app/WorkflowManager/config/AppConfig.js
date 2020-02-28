@@ -7,7 +7,7 @@ define( function() {
         // Note: If using https, replace http with https and include port numbers
         //       6080 or 6443 as needed.
         app: {
-            ServiceRoot: "https://workflowsample.esri.com/server/rest/services/Workflow/WMServer",
+            ServiceRoot: "https://workflowsample.esri.com/arcgis/rest/services/Workflow/WMServer",
             // Determines authentication mode to use for the application
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
@@ -31,7 +31,7 @@ define( function() {
 
             jobLOILayer: {
                 type: "dynamic",
-                url: "https://workflowsample.esri.com/server/rest/services/Workflow_LOI/MapServer",
+                url: "https://workflowsample.esri.com/arcgis/rest/services/Workflow_LOI/MapServer",
                 // Point layer ID
                 POILayerID: 0,
                 // Polygon layer ID
