@@ -23,8 +23,8 @@ The 10.3.1 version of this viewer can be found on the [10.3.1 branch](https://gi
 
 ### ArcGIS Workflow Manager JavaScript API
 * The JavaScript viewer includes the latest [ArcGIS Workflow Manager JavaScript API](js/app/WorkflowManager/libs/workflowmanager).
-* Refer to the [ArcGIS Workflow Manager JavaScript API Reference](http://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
-* Download older versions of the API and help documentation from the [ArcGIS Workflow Manager API Download site](http://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
+* Refer to the [ArcGIS Workflow Manager JavaScript API Reference](https://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
+* Download older versions of the API and help documentation from the [ArcGIS Workflow Manager API Download site](https://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
 
 ### Supported Browsers
 The Workflow Manager JavaScript viewer supports the following browsers:
