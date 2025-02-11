@@ -12,13 +12,13 @@ define( function() {
             //  "windows"   - windows authentication
             //  "token"     - ArcGIS Server token authentication
             //  "portal"    - ArcGIS Portal authentication
-            //                  (available in ArcGIS Workflow Manager Server 10.3.1 and later versions)
+            //                  (available in ArcGIS Workflow Manager (Classic) Server 10.3.1 and later versions)
             //  "none"      - not authenticated
             AuthenticationMode: "none",
             TokenService: "https://your-server/arcgis/tokens",
             // Portal URL and AppId only apply if using portal authentication
             PortalURL: "https://your-server/arcgis",
-            // The default appId for the Workflow Manager web application in Portal 10.5 and later versions is "wmxweb".
+            // The default appId for the Workflow Manager (Classic) web application in Portal 10.5 and later versions is "wmxweb".
             // Update the appId to the appropriate value as needed.
             AppId: "wmxweb",
             // When specifying a domain with the default user, use "\\" to separate domain and username
