@@ -1,12 +1,10 @@
 # ⛔ ArcGIS Workflow Manager (Classic) has been deprecated
-[Learn more about the deprecation of ArcGIS Workflow Manager (Classic)](https://support.esri.com/en-us/knowledge-base/arcgis-workflow-manager-classic-deprecation-000031190)
+Learn more about the [deprecation of ArcGIS Workflow Manager (Classic)](https://support.esri.com/en-us/knowledge-base/arcgis-workflow-manager-classic-deprecation-000031190) and the new [service-based ArcGIS Workflow Manager](https://www.esri.com/en-us/arcgis/products/arcgis-workflow-manager/overview)
 
 workflowmanager-viewer-js
 ==========================
 
 Source code for ArcGIS Workflow Manager (Classic) JavaScript viewer - Manage your workflows on the web.
-
-[View it live](https://workflowsample.esri.com/js/)
 
 ![App](https://raw.github.com/Esri/workflowmanager-viewer-js/master/workflowmanager-viewer-js.png)
 
@@ -16,7 +14,7 @@ Source code for ArcGIS Workflow Manager (Classic) JavaScript viewer - Manage you
 * Easily configurable to meet custom business needs and requirements - no programming skills required to deploy.
 
 ### Versions
-The current version of the Workflow Manager (Classic) JavaScript viewer is compatible with [ArcGIS JavaScript 3.19 API](https://developers.arcgis.com/javascript/3/) and [Workflow Manager (Classic) Server](https://server.arcgis.com/en/workflow-manager/) 10.4 and later versions.
+The current version of the Workflow Manager (Classic) JavaScript viewer is compatible with [ArcGIS JavaScript 3.19 API](https://developers.arcgis.com/javascript/3/) and [Workflow Manager (Classic) Server](https://enterprise.arcgis.com/en/workflow-manager/) 10.4 and later versions.
 
 A version of this viewer using ArcGIS JavaScript 4.3 API can be found on the [4master branch](https://github.com/Esri/workflowmanager-viewer-js/tree/4master) of this repository. A Workflow Manager (Classic) 4.x JavaScript API is also available and has been integrated with [ArcGIS API for JavaScript](https://developers.arcgis.com/downloads/apis-and-sdks?product=javascript) versions 4.3 through 4.12.
 
@@ -26,8 +24,7 @@ The 10.3.1 version of this viewer can be found on the [10.3.1 branch](https://gi
 
 ### ArcGIS Workflow Manager (Classic) JavaScript API
 * The JavaScript viewer includes the latest [ArcGIS Workflow Manager (Classic) JavaScript API](js/app/WorkflowManager/libs/workflowmanager).
-* Refer to the [ArcGIS Workflow Manager (Classic) JavaScript API Reference](https://workflowsample.esri.com/doc/javascript/jsapi/index.html) for usage information.
-* Download older versions of the API and help documentation from the [ArcGIS Workflow Manager (Classic) API Download site](https://www.esri.com/apps/products/download/index.cfm?fuseaction=download.all#ArcGIS_Workflow_Manager_API).
+* Refer to the [ArcGIS Workflow Manager (Classic) JavaScript API Reference](https://workflowsample.esri.com/JavaScript/jsapi/index.html) for usage information.
 
 ### Supported Browsers
 The Workflow Manager (Classic) JavaScript viewer supports the following browsers:
@@ -82,4 +79,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [license.txt]( https://raw.github.com/Esri/workflowmanager-viewer-js/master/license.txt) file.
+A copy of the license is available in the repository's [license.txt](License.txt) file.
