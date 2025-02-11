@@ -9,7 +9,7 @@ define({
         },
 
         header: {
-            title: "ArcGIS Workflow Manager",
+            title: "ArcGIS Workflow Manager (Classic)",
             subHeader: "Web Edition",
             logout: "Logout",
             welcome: "Welcome",
@@ -257,7 +257,7 @@ define({
             errorLoadingJobTypeDetails: "Unable to load job type details",
             errorLoadingServiceInfo: "Unable to load service info",
             errorLoadingUsers: "Unable to load users",
-            errorLoadingWorkflowConfiguration: "Unable to load Workflow Manager configuration: AOI layer task or configuration task is null",
+            errorLoadingWorkflowConfiguration: "Unable to load Workflow Manager (Classic) configuration: AOI layer task or configuration task is null",
             errorLoadingWorkflowInfo: "Unable to load workflow info",
             errorMarkAsDone: "Unable to mark the workflow step as complete.",
             errorMissingFields: "One or more required fields missing.",
@@ -280,7 +280,7 @@ define({
             errorRunningQuery: "Error running query {0}",
             errorStepNotWebEnabled: "The step is not configured to run on the web. You can execute the step on the desktop or contact your application administrator.",
             errorUnsupportedBrowser: "Unsupported Browser",
-            errorUnsupportedBrowserMsg: "The browser you are using is not supported by ArcGIS Workflow Manager. Please download the latest version of Internet Explorer.",
+            errorUnsupportedBrowserMsg: "The browser you are using is not supported by ArcGIS Workflow Manager (Classic). Please download the latest version of Internet Explorer.",
             errorUpdatingExtendedProperties: "Error updating extended properties",
             errorUpdatingJobAOI: "Error updating job AOI",
             errorUpdatingJobLOI: "Error updating job LOI",

@@ -36,7 +36,7 @@ define([
             this.wmConfigurationTask = args.wmConfigurationTask;
             
             if (!this.wmAOILayerTask && !this.wmConfigurationTask) {
-                console.log("Unable to load Workflow Manager configuration: AOI layer task or configuration task is null");
+                console.log("Unable to load Workflow Manager (Classic) configuration: AOI layer task or configuration task is null");
                 self.errorHandler(i18n.error.errorLoadingWorkflowConfiguration, error);
             }
             

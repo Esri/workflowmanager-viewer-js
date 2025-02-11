@@ -2547,7 +2547,7 @@ define([
                     // valid user login into server
                     self.setToken(data.token, data.expires);
 
-                    // validate user against workflow manager
+                    // validate user against Workflow Manager (Classic)
                     self.validateUser(self.user);
                     
                     // clear previous timer
